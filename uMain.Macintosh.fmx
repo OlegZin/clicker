@@ -1,0 +1,43 @@
+inherited fMain_Macintosh: TfMain_Macintosh
+  DesignerMasterStyle = 1
+  inherited sbScreen: TScrollBox
+    Viewport.Width = 360.000000000000000000
+    Viewport.Height = 445.000000000000000000
+    inherited iScreen: TImage
+      Position.X = 136.000000000000000000
+      Position.Y = 224.000000000000000000
+    end
+  end
+  inherited lTabbed: TLayout
+    inherited lItems: TLayout
+      inherited sbItems: TScrollBox
+        Viewport.Width = 360.000000000000000000
+        Viewport.Height = 72.000000000000000000
+        inherited Image2: TImage
+          MultiResBitmap.Height = 70
+          MultiResBitmap.Width = 70
+        end
+        inherited Image3: TImage
+          MultiResBitmap.Height = 70
+          MultiResBitmap.Width = 70
+        end
+        inherited Image4: TImage
+          MultiResBitmap.Height = 70
+          MultiResBitmap.Width = 70
+        end
+        inherited Image5: TImage
+          MultiResBitmap.Height = 70
+          MultiResBitmap.Width = 70
+        end
+        inherited Image6: TImage
+          MultiResBitmap.Height = 70
+          MultiResBitmap.Width = 70
+        end
+        inherited Image1: TImage
+          MultiResBitmap.Height = 70
+          MultiResBitmap.Width = 70
+        end
+      end
+    end
+  end
+end
