@@ -8,7 +8,7 @@ object fImgMap: TfImgMap
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   DesignerMasterStyle = 0
-  object iForest: TImage
+  object Forest: TImage
     MultiResBitmap = <
       item
         Width = 50
@@ -150,6 +150,23 @@ object fImgMap: TfImgMap
         FileName = 'C:\Users\zinovev\Desktop\'#1093#1083#1072#1084'\forest.bmp'
       end>
     Position.X = 8.000000000000000000
+    Position.Y = 8.000000000000000000
+  end
+  object Fog: TImage
+    MultiResBitmap = <
+      item
+        Width = 50
+        Height = 50
+        PNG = {
+          89504E470D0A1A0A0000000D49484452000000320000003208060000001E3F88
+          B1000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+          0057494441546843EDCFB11180400CC0B0C0E2191D1A86D07356E3DAD7EE3EF3
+          03F7D7E335A26944D388A6114D239A46348D681AD134A26944D388A6114D239A
+          46348D681AD134A26944D388A6114D239A46348D681AB1CCBC594F02E0C4D69D
+          460000000049454E44AE426082}
+        FileName = 'C:\Users\zinovev\Desktop\'#1093#1083#1072#1084'\fog.bmp'
+      end>
+    Position.X = 64.000000000000000000
     Position.Y = 8.000000000000000000
   end
 end

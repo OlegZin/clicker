@@ -18,29 +18,6 @@ uses
 
 const
 
-    // определение типов тайлов
-    // типы местности
-    LAND_FOREST = 0;      // лес
-    LAND_PLAIN  = 1;     // равнина
-    LAND_MOUNT  = 2;     // горы
-    LAND_SAND   = 3;     // пустыня
-    LAND_ICE    = 4;     // ледник
-    LAND_CANYON = 5;     // разлом
-    LAND_LAVA   = 6;     // лавовое поле
-
-    // типы объектов
-    OBJ_NONE        =  0;  // нет объекта
-    OBJ_FOG         =  1;  // тайл еще не исследован (туман войны)
-    OBJ_TOWN_SMALL  =  2;  // маленькое поселение
-    OBJ_TOWN_MEDIUM =  3;  // среднее поселение
-    OBJ_TOWN_BIG    =  4;  // большое поселение
-    OBJ_TOWN_GREAT  =  5;  // огромное поселение
-    OBJ_PREDATOR    =  6;  // хищник
-    OBJ_MAMONT      =  7;  // мамонт (временный)
-    OBJ_ATTACKER    =  8;  // атакующее племя (временный)
-    OBJ_CAVE        =  9;  // пещера
-    OBJ_HERD        = 10;  // стадо (временный)
-
     MAP_COL_COUNT   = 50;
     MAP_ROW_COUNT   = 50;
 
@@ -63,7 +40,8 @@ type
     TTileModeDrive = class
     private
         fScreen : TScrollBox;
-        fTiles: array [0..MAP_COL_COUNT, 0..MAP_ROW_COUNT] of TTile;
+        fLand: array [0..MAP_COL_COUNT, 0..MAP_ROW_COUNT] of TTile;
+        fObjects: array [0..MAP_COL_COUNT, 0..MAP_ROW_COUNT] of TTile;
         fImages: TImageList;
         fViewPort: TLayout;
     public
@@ -86,51 +64,59 @@ implementation
 { TTileModeDrive }
 
  uses
-    uMain;
+    uMain, uGameObjectManager;
 
  var
    BitmapSize: TSizeF;
 
 
 procedure TTileModeDrive.BuildField;
-{ формирование игрового поля }
+{ формирование игрового поля.
+    поле состоит из двух слоев:
+    - ландшафт, нижний слой (лес, горы, водоем и т.п.)
+    - объекты, верхний слой (поселения, стада, хищники и т.д.)
+ }
 var
     col, row: integer;
 begin
 
     for col := 0 to MAP_COL_COUNT - 1 do
     for row := 0 to MAP_ROW_COUNT - 1 do
-    fTiles[col, row].Land := LAND_FOREST;
+    mngObject.CreateLocationTile( LAND_FOREST, col, row, 1 );
 
 end;
 
 procedure TTileModeDrive.UpdateField;
 var
-    col, row: integer;
-    image: TImage;
+    layer, index: integer;
+    image, source: TImage;
+    location: TLocation;
 begin
 
+    // полный сброс отображения текущего поля
     if Assigned(fViewPort) then FreeAndNil(fViewPort);
     fViewPort := TLayout.Create(fScreen);
     fViewPort.Parent := fScreen;
     fViewPort.Width := MAP_COL_COUNT * TILE_WIDTH;
     fViewPort.Height := MAP_ROW_COUNT * TILE_HEIGHT;
 
-    for col := 0 to MAP_COL_COUNT - 1 do
-    for row := 0 to MAP_ROW_COUNT - 1 do
+
+    for layer := 0 to mngObject.GetLayerCount do
     begin
+        location := mngObject.GetFirstOnLayer( layer ) as TLocation;
+        while Assigned( location ) do
+        begin
+            image := TImage.Create(fViewPort);
+            image.Parent := fViewPort;
+            image.Height := TILE_WIDTH;
+            image.Width := TILE_HEIGHT;
+            image.Position.X := location.Position.Х * TILE_WIDTH;
+            image.Position.Y := location.Position.Y * TILE_HEIGHT;
+            source := TImage(fImgMap.FindComponent( location.Visualization.Name[ VISUAL_TILE ]) );
+            if assigned(source) then image.bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
 
-        image := TImage.Create(fViewPort);
-        image.Parent := fViewPort;
-        image.Height := TILE_WIDTH;
-        image.Width := TILE_HEIGHT;
-        image.Position.X := col * TILE_WIDTH;
-        image.Position.Y := row * TILE_HEIGHT;
-
-        case fTiles[col,row].Land of
-            LAND_FOREST: image.bitmap.Assign( fImgMap.iForest.MultiResBitmap.Bitmaps[1.0] );
+            location := mngObject.GetNextOnLayer( layer ) as TLocation;
         end;
-
     end;
 
 end;
