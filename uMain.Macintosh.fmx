@@ -3,10 +3,6 @@ inherited fMain_Macintosh: TfMain_Macintosh
   inherited sbScreen: TScrollBox
     Viewport.Width = 360.000000000000000000
     Viewport.Height = 445.000000000000000000
-    inherited iScreen: TImage
-      Position.X = 136.000000000000000000
-      Position.Y = 224.000000000000000000
-    end
   end
   inherited lTabbed: TLayout
     inherited lItems: TLayout

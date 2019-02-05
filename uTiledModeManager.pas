@@ -14,7 +14,7 @@ unit uTiledModeManager;
 interface
 
 uses
-    FMX.Layouts, FMX.Objects, SysUtils, System.Types, FMX.Graphics, FMX.ImgList;
+    FMX.Layouts, FMX.Objects, SysUtils, System.Types, FMX.Graphics, FMX.ImgList, uImgMap;
 
 const
 
@@ -62,12 +62,13 @@ type
 
     TTileModeDrive = class
     private
-        fScreen : TImage;
+        fScreen : TScrollBox;
         fTiles: array [0..MAP_COL_COUNT, 0..MAP_ROW_COUNT] of TTile;
         fImages: TImageList;
+        fViewPort: TLayout;
     public
 
-        procedure SetupComponents(screen: TImage; list: TImageList);
+        procedure SetupComponents(screen: TObject);
                  // ривязываем к движку элемент формы в котором развернем свою деятельность
 
         procedure BuildField;
@@ -107,61 +108,36 @@ procedure TTileModeDrive.UpdateField;
 var
     col, row: integer;
     image: TImage;
-    bm :TBitMap;
-    size: TSizeF;
-    sourceRect, targetRect: TrectF;
 begin
 
-    bm := TBitmap.Create;
-    //bm.Transparent:=true;
-    size.cx := TILE_HEIGHT;
-    size.cy := TILE_WIDTH;
-
-    sourceRect.Left := 0;
-    sourceRect.Top := 0;
-    sourceRect.Width := TILE_WIDTH;
-    sourceRect.Height := TILE_HEIGHT;
-
-    bm := TBitmap.Create;
-
-{    // пересоздаем
-    if Assigned(fViewPort) then
-    begin
-        FreeAndNil(fViewPort);
-        fViewPort := TLayout.Create(fScreen);
-        fViewPort.Visible := false;
-    end;
-}
-//    fScreen.Bitmap.Canvas.BeginScene;
+    if Assigned(fViewPort) then FreeAndNil(fViewPort);
+    fViewPort := TLayout.Create(fScreen);
+    fViewPort.Parent := fScreen;
+    fViewPort.Width := MAP_COL_COUNT * TILE_WIDTH;
+    fViewPort.Height := MAP_ROW_COUNT * TILE_HEIGHT;
 
     for col := 0 to MAP_COL_COUNT - 1 do
     for row := 0 to MAP_ROW_COUNT - 1 do
     begin
 
-        targetRect.Left := col * TILE_WIDTH;
-        targetRect.Top := row * TILE_HEIGHT;
-        targetRect.Width := TILE_WIDTH;
-        targetRect.Height := TILE_HEIGHT;
+        image := TImage.Create(fViewPort);
+        image.Parent := fViewPort;
+        image.Height := TILE_WIDTH;
+        image.Width := TILE_HEIGHT;
+        image.Position.X := col * TILE_WIDTH;
+        image.Position.Y := row * TILE_HEIGHT;
 
-        bm := fImages.Bitmap(size, fTiles[col,row].Land);
-
-        fScreen.Bitmap.Canvas.DrawBitmap(
-            bm,
-            sourceRect,
-            targetRect,
-            1,
-            false);
+        case fTiles[col,row].Land of
+            LAND_FOREST: image.bitmap.Assign( fImgMap.iForest.MultiResBitmap.Bitmaps[1.0] );
+        end;
 
     end;
 
-//    fScreen.Bitmap.Canvas.EndScene;
-
 end;
 
-procedure TTileModeDrive.SetupComponents(screen: TImage; list: TImageList);
+procedure TTileModeDrive.SetupComponents(screen: TObject);
 begin
-    fScreen := Screen;
-    fImages := list;
+    fScreen := Screen as TScrollBox;
 end;
 
 initialization

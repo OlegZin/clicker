@@ -30,8 +30,6 @@ type
     sbItems: TScrollBox;
     Image1: TImage;
     ilResources: TImageList;
-    ilObjects: TImageList;
-    iScreen: TImage;
     procedure FormCreate(Sender: TObject);
     procedure sbScreenClick(Sender: TObject);
     procedure tResTimerTimer(Sender: TObject);
@@ -53,6 +51,8 @@ var
 implementation
 
 {$R *.fmx}
+
+uses uImgMap;
 {$R *.Macintosh.fmx MACOS}
 
 var
@@ -129,7 +129,7 @@ begin
 
      // инициализация движка для текущего режима
      mTileDrive := TTileModeDrive.Create;
-     mTileDrive.SetupComponents(iScreen, ilObjects);
+     mTileDrive.SetupComponents(sbScreen);
      mTileDrive.BuildField;
      mTileDrive.UpdateField;
 
@@ -137,7 +137,7 @@ end;
 
 function TfMain.GetTileBitmap(index: integer): TBitMap;
 begin
-     result := ilObjects.Bitmap(TileSize, index);
+//     result := ilObjects.Bitmap(TileSize, index);
 end;
 
 procedure TfMain.InitGame;
@@ -151,6 +151,8 @@ var
   ,stateLoaded        // удалось ли загрузить данные состояния игры из автосейва
            : boolean;
 begin
+
+    fImgMap := TfImgMap.Create(Application);
 
     // создаем менеджер ресурсов
     mResManager := TResourceManager.Create;

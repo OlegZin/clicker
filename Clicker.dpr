@@ -6,7 +6,8 @@ uses
   uMain in 'uMain.pas' {fMain},
   uResourceManager in 'uResourceManager.pas',
   uGameManager in 'uGameManager.pas',
-  uTiledModeManager in 'uTiledModeManager.pas';
+  uTiledModeManager in 'uTiledModeManager.pas',
+  uImgMap in 'uImgMap.pas' {fImgMap};
 
 {$R *.res}
 
