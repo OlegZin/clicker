@@ -42,11 +42,32 @@ type
 
     TGameManager = class
         GameSatate : TGameState;
+
+        procedure ProcessObjectClick( id : integer );
     end;
 
 var
    mGameManager : TGameManager;
 
 implementation
+
+{ TGameManager }
+
+uses
+    uGameObjectManager, uResourceManager;
+
+procedure TGameManager.ProcessObjectClick(id: integer);
+var
+    obj : TBaseObject;
+begin
+    obj := mngObject.FindObject( id );
+    if obj is TResoursed then
+    begin
+        // если привязан хотя бы один ресурс
+        if   Length((obj as TResoursed).Recource) > 0
+        then mResManager.ResCount(RES_WOOD, 1);
+    end;
+
+end;
 
 end.

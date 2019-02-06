@@ -8,7 +8,7 @@ uses
   FMX.Controls.Presentation, FMX.Layouts, FMX.TabControl, System.ImageList,
   FMX.ImgList, FMX.ExtCtrls, FMX.Objects,
 
-  uResourceManager, uTiledModeManager, uGameManager;
+  uResourceManager, uTiledModeManager, uGameManager, uGameObjectManager;
 
 type
   TfMain = class(TForm)
@@ -31,9 +31,9 @@ type
     Image1: TImage;
     ilResources: TImageList;
     procedure FormCreate(Sender: TObject);
-    procedure sbScreenClick(Sender: TObject);
     procedure tResTimerTimer(Sender: TObject);
     procedure sbItemsHScrollChange(Sender: TObject);
+    procedure OnClickCallback(Sender: TObject);
   private
     { Private declarations }
   public
@@ -130,6 +130,7 @@ begin
      // инициализация движка для текущего режима
      mTileDrive := TTileModeDrive.Create;
      mTileDrive.SetupComponents(sbScreen);
+     mTileDrive.callback := OnClickCallback;
      mTileDrive.BuildField;
      mTileDrive.UpdateField;
 
@@ -138,6 +139,22 @@ end;
 function TfMain.GetTileBitmap(index: integer): TBitMap;
 begin
 //     result := ilObjects.Bitmap(TileSize, index);
+end;
+
+procedure TfMain.OnClickCallback(Sender: TObject);
+{ ключевой обработчик клика по элементу на игровом поле.
+  он привязан как обработчик OnClick всех объектов.
+  Sender - объект TImage отображающий объект на поле
+  (Sender as TImage).Tag - id объекта в массиве
+   }
+begin
+//    ShowMessage( IntToStr( (Sender as TImage).Tag ) );
+{
+    mResManager.ResCount(RES_WOOD, 1);
+    if mResManager.GetCount(RES_WOOD) = 10 then
+    mResManager.ResCount(RES_IQ, 1);
+}
+    mGameManager.ProcessObjectClick( (Sender as TImage).Tag );
 end;
 
 procedure TfMain.InitGame;
@@ -152,6 +169,7 @@ var
            : boolean;
 begin
 
+    // создаем форму, содержащую базу всех используемых в игре изображений
     fImgMap := TfImgMap.Create(Application);
 
     // создаем менеджер ресурсов
@@ -168,7 +186,7 @@ begin
     TileSize.cy := TILE_WIDTH;
 
     // пытаемся считать данные предыдущей сессии игры (автосейв при выходе из игры)
-    if FileExists( FILE_RESOURCES_SAVE ) then
+{    if FileExists( FILE_RESOURCES_SAVE ) then
     begin
         try
             AssignFile( fResFile, FILE_RESOURCES_SAVE );
@@ -198,7 +216,7 @@ begin
         except
         end;
     end;
-
+ }
 
 
     // при неудачной загрузке инициализируем новую игру
@@ -248,14 +266,6 @@ var
 begin
     s := fMain.sbScreen.Size;
     fMain.Caption := 'cx: ' + floattostr(s.Size.cx) + ' cy: ' + floatTostr(s.Size.cy);
-end;
-
-procedure TfMain.sbScreenClick(Sender: TObject);
-begin
-    mResManager.ResCount(RES_WOOD, 1);
-    if mResManager.GetCount(RES_WOOD) = 10 then
-    mResManager.ResCount(RES_IQ, 1);
-
 end;
 
 procedure TfMain.tResTimerTimer(Sender: TObject);

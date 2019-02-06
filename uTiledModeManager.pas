@@ -26,6 +26,8 @@ const
 
 type
 
+    TCallback = procedure (Sender: TObject) of object;
+
     { игровой тайтл, содержащий в себе несколько игровых слоев.
       1 - тип местности
       2 - объект
@@ -45,6 +47,7 @@ type
         fImages: TImageList;
         fViewPort: TLayout;
     public
+        callback : TCallback;
 
         procedure SetupComponents(screen: TObject);
                  // ривязываем к движку элемент формы в котором развернем свою деятельность
@@ -64,7 +67,7 @@ implementation
 { TTileModeDrive }
 
  uses
-    uMain, uGameObjectManager;
+    uMain, uGameObjectManager, DB;
 
  var
    BitmapSize: TSizeF;
@@ -72,9 +75,6 @@ implementation
 
 procedure TTileModeDrive.BuildField;
 { формирование игрового поля.
-    поле состоит из двух слоев:
-    - ландшафт, нижний слой (лес, горы, водоем и т.п.)
-    - объекты, верхний слой (поселения, стада, хищники и т.д.)
  }
 var
     col, row: integer;
@@ -82,20 +82,20 @@ begin
 
     for col := 0 to MAP_COL_COUNT - 1 do
     for row := 0 to MAP_ROW_COUNT - 1 do
-    mngObject.SetLocationResource(
-        mngObject.CreateLocationTile( LAND_FOREST, col, row, 1 ),
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_FOREST, col, row, 1 ),
         RESOURCE_WOOD, 1000, 1, 0.01, 1
     );
 
-    mngObject.CreateLocationTile( LAND_FOG, 0, 0, 10 );
-    mngObject.CreateLocationTile( LAND_FOG, 1, 1, 10 );
+    mngObject.CreateTile( OBJ_FOG, 0, 0, 10 );
+    mngObject.CreateTile( OBJ_FOG, 1, 1, 10 );
 end;
 
 procedure TTileModeDrive.UpdateField;
 var
     layer, index: integer;
     image, source: TImage;
-    location: TLocation;
+    location: TResoursed;
 begin
 
     // полный сброс отображения текущего поля
@@ -108,21 +108,22 @@ begin
     // вывод объектов по слоям, что обеспечивает их привильное перекрытие
     for layer := 0 to mngObject.GetLayerCount do
     begin
-        location := mngObject.GetFirstOnLayer( layer ) as TLocation;
+        location := mngObject.GetFirstOnLayer( layer ) as TResoursed;
 
         while Assigned( location ) do
         begin
             image := TImage.Create(fViewPort);
             image.Parent := fViewPort;
+            image.Tag := location.id;
+            image.OnClick := callback;
             image.Height := TILE_WIDTH;
             image.Width := TILE_HEIGHT;
             image.Position.X := location.Position.Х * TILE_WIDTH;
             image.Position.Y := location.Position.Y * TILE_HEIGHT;
-//            image.BringToFront;
             source := TImage(fImgMap.FindComponent( location.Visualization.Name[ VISUAL_TILE ]) );
             if assigned(source) then image.bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
 
-            location := mngObject.GetNextOnLayer( layer ) as TLocation;
+            location := mngObject.GetNextOnLayer( layer ) as TResoursed;
         end;
     end;
 

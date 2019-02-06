@@ -11,49 +11,12 @@ interface
 
 const
 
-    // определение типов тайлов
-    // типы местности
-    LAND_FOREST = 0;     // лес
-    LAND_PLAIN  = 1;     // равнина
-    LAND_MOUNT  = 2;     // горы
-    LAND_SAND   = 3;     // пустыня
-    LAND_ICE    = 4;     // ледник
-    LAND_CANYON = 5;     // разлом
-    LAND_LAVA   = 6;     // лавовое поле
-    LAND_FOG    = 7;     // лавовое поле
-
-    // типы объектов
-    OBJ_NONE        =  0;  // нет объекта
-    OBJ_FOG         =  1;  // тайл еще не исследован (туман войны)
-    OBJ_TOWN_SMALL  =  2;  // маленькое поселение
-    OBJ_TOWN_MEDIUM =  3;  // среднее поселение
-    OBJ_TOWN_BIG    =  4;  // большое поселение
-    OBJ_TOWN_GREAT  =  5;  // огромное поселение
-    OBJ_PREDATOR    =  6;  // хищник
-    OBJ_MAMONT      =  7;  // мамонт (временный)
-    OBJ_ATTACKER    =  8;  // атакующее племя (временный)
-    OBJ_CAVE        =  9;  // пещера
-    OBJ_HERD        = 10;  // стадо (временный)
-
-    // типы тесурсов
-    RESOURCE_IQ     = 0;
-    RESOURCE_HEALTH = 1;
-    RESOURCE_MAN    = 2;
-    RESOURCE_WOMAN  = 3;
-
-    RESOURCE_WOOD   = 4;
-    RESOURCE_GRASS  = 5;
-    RESOURCE_STONE  = 6;
-    RESOURCE_ICE    = 7;
-    RESOURCE_LAVA   = 8;
-
-    RESOURCE_FOOD   = 9;
-    RESOURCE_BONE   = 10;
-
+    // максимальное количество слоев
     LAYER_COUNT = 99;
 
     // слоты для имен отображений в массиве  TVisualization.Name / TVisualization.Id
     VISUAL_TILE = 0;
+    VISUAL_ICON = 1;
 
 type
 
@@ -133,34 +96,69 @@ type
 
     TResource = class(TBaseObject)
         Res: TCount;
+        constructor Create(kind: integer); overload;
     end;
 
     // объект, отображающий элемент/область игрового мира с характерной экосистемой
     // может содержать несколько ресурсов
-    TLocation = class(TBaseObject)
+    TResoursed = class(TBaseObject)
         Recource: array of TResource;
     end;
 
     TObjectManager = class
       private
-        ID: integer;                        // id-счетчик для очередного создаваемого объекта
-        fObjects: array [0..LAYER_COUNT] of array of TBaseObject;     // все имеющиеся в игре объекты
-        fLayerIndex: array [0..LAYER_COUNT] of integer;
+        fObjects: array [0..LAYER_COUNT] of array of TBaseObject;
+        ///    все имеющиеся в игре объекты.
+        ///    первый индекс - слой, на котором находится объект
+        ///    второй индекс - очередность в массиве всех объектов на данном слое
+        ///
+        ///    слои полезны во многих аспектах. например, для очередности отрисовки объектов
+        ///    на игровом поле для корректного перекрытия.
+        ///    или для возможности массовых операций над объектами слоя: скрыть/показать,
+        ///    модифицировать, анимировать.
+        ///    в данном случае, они позволяют правильно отобразить объектвы относитьельно друг друга
+        ///    сначала ландшафт, потом объекты, потом туман войны. где объекты
+        ///    перекрывают ландшафт, пока существуют, а туман перекрывает все.
 
-        function GetId( layer: integer ): integer;            // возвращает уникальный id для нового объекта
-        function FindObject( id : integer ): TBaseObject;
+        fLayerIndex: array [0..LAYER_COUNT] of integer;
+        ///    массив индексов текущих выбранных объектов на каждом слое
+        ///    по одному на слой.
+        ///    используется для механизма перебора объектов слоя методами
+        ///    GetFirstOnLayer и GetNextOnLayer
+        ///    что применяется, например, при отрисовке поля, коргда слои обрабатываются
+        ///    в очередности увеличения индекса
+
+        function GetId( layer: integer ): integer;
+        ///    возвращает уникальный id для нового объекта.
+        ///    генерится на основе номера слоя и индексе объекта в массиве данного слоя.
+        ///    что позволяет по самому id определить требуемый элмент массива
+        ///    не применяя перебор слоев и объектов.
+        ///    подразумевается, что положение объектов в массиве статично и
+        ///    обнуляемые экземпляры не изымаются из массива, а просто становятся nil
+
         procedure AddObjectToArray( obj: TBaseObject; layer: integer );
+        ///    добавляет объект в конец массива указанного слоя
+
       public
 
         function GetLayerCount: integer;
+        ///    возвращает максимальный возможный индекс слоя
+
         function GetFirstOnLayer( layer: integer ): TBaseObject;
         function GetNextOnLayer( layer: integer ): TBaseObject;
+        ///    методы, позволяющие последовательно перебрать все объекты
+        ///    указанного слоя, что полезно, на пример, при отрисовке поля
 
-        function CreateLocationTile( Kind, X, Y, Z: integer ): integer;
-        // создает базовую локацию в виде тайла без ресурса и возвращает его id
+        function CreateTile( Kind, X, Y, layer: integer ): integer;
+        ///    создает тайла объекта без ресурса и возвращает его id
 
-        procedure SetLocationResource( id, Kind: integer; Count, Once, Delta, Period: real );
-        // привязывает ресурс к указанной локации
+        procedure SetResource( id, Kind: integer; Count, Once, Delta, Period: real );
+        ///    инициализирует и привязывает ресурс к указанному объекту, который
+        ///    может содержать ресурсы
+
+        function FindObject( id : integer ): TBaseObject;
+        ///    раскладывает полученный id на индексы в массиве fObjects и
+        ///    возвращают соответсвующий объект
 
     end;
 
@@ -175,56 +173,72 @@ uses
     DB;
 
 procedure TObjectManager.AddObjectToArray(obj: TBaseObject; layer: integer);
+///    добавление объекта в конец массива объектов указанного слоя
 begin
     SetLength(fObjects[layer], Length(fObjects[layer]) + 1 );
     fObjects[layer][High(fObjects[layer])] := obj;
 end;
 
-function TObjectManager.CreateLocationTile(Kind, X, Y, Z: integer): integer;
-{
-}
+function TObjectManager.CreateTile(Kind, X, Y, layer: integer): integer;
+///    создает тайловую локацию указанного типа и добавляет ее в массив объектов
+///    kind - тип объекта
+///    x, y - положение на карте
+///    layer - слой расположения, объекты более высокого слоя будут перекрывать его
+///    в качестве данных используется заранее определенный массив из модуля DB
 var
-    location: TLocation;
+    location: TResoursed;
 begin
     result := 0;
 
-    location := TLocation.Create;
-    location.id := GetId( Z );
+    // создаем объект локации, определяем тип и положение
+    location := TResoursed.Create;
+    location.id := GetId( layer );
     location.Identity.Common := Kind;
     location.Position.Х := X;
     location.Position.Y := Y;
 
-    // заполняем имя и имя компонента с картинкой для данного типа месности
-    location.Visualization.Name[ VISUAL_TILE ]  := TableLocations[ Kind, LAND_FIELD_IMAGE ];
-    location.Name := TableLocations[ Kind, LAND_FIELD_NAME];
+    // задаем имя, имя компонента, картинку для данного типа объекта
+    location.Visualization.Name[ VISUAL_TILE ]  := TableObjects[ Kind, TABLE_FIELD_TILE_IMAGE ];
+    location.Name := TableObjects[ Kind, TABLE_FIELD_NAME ];
 
-    AddObjectToArray( location, Z );
-
-    // добавляем источник ресурса при клике
-//    SetLocationResource( location.id, RESOURCE_WOOD, 1000, 1, 0.01, 1 );
+    // добавляем в общий массив
+    AddObjectToArray( location, layer );
 
     result := location.id;
 end;
 
-procedure TObjectManager.SetLocationResource(id, Kind: integer; Count,
+procedure TObjectManager.SetResource(id, Kind: integer; Count,
   Once, Delta, Period: real);
-{ создание в указанной локации ресурса }
+///    создание в указанной локации ресурса.
+///    id - идентификатор объекта в массиве fObjects
+///    kind - тип ресурса
 var
-    location : TLocation;
+    location : TResoursed;
     resource : TResource;
+    obj : TBaseObject;
 begin
-    location := FindObject( id ) as TLocation;
+    // находим объект, которому нужно добавить ресурс
+    obj := FindObject( id );
 
-    // добавляем новый ресурс в массив
+    // проверяем наличие нужного типа его/предков, поддерживающих
+    // привязку ресурсов
+    if not (obj is TResoursed) then exit;
+
+    // берем его в работу
+    location := obj as TResoursed;
+
+    // добавляем новый ресурс в массив ресурсов данного объекта
     resource := TResource.Create;
     SetLength(location.Recource, Length(location.Recource)+1);
     location.Recource[ High(location.Recource) ] := resource;
 
+    // инициализируем параметры ресурса
     resource.Res.Count.current  := Count;     // стартовое значение объема ресурса
     resource.Res.Once.current   := Once;      // добыча при клике
     resource.Res.Delta.current  := Delta;     // изменение по таймеру (прирост/убытие)
-    resource.Res.Period.current := Period;    // сколько тиков на одну Delta
+    resource.Res.Period.current := Period;    // через сколько тиков применять Delta
     resource.Res.PassTicks      := 0;         // инициализация счетчика пропущенных тиков
+
 end;
 
 function TObjectManager.FindObject(id: integer): TBaseObject;
@@ -266,9 +280,6 @@ function TObjectManager.GetId( layer: integer ): integer;
 begin
     result := ( Length( fObjects[layer] ) );
     result := layer + ( result * 1000 );
-
-//    Result := self.ID;
-//    Inc(self.ID);
 end;
 
 function TObjectManager.GetLayerCount: integer;
@@ -282,9 +293,18 @@ constructor TBaseObject.Create;
 begin
 end;
 
+{ TResource }
+
+constructor TResource.Create(kind: integer);
+{ по указанному типу заполняет базовые поля }
+begin
+    self.Identity.Common := kind;
+    self.Name := TableResource[ kind, TABLE_FIELD_NAME ];
+    self.Visualization.Name[ VISUAL_ICON ] := TableResource[ kind, TABLE_FIELD_ICON_IMAGE ];
+end;
+
 initialization
     mngObject := TObjectManager.Create;
-    mngObject.ID := 1;
 
 finalization
     mngObject.Free;

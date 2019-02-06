@@ -15,7 +15,6 @@ object fMain: TfMain
     Size.Height = 445.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
-    OnClick = sbScreenClick
     Viewport.Width = 360.000000000000000000
     Viewport.Height = 445.000000000000000000
   end
