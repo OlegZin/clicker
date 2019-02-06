@@ -20,6 +20,7 @@ const
     LAND_ICE    = 4;     // ледник
     LAND_CANYON = 5;     // разлом
     LAND_LAVA   = 6;     // лавовое поле
+    LAND_FOG    = 7;     // лавовое поле
 
     // типы объектов
     OBJ_NONE        =  0;  // нет объекта
@@ -50,6 +51,9 @@ const
     RESOURCE_BONE   = 10;
 
     LAYER_COUNT = 99;
+
+    // слоты для имен отображений в массиве  TVisualization.Name / TVisualization.Id
+    VISUAL_TILE = 0;
 
 type
 
@@ -170,10 +174,6 @@ implementation
 uses
     DB;
 
-const
-    // слоты для имен отображений в массиве  TVisualization.Name / TVisualization.Id
-    VISUAL_TILE = 0;
-
 procedure TObjectManager.AddObjectToArray(obj: TBaseObject; layer: integer);
 begin
     SetLength(fObjects[layer], Length(fObjects[layer]) + 1 );
@@ -195,13 +195,13 @@ begin
     location.Position.Y := Y;
 
     // заполняем имя и имя компонента с картинкой для данного типа месности
-    location.Visualization.Name[ VISUAL_TILE ]  := TableLocations[ LAND_FOREST, LAND_FIELD_IMAGE ];
-    location.Name := TableLocations[ LAND_FOREST, LAND_FIELD_NAME];
+    location.Visualization.Name[ VISUAL_TILE ]  := TableLocations[ Kind, LAND_FIELD_IMAGE ];
+    location.Name := TableLocations[ Kind, LAND_FIELD_NAME];
 
     AddObjectToArray( location, Z );
 
     // добавляем источник ресурса при клике
-    SetLocationResource( location.id, RESOURCE_WOOD, 1000, 1, 0.01, 1 );
+//    SetLocationResource( location.id, RESOURCE_WOOD, 1000, 1, 0.01, 1 );
 
     result := location.id;
 end;

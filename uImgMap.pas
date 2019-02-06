@@ -8,8 +8,8 @@ uses
 
 type
   TfImgMap = class(TForm)
-    Forest: TImage;
-    Fog: TImage;
+    tile_forest: TImage;
+    tile_fog: TImage;
   private
     { Private declarations }
   public

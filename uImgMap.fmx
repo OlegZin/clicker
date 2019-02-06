@@ -8,7 +8,8 @@ object fImgMap: TfImgMap
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   DesignerMasterStyle = 0
-  object Forest: TImage
+  object tile_forest: TImage
+    MultiResBitmap.TransparentColor = 16777215
     MultiResBitmap = <
       item
         Width = 50
@@ -152,7 +153,7 @@ object fImgMap: TfImgMap
     Position.X = 8.000000000000000000
     Position.Y = 8.000000000000000000
   end
-  object Fog: TImage
+  object tile_fog: TImage
     MultiResBitmap = <
       item
         Width = 50

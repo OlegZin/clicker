@@ -82,8 +82,13 @@ begin
 
     for col := 0 to MAP_COL_COUNT - 1 do
     for row := 0 to MAP_ROW_COUNT - 1 do
-    mngObject.CreateLocationTile( LAND_FOREST, col, row, 1 );
+    mngObject.SetLocationResource(
+        mngObject.CreateLocationTile( LAND_FOREST, col, row, 1 ),
+        RESOURCE_WOOD, 1000, 1, 0.01, 1
+    );
 
+    mngObject.CreateLocationTile( LAND_FOG, 0, 0, 10 );
+    mngObject.CreateLocationTile( LAND_FOG, 1, 1, 10 );
 end;
 
 procedure TTileModeDrive.UpdateField;
@@ -100,10 +105,11 @@ begin
     fViewPort.Width := MAP_COL_COUNT * TILE_WIDTH;
     fViewPort.Height := MAP_ROW_COUNT * TILE_HEIGHT;
 
-
+    // вывод объектов по слоям, что обеспечивает их привильное перекрытие
     for layer := 0 to mngObject.GetLayerCount do
     begin
         location := mngObject.GetFirstOnLayer( layer ) as TLocation;
+
         while Assigned( location ) do
         begin
             image := TImage.Create(fViewPort);
@@ -112,6 +118,7 @@ begin
             image.Width := TILE_HEIGHT;
             image.Position.X := location.Position.Х * TILE_WIDTH;
             image.Position.Y := location.Position.Y * TILE_HEIGHT;
+//            image.BringToFront;
             source := TImage(fImgMap.FindComponent( location.Visualization.Name[ VISUAL_TILE ]) );
             if assigned(source) then image.bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
 
