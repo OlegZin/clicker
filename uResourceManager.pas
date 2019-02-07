@@ -26,6 +26,12 @@ const
     FIELD_USED        = 7;
     FIELD_VISIBLE     = 8;
     FIELD_ICON        = 9;
+    FIELD_PASSTICKS   = 10;
+
+    // режимы пересчета количества ресурсов.
+    CALC_MODE_AUTO  = 0;   // на таймер. брать значение Delta с учетом пропуска тиков
+    CALC_MODE_CKICK = 1;   // клик игрока. брать значение Once
+    CALC_MODE_VALUE = 2;   // принудительно. использовать указанное значение
 
 type
 
@@ -40,8 +46,8 @@ type
 
         view : TComponents;      // ссылка на структуру компонент, которая представляет данный ресурс
 
-        used                     // признак использования ячейки (ресурс инициализирован и активен)
-       ,visible                  // признак видимости на панели (ресурс остается активным)
+//        used                     // признак использования ячейки (ресурс инициализирован и активен)
+        visible                  // признак видимости на панели (ресурс остается активным)
        ,virgin                   // ресурс еще ни разу не был получен игроком и будет скрыт, пока не начнет увеличиваться
                                  // механизм постепенного открытия ресурсов, что делает игру более увлевательной
             : boolean;
@@ -67,7 +73,7 @@ type
         procedure SetupComponents(_layout: TLayout; _flayout: TFlowLayout);
                                  // привязываем менеджер к компонентам на форме
 
-        function CreateRecource(_kind: integer; _count, _increment, _once: real): integer;
+        function CreateRecource(_kind: integer; _count, _increment: real): integer;
                                  // создает новый ресурс
 
 //        procedure SetResData( data: TResource );
@@ -79,8 +85,9 @@ type
         procedure UpdateResPanel;
                                  // обновляем видимость ресурсов на панели
 
-        procedure ResCount( index: integer; _increment: real = 0 );
+        procedure ResCount( mode, index: integer; _increment: real = 0 );
                                  // единовременное изменение количества ресурса на значение
+        function TargetResCount(res: uGameObjectManager.TResource; mode: integer; _increment: real = 0 ): real;
 
         procedure SetAttr( index: integer; field: integer; value: variant );
                                  // устанавливаем значение одного из параметров ресурса
@@ -101,7 +108,7 @@ uses
 var
    BitmapSize: TSizeF;
 
-function TResourceManager.CreateRecource(_kind: integer; _count, _increment, _once: real): integer;
+function TResourceManager.CreateRecource(_kind: integer; _count, _increment: real): integer;
 { инициализирование ресурса: параметры и создание пердставления }
 begin
 
@@ -112,13 +119,11 @@ begin
         Resource := TResourcedObject.Create;
         SetLength(Resource.Recource, 1 );
         Resource.Recource[0] := uGameObjectManager.TResource.Create( _kind );
-        Resource.Recource[0].Item.Count.current := _count;
-        Resource.Recource[0].Item.Once.current := _once;
-        Resource.Recource[0].Item.Delta.current := _increment;
-        Resource.Recource[0].Item.Min.current   := 0;
-        Resource.Recource[0].Item.Max.current   := MaxCurrency;
+        Resource.Recource[0].Item.Count.current  := _count;
+        Resource.Recource[0].Item.Delta.current  := _increment;
+        Resource.Recource[0].Item.Min.current    := 0;
+        Resource.Recource[0].Item.Max.current    := MaxCurrency;
 
-        used        := true;
         visible     := false;
         virgin      := _count = 0;
     end;
@@ -180,13 +185,14 @@ procedure TResourceManager.SetAttr(index, field: integer; value: variant);
 { меняем значение одного из полей ресурса }
 begin
     case field of
-    FIELD_CAPTION     : fResources[ index ].Resource.Recource[0].Name               := value;
-    FIELD_DESCRIP     : fResources[ index ].Resource.Recource[0].Description        := value;
-    FIELD_COUNT       : fResources[ index ].Resource.Recource[0].Item.Count.current := value;
-    FIELD_INCREMENT   : fResources[ index ].Resource.Recource[0].Item.Delta.current := value;
-    FIELD_MAXIMUM     : fResources[ index ].Resource.Recource[0].Item.Max.current   := value;
-    FIELD_MINIMUM     : fResources[ index ].Resource.Recource[0].Item.Min.current   := value;
-    FIELD_USED        : fResources[ index ].used        := value;
+    FIELD_CAPTION     : fResources[ index ].Resource.Recource[0].Name                := value;
+    FIELD_DESCRIP     : fResources[ index ].Resource.Recource[0].Description         := value;
+    FIELD_COUNT       : fResources[ index ].Resource.Recource[0].Item.Count.current  := value;
+    FIELD_INCREMENT   : fResources[ index ].Resource.Recource[0].Item.Delta.current  := value;
+    FIELD_MAXIMUM     : fResources[ index ].Resource.Recource[0].Item.Max.current    := value;
+    FIELD_MINIMUM     : fResources[ index ].Resource.Recource[0].Item.Min.current    := value;
+    FIELD_PASSTICKS   : fResources[ index ].Resource.Recource[0].Item.Period.current := value;
+//    FIELD_USED        : fResources[ index ].used        := value;
     FIELD_VISIBLE     : fResources[ index ].visible     := value;
     end;
 end;
@@ -267,7 +273,7 @@ begin
     end;
 end;
 
-procedure TResourceManager.ResCount(index: integer; _increment: real = 0 );
+function TResourceManager.TargetResCount(res: uGameObjectManager.TResource; mode: integer; _increment: real = 0 ): real;
 var
    count
   ,increment
@@ -276,32 +282,70 @@ var
    : real;
 begin
 
+    count := res.Item.count.current;
+
+    case mode of
+        CALC_MODE_AUTO : increment := res.Item.Delta.current;
+        CALC_MODE_CKICK : increment := res.Item.Once.current;
+        CALC_MODE_VALUE : increment := _increment;
+    end;
+
+    minimum := res.Item.Min.current;
+    maximum := res.Item.Max.current;
+
+    count := count + increment;
+
+    if count < minimum then count := minimum;
+    if count > maximum then count := maximum;
+
+    // возвращаем величину фактического изменения
+    result := count - res.Item.count.current;
+
+    res.Item.Count.current := count;
+
+end;
+
+procedure TResourceManager.ResCount(mode, index: integer; _increment: real = 0 );
+{ метод модифицирует глобальные ресурсы и вызывается при тике таймера }
+var
+   period
+           : real;
+begin
+
     with fResources[ index ] do
     begin
-        count := fResources[ index ].Resource.Recource[0].Item.count.current;
 
-        if _increment > 0
-        then increment := _increment
-        else increment := fResources[ index ].Resource.Recource[0].Item.Delta.current;
+        // проверяем на наличие настройки тиков ресурса
+        period := Resource.Recource[0].Item.Period.current + Resource.Recource[0].Item.Period.bonus;
 
-        minimum := fResources[ index ].Resource.Recource[0].Item.Min.current;
-        maximum := fResources[ index ].Resource.Recource[0].Item.Max.current;
+        // если указан ненулевой период (отработка каждый тик)
+        // проверяем не достигло ли количество пропущенных тиков нужного значения
+        if period > Resource.Recource[0].Item.PassTicks then
+        begin
 
-       count := count + increment;
+           // тикаем за этот вызов таймера...
+           Inc(Resource.Recource[0].Item.PassTicks);
 
-       if count < minimum then count := minimum;
-       if count > maximum then count := maximum;
+           // если достигли конча периода
+           if period = Resource.Recource[0].Item.PassTicks
+           // сбрасываем счетчик и идем на обработку ресурса
+           then Resource.Recource[0].Item.PassTicks := 0
+           // иначе выходим. еще не время...
+           else exit;
 
-       // радуем игрока появлением нового ресурса (теперь он будет отображаться на панели)
-       if virgin and ( count > 0 ) then
-       begin
-           virgin := false;
-           view.layout.Parent := fFLayout;
-       end;
+        end;
 
-       fResources[ index ].Resource.Recource[0].Item.count.current := count;
+        // персчитываем ресурс и получаем текущее значение
+        TargetResCount( Resource.Recource[0], mode, _increment );
 
-       UpdateView( index );
+        // радуем игрока появлением нового ресурса (теперь он будет отображаться на панели)
+        if virgin and ( Resource.Recource[0].Item.Count.current > 0 ) then
+        begin
+            virgin := false;
+            view.layout.Parent := fFLayout;
+        end;
+
+        UpdateView( index );
     end;
 
 end;
@@ -309,12 +353,41 @@ end;
 procedure TResourceManager.OnTimer;
 { метод срабатывает на таймер. реализует прирост ресурсов согласно значению прироста}
 var
-   i : integer;
+    i : integer;
+    layer, index: integer;
+    obj: TBaseObject;
 begin
 
-   for I := 0 to High(fResources) do
-   With fResources[i] do
-       if used then ResCount( i );
+    // перебираем все имеющиеся глобальные ресурсы
+    for I := 0 to High(fResources) do ResCount( CALC_MODE_AUTO, i );
+
+    // перебираем все объекты имеющие ресурсы и пересчитываем их, при необходимости
+    for layer := 0 to mngObject.GetLayerCount do
+    begin
+
+        obj := mngObject.GetFirstOnLayer( layer );
+
+        while Assigned( obj ) do
+        begin
+
+            if obj is TResourcedObject then
+            for index := 0 to High((obj as TResourcedObject).Recource) do
+            begin
+
+                mResManager.TargetResCount(
+                    (obj as TResourcedObject).Recource[index],                                                // изменяемый ресурс
+                    CALC_MODE_VALUE,                                        // изменяем на указанное количество
+
+                    (obj as TResourcedObject).Recource[index].Item.Delta.current +
+                    (obj as TResourcedObject).Recource[index].Item.Delta.bonus     // количество на изменение
+                );
+
+            end;
+
+            obj := mngObject.GetNextOnLayer( layer ) as TResourcedObject;
+        end;
+    end;
+
 
 end;
 

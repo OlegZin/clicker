@@ -109,19 +109,20 @@ begin
     begin
 
         // создаем ресурсы
-        CreateRecource( RESOURCE_IQ, 0, 0, 1 );
-        CreateRecource( RESOURCE_HEALTH, 90, 1, 1 );
-        CreateRecource( RESOURCE_MAN, 1, 0, 1 );
-        CreateRecource( RESOURCE_WOMAN, 0, 0, 1 );
-        CreateRecource( RESOURCE_WOOD, 0, 0, 1 );
-        CreateRecource( RESOURCE_GRASS, 0, 0, 1 );
-        CreateRecource( RESOURCE_STONE, 0, 0, 1 );
-        CreateRecource( RESOURCE_ICE, 0, 0, 1 );
-        CreateRecource( RESOURCE_LAVA, 0, 0, 1 );
-        CreateRecource( RESOURCE_FOOD, 10, -1, 1 );
-        CreateRecource( RESOURCE_BONE, 0, 0, 1 );
+        CreateRecource( RESOURCE_IQ, 0, 0 );
+        CreateRecource( RESOURCE_HEALTH, 90, 0.1 );
+        CreateRecource( RESOURCE_MAN, 1, 0 );
+        CreateRecource( RESOURCE_WOMAN, 0, 0 );
+        CreateRecource( RESOURCE_WOOD, 0, 0 );
+        CreateRecource( RESOURCE_GRASS, 0, 0 );
+        CreateRecource( RESOURCE_STONE, 0, 0 );
+        CreateRecource( RESOURCE_ICE, 0, 0 );
+        CreateRecource( RESOURCE_LAVA, 0, 0 );
+        CreateRecource( RESOURCE_FOOD, 10, -0.1 );
+        CreateRecource( RESOURCE_BONE, 0, 0 );
 
         SetAttr(RESOURCE_HEALTH, FIELD_MAXIMUM, 100);
+        SetAttr(RESOURCE_FOOD, FIELD_PASSTICKS, 0);
 
         GameSatate.Potential := 0;
         GameSatate.Era := ERA_PRIMAL;
@@ -133,13 +134,63 @@ end;
 procedure TGameManager.ProcessObjectClick(id: integer);
 var
     obj : TBaseObject;
+    i: integer;
+    resTile: uGameObjectManager.TResource;
+
+    deltaSource
+   ,deltaTarget : real;
+
 begin
+
+//     mResManager.ResCount( CALC_MODE_VALUE, RESOURCE_WOOD, 1 );
+
+
     obj := mngObject.FindObject( id );
     if obj is TResourcedObject then
     begin
         // если привязан хотя бы один ресурс
-        if   Length((obj as TResourcedObject).Recource) > 0
-        then mResManager.ResCount( RESOURCE_WOOD, (obj as TResourcedObject).Recource[0].Item.Once.current );
+        if   Length((obj as TResourcedObject).Recource) > 0 then
+        // перебираем все имеющиеся в локации ресурсы и отправляем на пересчет
+        for I := 0 to High((obj as TResourcedObject).Recource) do
+        begin
+            // получаем лаконичное имя
+            resTile := (obj as TResourcedObject).Recource[i];
+
+            ///    логика пересчета следующая. при клике по локации ее Once
+            ///    (списание за клик) имеет отрицательное значение, что
+            ///    уменьшает запас в локации ( Count ), но при этом, в общем
+            ///    хранилище запас должен увеличиваться. т.е. прирост с обратным знаком
+            ///    и на оборот, что делает клик по локации ресурсопотребляющим
+            ///    например, это монстр и для его атаки расходуется что-то из ресурсов
+
+            // проверяем возможность взятия ресурса
+            // персчитываем ресурс в локации
+            deltaSource :=
+            mResManager.TargetResCount(
+                resTile,                                                // изменяемый ресурс
+                CALC_MODE_VALUE,                                        // изменяем на указанное количество
+                resTile.Item.Once.current + resTile.Item.Once.bonus     // количество на изменение
+            );
+
+            // если изменения локального ресурса не произошло (достигнут верхний или нижний лимит)
+            // в глобальном хранилише менять тоже не будем
+            if deltaSource <> 0 then
+
+            // пересчитываем в глобальном хранилище
+            mResManager.ResCount(
+                CALC_MODE_VALUE,                                        // изменяем на указанное количество
+                resTile.Identity.Common,                                // тип изменяемого ресурса
+                -(deltaSource)  // количество на изменение
+            );
+            ///    при клике можно запустить пересчет в режиме CALC_MODE_CLICK,
+            ///    но при этом буддет использована настройка разового изменения
+            ///    самого ресурса из хранилища, а не индивидуальные параметры
+            ///    самой локации.
+            ///    потому используется режим CALC_MODE_VALUE, чтобы учитивать
+            ///    индивидуальные особенности локаций
+
+
+        end;
     end;
 
 end;

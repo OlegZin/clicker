@@ -137,22 +137,15 @@ end;
 
 function TfMain.GetTileBitmap(index: integer): TBitMap;
 begin
-//     result := ilObjects.Bitmap(TileSize, index);
 end;
 
 procedure TfMain.OnClickCallback(Sender: TObject);
 { ключевой обработчик клика по элементу на игровом поле.
-  он привязан как обработчик OnClick всех объектов.
+  он привязан как обработчик OnClick всех игровых объектов.
   Sender - объект TImage отображающий объект на поле
   (Sender as TImage).Tag - id объекта в массиве
    }
 begin
-//    ShowMessage( IntToStr( (Sender as TImage).Tag ) );
-{
-    mResManager.ResCount(RES_WOOD, 1);
-    if mResManager.GetCount(RES_WOOD) = 10 then
-    mResManager.ResCount(RES_IQ, 1);
-}
     mGameManager.ProcessObjectClick( (Sender as TImage).Tag );
 end;
 

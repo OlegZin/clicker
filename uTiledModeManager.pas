@@ -84,18 +84,24 @@ begin
     for row := 0 to MAP_ROW_COUNT - 1 do
     mngObject.SetResource(
         mngObject.CreateTile( OBJ_FOREST, col, row, 1 ),
-        RESOURCE_WOOD, 1000, 1, 0.01, 1
+        RESOURCE_WOOD, 50, -10, 1, 0
     );
 
-    mngObject.CreateTile( OBJ_FOG, 0, 0, 10 );
-    mngObject.CreateTile( OBJ_FOG, 1, 1, 10 );
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_FOG, 0, 0, 10 ),
+        RESOURCE_STONE, 50, -10, 0, 0
+    );
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_FOG, 1, 1, 10 ),
+        RESOURCE_STONE, 50, -10, 0, 0
+    );
 end;
 
 procedure TTileModeDrive.UpdateField;
 var
     layer, index: integer;
     image, source: TImage;
-    location: TResourcedObject;
+    obj: TBaseObject;
 begin
 
     // полный сброс отображения текущего поля
@@ -108,22 +114,22 @@ begin
     // вывод объектов по слоям, что обеспечивает их привильное перекрытие
     for layer := 0 to mngObject.GetLayerCount do
     begin
-        location := mngObject.GetFirstOnLayer( layer ) as TResourcedObject;
+        obj := mngObject.GetFirstOnLayer( layer );
 
-        while Assigned( location ) do
+        while Assigned( obj ) do
         begin
             image := TImage.Create(fViewPort);
             image.Parent := fViewPort;
-            image.Tag := location.id;
+            image.Tag := obj.id;
             image.OnClick := callback;
             image.Height := TILE_WIDTH;
             image.Width := TILE_HEIGHT;
-            image.Position.X := location.Position.Х * TILE_WIDTH;
-            image.Position.Y := location.Position.Y * TILE_HEIGHT;
-            source := TImage(fImgMap.FindComponent( location.Visualization.Name[ VISUAL_TILE ]) );
+            image.Position.X := obj.Position.Х * TILE_WIDTH;
+            image.Position.Y := obj.Position.Y * TILE_HEIGHT;
+            source := TImage(fImgMap.FindComponent( obj.Visualization.Name[ VISUAL_TILE ]) );
             if assigned(source) then image.bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
 
-            location := mngObject.GetNextOnLayer( layer ) as TResourcedObject;
+            obj := mngObject.GetNextOnLayer( layer ) as TResourcedObject;
         end;
     end;
 

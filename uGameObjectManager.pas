@@ -18,6 +18,10 @@ const
     VISUAL_TILE = 0;
     VISUAL_ICON = 1;
 
+    // поведение при выходе за нижнюю или верхнюю границу количества ресурса
+    BOUND_MODE_CUT   = 0;                    // разрешить с выравниванием итога по границе
+    BOUND_MODE_BLOCK = 1;                    // блокировать данное изменение
+
 type
 
     TBaseObject = class;
@@ -47,8 +51,8 @@ type
     end;
 
     TVisualization = record
-        Name: array [0..9] of string;  // набор имен отображений для различных игровых режимов
-        Id  : array [0..9] of integer; // набор индексов отображения для различных режимов
+        Name: array [0..99] of string[20];  // набор имен картинок для различных игровых режимов
+        Id  : array [0..99] of integer; // набор индексов отображения для различных режимов
     end;
 
     TFloatValue = record
@@ -73,9 +77,14 @@ type
        ,Min                          // минимально возможное базовое значение
                 : TFloatValue;
 
-        PassTicks: integer;          // счетчик пропущенных тиков. когда сравнивается с
+        PassTicks                    // счетчик пропущенных тиков. когда сравнивается с
                                      // Period.current, сбрасывается на 0 и производится
                                      // применение Delta.current к Count.current
+       ,LowBoundMode                 // что делать при выходе за нижнюю границу
+                                     // одно из значений флагов BOUND_MODE_XXX
+       ,HighBoundMode                // что делать при выходе за верхнюю границу
+                                     // одно из значений флагов BOUND_MODE_XXX
+                : integer;
     end;
 
     // объект с набором базовых свойств
@@ -170,7 +179,7 @@ implementation
 { TObjectManager }
 
 uses
-    DB;
+    DB, SysUtils;
 
 procedure TObjectManager.AddObjectToArray(obj: TBaseObject; layer: integer);
 ///    добавление объекта в конец массива объектов указанного слоя
@@ -233,11 +242,12 @@ begin
     location.Recource[ High(location.Recource) ] := resource;
 
     // инициализируем параметры ресурса
-    resource.Item.Count.current  := Count;     // стартовое значение объема ресурса
-    resource.Item.Once.current   := Once;      // добыча при клике
-    resource.Item.Delta.current  := Delta;     // изменение по таймеру (прирост/убытие)
-    resource.Item.Period.current := Period;    // через сколько тиков применять Delta
-    resource.Item.PassTicks      := 0;         // инициализация счетчика пропущенных тиков
+    resource.Item.Count.current  := Count;       // стартовое значение объема ресурса
+    resource.Item.Once.current   := Once;        // добыча при клике
+    resource.Item.Delta.current  := Delta;       // изменение по таймеру (прирост/убытие)
+    resource.Item.Period.current := Period;      // через сколько тиков применять Delta
+    resource.Item.PassTicks      := 0;           // инициализация счетчика пропущенных тиков
+    resource.Item.Max.current    := MaxCurrency; // максимальный предел
 
 end;
 
