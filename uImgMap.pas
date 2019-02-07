@@ -10,6 +10,13 @@ type
   TfImgMap = class(TForm)
     tile_forest: TImage;
     tile_fog: TImage;
+    icon_iq: TImage;
+    icon_food: TImage;
+    icon_health: TImage;
+    icon_man: TImage;
+    icon_wood: TImage;
+    icon_stone: TImage;
+    icon_woman: TImage;
   private
     { Private declarations }
   public

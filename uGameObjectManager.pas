@@ -95,13 +95,13 @@ type
     end;
 
     TResource = class(TBaseObject)
-        Res: TCount;
+        Item: TCount;
         constructor Create(kind: integer); overload;
     end;
 
     // объект, отображающий элемент/область игрового мира с характерной экосистемой
     // может содержать несколько ресурсов
-    TResoursed = class(TBaseObject)
+    TResourcedObject = class(TBaseObject)
         Recource: array of TResource;
     end;
 
@@ -186,12 +186,12 @@ function TObjectManager.CreateTile(Kind, X, Y, layer: integer): integer;
 ///    layer - слой расположения, объекты более высокого слоя будут перекрывать его
 ///    в качестве данных используется заранее определенный массив из модуля DB
 var
-    location: TResoursed;
+    location: TResourcedObject;
 begin
     result := 0;
 
     // создаем объект локации, определяем тип и положение
-    location := TResoursed.Create;
+    location := TResourcedObject.Create;
     location.id := GetId( layer );
     location.Identity.Common := Kind;
     location.Position.Х := X;
@@ -213,7 +213,7 @@ procedure TObjectManager.SetResource(id, Kind: integer; Count,
 ///    id - идентификатор объекта в массиве fObjects
 ///    kind - тип ресурса
 var
-    location : TResoursed;
+    location : TResourcedObject;
     resource : TResource;
     obj : TBaseObject;
 begin
@@ -222,22 +222,22 @@ begin
 
     // проверяем наличие нужного типа его/предков, поддерживающих
     // привязку ресурсов
-    if not (obj is TResoursed) then exit;
+    if not (obj is TResourcedObject) then exit;
 
     // берем его в работу
-    location := obj as TResoursed;
+    location := obj as TResourcedObject;
 
     // добавляем новый ресурс в массив ресурсов данного объекта
-    resource := TResource.Create;
+    resource := TResource.Create( kind );
     SetLength(location.Recource, Length(location.Recource)+1);
     location.Recource[ High(location.Recource) ] := resource;
 
     // инициализируем параметры ресурса
-    resource.Res.Count.current  := Count;     // стартовое значение объема ресурса
-    resource.Res.Once.current   := Once;      // добыча при клике
-    resource.Res.Delta.current  := Delta;     // изменение по таймеру (прирост/убытие)
-    resource.Res.Period.current := Period;    // через сколько тиков применять Delta
-    resource.Res.PassTicks      := 0;         // инициализация счетчика пропущенных тиков
+    resource.Item.Count.current  := Count;     // стартовое значение объема ресурса
+    resource.Item.Once.current   := Once;      // добыча при клике
+    resource.Item.Delta.current  := Delta;     // изменение по таймеру (прирост/убытие)
+    resource.Item.Period.current := Period;    // через сколько тиков применять Delta
+    resource.Item.PassTicks      := 0;         // инициализация счетчика пропущенных тиков
 
 end;
 

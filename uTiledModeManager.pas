@@ -95,7 +95,7 @@ procedure TTileModeDrive.UpdateField;
 var
     layer, index: integer;
     image, source: TImage;
-    location: TResoursed;
+    location: TResourcedObject;
 begin
 
     // полный сброс отображения текущего поля
@@ -108,7 +108,7 @@ begin
     // вывод объектов по слоям, что обеспечивает их привильное перекрытие
     for layer := 0 to mngObject.GetLayerCount do
     begin
-        location := mngObject.GetFirstOnLayer( layer ) as TResoursed;
+        location := mngObject.GetFirstOnLayer( layer ) as TResourcedObject;
 
         while Assigned( location ) do
         begin
@@ -123,7 +123,7 @@ begin
             source := TImage(fImgMap.FindComponent( location.Visualization.Name[ VISUAL_TILE ]) );
             if assigned(source) then image.bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
 
-            location := mngObject.GetNextOnLayer( layer ) as TResoursed;
+            location := mngObject.GetNextOnLayer( layer ) as TResourcedObject;
         end;
     end;
 

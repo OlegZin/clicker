@@ -9,12 +9,11 @@ interface
 
 uses
 
-    FMX.Layouts, FMX.Types, FMX.Objects, FMX.StdCtrls, SysUtils, System.Types;
+    FMX.Layouts, FMX.Types, FMX.Objects, FMX.StdCtrls, SysUtils, System.Types,
+
+    uGameObjectManager;
 
 const
-
-    // максимальное количество типов ресурсов. влияет на размер массива ресурсов
-    RES_COUNT = 1000;
 
     // синонимы полей записи ресурса
     FIELD_CAPTION     = 0;
@@ -28,47 +27,18 @@ const
     FIELD_VISIBLE     = 8;
     FIELD_ICON        = 9;
 
-    // синонимы ресурсов
-    RES_IQ             = 0;
-    RES_FOOD           = 1;
-    RES_HEALTH         = 2;
-    RES_MAN            = 3;
-    RES_WOMAN          = 4;
-    RES_WOOD           = 5;
-    RES_STONE          = 6;
-
-    // синонимы id иконок ресурсов в fMain.ilResources (ImageList)
-    ICON_IQ             = 0;
-    ICON_FOOD           = 1;
-    ICON_HEALTH         = 2;
-    ICON_MAN            = 3;
-    ICON_WOMAN          = 4;
-    ICON_WOOD           = 5;
-    ICON_STONE          = 6;
-
 type
 
-    TCompinents = record
+    TComponents = record
         layout: TLayout;
         image: TImage;
         text: Tlabel;
     end;
 
     TResource = record
-        caption                  // имя ресурса для пользователя
-       ,descrip                  // краткое описание
-            : shortstring;
+        Resource: TResourcedObject;    // основные числовые атрибуты ресурса
 
-        icon                     // индекс иконки для ресурса из fMain.ilResources (ImageList)
-            : integer;
-
-        count                    // текущее имеющееся количество
-       ,increment                // текущий прирост
-       ,maximum                  // предел максимального значения
-       ,minimum                  // предел минимального значения
-            : Real;
-
-        view : TCompinents;      // ссылка на структуру компонент, которая представляет данный ресурс
+        view : TComponents;      // ссылка на структуру компонент, которая представляет данный ресурс
 
         used                     // признак использования ячейки (ресурс инициализирован и активен)
        ,visible                  // признак видимости на панели (ресурс остается активным)
@@ -82,13 +52,12 @@ type
         fLayout  : TLayout;      // родительская панель для блока ресурсов (с кнопкой меню)
         fFLayout : TFlowLayout;  // рабочая панель для блока ресурсов
 
-        fResources : array[ 0 .. RES_COUNT - 1 ] of TResource;
+        fResources : array of TResource;
                                  // массив со всеми существующими ресурсами
-        fMax     : integer;      // максимальный индекс зарегистрированного ресурса для оптимизации перебора массива fResources
 
         procedure UpdateView( index: integer );
                                  // обновляем содержимое представления ресурса
-        procedure CreateView( index, icon: integer );
+        procedure CreateView( index: integer; icon: string );
                                  // создает комплект компонент для отображения ресурса на панели fFLayout
 
     public
@@ -98,10 +67,10 @@ type
         procedure SetupComponents(_layout: TLayout; _flayout: TFlowLayout);
                                  // привязываем менеджер к компонентам на форме
 
-        function CreateRecource(_index: integer; _caption: shortstring; _icon: integer; _count, _increment: real; _descrip: string): integer;
+        function CreateRecource(_kind: integer; _count, _increment, _once: real): integer;
                                  // создает новый ресурс
 
-        procedure SetResData( data: TResource );
+//        procedure SetResData( data: TResource );
                                  // полные данные по одному из ресурсов для включения в массив
 
         /// МЕТОДЫ УПРАВЛЕНИЯ
@@ -110,9 +79,8 @@ type
         procedure UpdateResPanel;
                                  // обновляем видимость ресурсов на панели
 
-        procedure ResCount( index: integer; _increment: real );
+        procedure ResCount( index: integer; _increment: real = 0 );
                                  // единовременное изменение количества ресурса на значение
-                                 //_increment (в плюс или минус)
 
         procedure SetAttr( index: integer; field: integer; value: variant );
                                  // устанавливаем значение одного из параметров ресурса
@@ -128,51 +96,42 @@ implementation
 { TResourceManager }
 
 uses
-    uMain;
+    uMain, uImgMap;
 
 var
    BitmapSize: TSizeF;
 
-function TResourceManager.CreateRecource(_index: integer; _caption: shortstring;
-  _icon: integer; _count, _increment: real; _descrip: string): integer;
+function TResourceManager.CreateRecource(_kind: integer; _count, _increment, _once: real): integer;
 { инициализирование ресурса: параметры и создание пердставления }
 begin
 
-    // если привышен размер массва ресурсов
-    if (_index > RES_COUNT) OR (_index < 0) then
-    begin
-        result := -1;
-        exit;
-    end;
-
     // заполняем данными
-    with fResources[_index] do
+    SetLength(fResources, Length(fResources)+1);
+    with fResources[high(fResources)] do
     begin
-        caption     := _caption;
-        descrip     := _descrip;
-        icon        := _icon;
-        count       := _count;
-        increment   := _increment;
-        minimum     := 0;
-        maximum     := MaxCurrency;
+        Resource := TResourcedObject.Create;
+        SetLength(Resource.Recource, 1 );
+        Resource.Recource[0] := uGameObjectManager.TResource.Create( _kind );
+        Resource.Recource[0].Item.Count.current := _count;
+        Resource.Recource[0].Item.Once.current := _once;
+        Resource.Recource[0].Item.Delta.current := _increment;
+        Resource.Recource[0].Item.Min.current   := 0;
+        Resource.Recource[0].Item.Max.current   := MaxCurrency;
+
         used        := true;
         visible     := false;
-        virgin      := _count = minimum;
+        virgin      := _count = 0;
     end;
-
-    result := _index;
-
-    // запоминаем максимальный используемый индекс для дальнейшей оптимизации перебора массива
-    if fMax < _index then fMax := _index;
 
 end;
 
-procedure TResourceManager.CreateView(index, icon: integer);
+procedure TResourceManager.CreateView(index: integer; icon: string);
 { создание представления ресурса для панели ресурсов }
 var
    _layout: TLayout;
    _image: TImage;
    _label: TLabel;
+   source: TImage;
 begin
 
     _layout := TLayout.Create(fFLayout);
@@ -190,7 +149,10 @@ begin
         Width := 15;
         Position.X := 1;
         Position.Y := 1;
-        Bitmap.Assign( fMain.ilResources.Bitmap(BitmapSize, icon) );
+        source := TImage(fImgMap.FindComponent( icon ));
+        if assigned(source) then bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
+
+//        Bitmap.Assign( fMain.ilResources.Bitmap(BitmapSize, icon) );
     end;
 
     _label := TLabel.Create(_layout);
@@ -211,27 +173,28 @@ end;
 
 function TResourceManager.GetCount(index: integer): real;
 begin
-    result := fResources[ index ].count;
+    result := fResources[ index ].Resource.Recource[0].Item.count.current;
 end;
 
 procedure TResourceManager.SetAttr(index, field: integer; value: variant);
 { меняем значение одного из полей ресурса }
 begin
     case field of
-    FIELD_CAPTION     : fResources[ index ].caption     := value;
-    FIELD_DESCRIP     : fResources[ index ].descrip     := value;
-    FIELD_COUNT       : fResources[ index ].count       := value;
-    FIELD_INCREMENT   : fResources[ index ].increment   := value;
-    FIELD_MAXIMUM     : fResources[ index ].maximum     := value;
-    FIELD_MINIMUM     : fResources[ index ].minimum     := value;
+    FIELD_CAPTION     : fResources[ index ].Resource.Recource[0].Name               := value;
+    FIELD_DESCRIP     : fResources[ index ].Resource.Recource[0].Description        := value;
+    FIELD_COUNT       : fResources[ index ].Resource.Recource[0].Item.Count.current := value;
+    FIELD_INCREMENT   : fResources[ index ].Resource.Recource[0].Item.Delta.current := value;
+    FIELD_MAXIMUM     : fResources[ index ].Resource.Recource[0].Item.Max.current   := value;
+    FIELD_MINIMUM     : fResources[ index ].Resource.Recource[0].Item.Min.current   := value;
     FIELD_USED        : fResources[ index ].used        := value;
     FIELD_VISIBLE     : fResources[ index ].visible     := value;
     end;
 end;
 
+{
 procedure TResourceManager.SetResData(data: TResource);
-{ получаем из внешнего источника данные по одному из ресурсов.
-  данный ресурс добавляется в массив в первую свободную ячейку }
+///  получаем из внешнего источника данные по одному из ресурсов.
+///  данный ресурс добавляется в массив в первую свободную ячейку
 var
     i : integer;
 begin
@@ -239,6 +202,7 @@ begin
     if not fResources[i].used then
         fResources[i] := data;
 end;
+}
 
 procedure TResourceManager.SetupComponents(_layout: TLayout; _flayout: TFlowLayout);
 begin
@@ -252,13 +216,13 @@ var
     i : integer;
 begin
 
-    for I := 0 to RES_COUNT - 1 do
+    for I := 0 to Length(fResources)-1 do
     with fResources[i] do
     begin
 
         // создаем представление, если еще нет и нужно его показать
         if   not Assigned( view.layout )
-        then CreateView( i, icon );
+        then CreateView( i, fResources[i].Resource.Recource[0].Visualization.Name[ VISUAL_ICON ] );
 
         // готовое представление привязываем к объекту, чтобы показать на панели
         if   Assigned( view.layout ) and visible and ( not virgin )
@@ -274,10 +238,17 @@ begin
 end;
 
 procedure TResourceManager.UpdateView( index: integer );
+var
+   count
+  ,increment
+   : real;
 begin
     with fResources[ index ] do
     if visible then
     begin
+
+        count := Resource.Recource[0].Item.count.current;
+        increment := Resource.Recource[0].Item.Delta.current;
 
         if round(count) <> count
         then
@@ -293,15 +264,30 @@ begin
         then view.text.Text := view.text.Text + Format(' (%1.0f)', [increment])
         else view.text.Text := view.text.Text;
 
-
     end;
 end;
 
-procedure TResourceManager.ResCount(index: integer; _increment: real);
+procedure TResourceManager.ResCount(index: integer; _increment: real = 0 );
+var
+   count
+  ,increment
+  ,minimum
+  ,maximum
+   : real;
 begin
+
     with fResources[ index ] do
     begin
-       count := count + _increment;
+        count := fResources[ index ].Resource.Recource[0].Item.count.current;
+
+        if _increment > 0
+        then increment := _increment
+        else increment := fResources[ index ].Resource.Recource[0].Item.Delta.current;
+
+        minimum := fResources[ index ].Resource.Recource[0].Item.Min.current;
+        maximum := fResources[ index ].Resource.Recource[0].Item.Max.current;
+
+       count := count + increment;
 
        if count < minimum then count := minimum;
        if count > maximum then count := maximum;
@@ -312,6 +298,8 @@ begin
            virgin := false;
            view.layout.Parent := fFLayout;
        end;
+
+       fResources[ index ].Resource.Recource[0].Item.count.current := count;
 
        UpdateView( index );
     end;
@@ -324,9 +312,9 @@ var
    i : integer;
 begin
 
-   for I := 0 to fMax do
+   for I := 0 to High(fResources) do
    With fResources[i] do
-       if used then ResCount( i, increment );
+       if used then ResCount( i );
 
 end;
 
