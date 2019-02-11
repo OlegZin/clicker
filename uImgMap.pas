@@ -17,6 +17,8 @@ type
     icon_wood: TImage;
     icon_stone: TImage;
     icon_woman: TImage;
+    tile_dead: TImage;
+    tile_plane: TImage;
   private
     { Private declarations }
   public

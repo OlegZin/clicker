@@ -54,10 +54,6 @@ implementation
 uses uImgMap, DB;
 {$R *.Macintosh.fmx MACOS}
 
-var
-    TileSize: TSizeF;
-
-
 procedure TfMain.FormCreate(Sender: TObject);
 begin
     // загружаем данные автосейва, или инициализируем новую игру
@@ -164,11 +160,6 @@ begin
     mGameManager := TGameManager.Create;
     // инициализируем игру
     mGameManager.InitGame;
-
-
-    TileSize.cx := TILE_HEIGHT;
-    TileSize.cy := TILE_WIDTH;
-
 
 end;
 

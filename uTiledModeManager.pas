@@ -82,8 +82,16 @@ begin
 
     for col := 0 to MAP_COL_COUNT - 1 do
     for row := 0 to MAP_ROW_COUNT - 1 do
+    mngObject.CreateTile( OBJ_DEAD, col, row, 1 );
+
+    for col := 2 to MAP_COL_COUNT - 3 do
+    for row := 2 to MAP_ROW_COUNT - 3 do
+    mngObject.CreateTile( OBJ_PLAIN, col, row, 2 );
+
+    for col := 4 to MAP_COL_COUNT - 5 do
+    for row := 4 to MAP_ROW_COUNT - 5 do
     mngObject.SetResource(
-        mngObject.CreateTile( OBJ_FOREST, col, row, 1 ),
+        mngObject.CreateTile( OBJ_FOREST, col, row, 3 ),
         RESOURCE_WOOD, 50, -10, 1, 0
     );
 

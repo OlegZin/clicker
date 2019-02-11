@@ -16,15 +16,16 @@ const
     OBJ_CANYON      =  5;  // разлом
     OBJ_LAVA        =  6;  // лавовое поле
     OBJ_FOG         =  7;  // лавовое поле
-    OBJ_TOWN_SMALL  =  8;  // маленькое поселение
-    OBJ_TOWN_MEDIUM =  9;  // среднее поселение
-    OBJ_TOWN_BIG    = 10;  // большое поселение
-    OBJ_TOWN_GREAT  = 11;  // огромное поселение
-    OBJ_PREDATOR    = 12;  // хищник
-    OBJ_MAMONT      = 13;  // мамонт (временный)
-    OBJ_ATTACKER    = 14;  // атакующее плем€ (временный)
-    OBJ_CAVE        = 15;  // пещера
-    OBJ_HERD        = 16;  // стадо (временный)
+    OBJ_DEAD        =  8;  // стадо (временный)
+    OBJ_TOWN_SMALL  =  9;  // маленькое поселение
+    OBJ_TOWN_MEDIUM = 10;  // среднее поселение
+    OBJ_TOWN_BIG    = 11;  // большое поселение
+    OBJ_TOWN_GREAT  = 12;  // огромное поселение
+    OBJ_PREDATOR    = 13;  // хищник
+    OBJ_MAMONT      = 14;  // мамонт (временный)
+    OBJ_ATTACKER    = 15;  // атакующее плем€ (временный)
+    OBJ_CAVE        = 16;  // пещера
+    OBJ_HERD        = 17;  // стадо (временный)
 
     // типы тесурсов
     RESOURCE_IQ     = 0;
@@ -42,7 +43,7 @@ const
     RESOURCE_BONE   = 10;
 
 var
-    TableObjects : array [0..7, 0..2] of string = (
+    TableObjects : array [0..8, 0..2] of string = (
       ('Ћес',     'tile_forest', ''),
       ('–авнина', 'tile_plane',  ''),
       ('√оры',    'tile_mount',  ''),
@@ -50,7 +51,8 @@ var
       ('Ћедник',  'tile_ice',    ''),
       ('–азлом',  'tile_canyon', ''),
       ('Ћава',    'tile_lava',   ''),
-      ('“уман',   'tile_fog',    '')
+      ('“уман',   'tile_fog',    ''),
+      ('ћертва€ земл€', 'tile_dead',    '')
     );
 
     TableResource : array [0..10, 0..2] of string = (
