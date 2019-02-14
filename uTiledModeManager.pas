@@ -16,38 +16,17 @@ interface
 uses
     FMX.Layouts, FMX.Objects, SysUtils, System.Types, FMX.Graphics, FMX.ImgList, uImgMap;
 
-const
-
-    MAP_COL_COUNT   = 50;
-    MAP_ROW_COUNT   = 50;
-
-    TILE_WIDTH      = 50;
-    TILE_HEIGHT     = 50;
-
 type
 
     TCallback = procedure (Sender: TObject) of object;
 
-    { игровой тайтл, содержащий в себе несколько игровых слоев.
-      1 - тип местности
-      2 - объект
-      3 - туман, если сектор еще не исследован
-    }
-    TTile = record
-        Land: smallint;   // тип местности. см. константы LAND_ХХХ
-        Obj: smallint;    // тип объекта, если есть
-        Fog: boolean;     // скрыт ли сектор туманом неизвестности
-    end;
-
     TTileModeDrive = class
     private
         fScreen : TScrollBox;
-        fLand: array [0..MAP_COL_COUNT, 0..MAP_ROW_COUNT] of TTile;
-        fObjects: array [0..MAP_COL_COUNT, 0..MAP_ROW_COUNT] of TTile;
-        fImages: TImageList;
         fViewPort: TLayout;
     public
         callback : TCallback;
+                 // внешний обработчик, вызываемый при клике по картинке объекта
 
         procedure SetupComponents(screen: TObject);
                  // ривязываем к движку элемент формы в котором развернем свою деятельность
@@ -77,37 +56,54 @@ procedure TTileModeDrive.BuildField;
 { формирование игрового поля.
  }
 var
-    col, row: integer;
+    col, row, id: integer;
 begin
 
+    // основа карты
     for col := 0 to MAP_COL_COUNT - 1 do
     for row := 0 to MAP_ROW_COUNT - 1 do
-    mngObject.CreateTile( OBJ_DEAD, col, row, 1 );
+    begin
+        mngObject.CreateTile( OBJ_DEAD, col, row, 1 );
+        mngObject.CreateTile( OBJ_PLAIN, col, row, 2 );
+    end;
 
-    for col := 2 to MAP_COL_COUNT - 3 do
-    for row := 2 to MAP_ROW_COUNT - 3 do
-    mngObject.CreateTile( OBJ_PLAIN, col, row, 2 );
+    // деревья с ресурсами
+    for col := 0 to 100 do
+    begin
+        id := mngObject.CreateTile( OBJ_TREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 );
+        if id >= 0
+        then mngObject.SetResource( id, RESOURCE_WOOD, 50, -10, 1, 0 );
+    end;
 
-    for col := 4 to MAP_COL_COUNT - 5 do
-    for row := 4 to MAP_ROW_COUNT - 5 do
+    for col := 0 to 20 do
     mngObject.SetResource(
-        mngObject.CreateTile( OBJ_FOREST, col, row, 3 ),
+        mngObject.CreateTile( OBJ_BERRY, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_FOOD, 10, -1, 1, 10
+    );
+
+{
+    // горы с ресурсами
+    for col := 0 to 100 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_MOUNT, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 4 ),
+        RESOURCE_STONE, 50, -10, 0, 0
+    );
+
+    // лесочки с ресурсами
+    for col := 0 to 100 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_FOREST, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
         RESOURCE_WOOD, 50, -10, 1, 0
     );
-
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_FOG, 0, 0, 10 ),
-        RESOURCE_STONE, 50, -10, 0, 0
-    );
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_FOG, 1, 1, 10 ),
-        RESOURCE_STONE, 50, -10, 0, 0
-    );
+}
+    // туман войны
+    mngObject.CreateTile( OBJ_FOG, 0, 0, 10 );
+    mngObject.CreateTile( OBJ_FOG, 1, 1, 10 );
 end;
 
 procedure TTileModeDrive.UpdateField;
 var
-    layer, index: integer;
+    layer: integer;
     image, source: TImage;
     obj: TBaseObject;
 begin

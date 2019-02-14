@@ -45,6 +45,7 @@ type
 
         procedure ProcessObjectClick( id : integer );
         procedure InitGame;
+        procedure CalcGameState;
     end;
 
 var
@@ -56,6 +57,25 @@ implementation
 
 uses
     uGameObjectManager, uResourceManager, DB;
+
+procedure TGameManager.CalcGameState;
+///    логическое ядро.
+///    метод вызывается таймером, кликом игрока, при инициализации игры.
+
+///    при изменении состояния ресурсов или иных значимых объектов производит
+///    переоценку состояния игры и вносит изменения в процесс, если выполняются
+///    прописанные условия.
+///    например, при накоплении нужно количества ресурса, может открыться возможность
+///    крафта нового предмета
+
+///    проверка проводится для всех объектов из DB.logic - таблицы, где описываются
+///    требования для появления в игре каждого объекта или эффекта
+///    при соблюдении парметров, для объекта выставляется флаг активации, иначе
+///    сбрасывается. после чего обновленный массив объектов обрабатывается
+///    визуализатором
+begin
+
+end;
 
 procedure TGameManager.InitGame;
 var
@@ -108,18 +128,18 @@ begin
     with mResManager, mGameManager do
     begin
 
-        // создаем ресурсы
-        CreateRecource( RESOURCE_IQ, 0, 0 );
-        CreateRecource( RESOURCE_HEALTH, 90, 0.1 );
-        CreateRecource( RESOURCE_MAN, 1, 0 );
-        CreateRecource( RESOURCE_WOMAN, 0, 0 );
-        CreateRecource( RESOURCE_WOOD, 0, 0 );
-        CreateRecource( RESOURCE_GRASS, 0, 0 );
-        CreateRecource( RESOURCE_STONE, 0, 0 );
-        CreateRecource( RESOURCE_ICE, 0, 0 );
-        CreateRecource( RESOURCE_LAVA, 0, 0 );
-        CreateRecource( RESOURCE_FOOD, 10, -0.1 );
-        CreateRecource( RESOURCE_BONE, 0, 0 );
+        // создаем ресурсы: тип, начальное количество, изменение за тик таймера
+        CreateRecource( RESOURCE_IQ,      0,   0  );
+        CreateRecource( RESOURCE_HEALTH, 90,  0.1 );
+        CreateRecource( RESOURCE_MAN,     1,   0  );
+        CreateRecource( RESOURCE_WOMAN,   0,   0  );
+        CreateRecource( RESOURCE_WOOD,    0,   0  );
+        CreateRecource( RESOURCE_GRASS,   0,   0  );
+        CreateRecource( RESOURCE_STONE,   0,   0  );
+        CreateRecource( RESOURCE_ICE,     0,   0  );
+        CreateRecource( RESOURCE_LAVA,    0,   0  );
+        CreateRecource( RESOURCE_FOOD,   10, -0.1 );
+        CreateRecource( RESOURCE_BONE,    0,   0  );
 
         SetAttr(RESOURCE_HEALTH, FIELD_MAXIMUM, 100);
         SetAttr(RESOURCE_FOOD, FIELD_PASSTICKS, 0);
@@ -140,58 +160,65 @@ var
     deltaSource
    ,deltaTarget : real;
 
+    hasChanges: boolean;
+
 begin
 
-//     mResManager.ResCount( CALC_MODE_VALUE, RESOURCE_WOOD, 1 );
+    hasChanges := false;
 
-
+    // получаем ссылку на объекта из массива
     obj := mngObject.FindObject( id );
+
+    // будем обрабатывать, если он может содержать и содержит ресурсы
     if obj is TResourcedObject then
+    if   Length((obj as TResourcedObject).Recource) > 0 then
+
+    // перебираем все имеющиеся в локации ресурсы и отправляем на пересчет
+    for I := 0 to High((obj as TResourcedObject).Recource) do
     begin
-        // если привязан хотя бы один ресурс
-        if   Length((obj as TResourcedObject).Recource) > 0 then
-        // перебираем все имеющиеся в локации ресурсы и отправляем на пересчет
-        for I := 0 to High((obj as TResourcedObject).Recource) do
-        begin
-            // получаем лаконичное имя
-            resTile := (obj as TResourcedObject).Recource[i];
+        // получаем лаконичное имя
+        resTile := (obj as TResourcedObject).Recource[i];
 
-            ///    логика пересчета следующая. при клике по локации ее Once
-            ///    (списание за клик) имеет отрицательное значение, что
-            ///    уменьшает запас в локации ( Count ), но при этом, в общем
-            ///    хранилище запас должен увеличиваться. т.е. прирост с обратным знаком
-            ///    и на оборот, что делает клик по локации ресурсопотребляющим
-            ///    например, это монстр и для его атаки расходуется что-то из ресурсов
+        ///    логика пересчета следующая. при клике по локации ее Once
+        ///    (списание за клик) имеет отрицательное значение, что
+        ///    уменьшает запас в локации ( Count ), но при этом, в общем
+        ///    хранилище запас должен увеличиваться. т.е. прирост с обратным знаком
+        ///    и на оборот, что делает клик по локации ресурсопотребляющим
+        ///    например, это монстр и для его атаки расходуется что-то из ресурсов
 
-            // проверяем возможность взятия ресурса
-            // персчитываем ресурс в локации
-            deltaSource :=
-            mResManager.TargetResCount(
-                resTile,                                                // изменяемый ресурс
-                CALC_MODE_VALUE,                                        // изменяем на указанное количество
-                resTile.Item.Once.current + resTile.Item.Once.bonus     // количество на изменение
-            );
+        // проверяем возможность взятия ресурса
+        // персчитываем ресурс в локации
+        deltaSource :=
+        mResManager.TargetResCount(
+            resTile,                                                // изменяемый ресурс
+            CALC_MODE_VALUE,                                        // изменяем на указанное количество
+            resTile.Item.Once.current + resTile.Item.Once.bonus     // количество на изменение
+        );
 
-            // если изменения локального ресурса не произошло (достигнут верхний или нижний лимит)
-            // в глобальном хранилише менять тоже не будем
-            if deltaSource <> 0 then
+        // если изменения локального ресурса не произошло (достигнут верхний или нижний лимит)
+        // в глобальном хранилише менять тоже не будем
+        if deltaSource <> 0 then
 
-            // пересчитываем в глобальном хранилище
-            mResManager.ResCount(
-                CALC_MODE_VALUE,                                        // изменяем на указанное количество
-                resTile.Identity.Common,                                // тип изменяемого ресурса
-                -(deltaSource)  // количество на изменение
-            );
-            ///    при клике можно запустить пересчет в режиме CALC_MODE_CLICK,
-            ///    но при этом буддет использована настройка разового изменения
-            ///    самого ресурса из хранилища, а не индивидуальные параметры
-            ///    самой локации.
-            ///    потому используется режим CALC_MODE_VALUE, чтобы учитивать
-            ///    индивидуальные особенности локаций
+        // пересчитываем в глобальном хранилище
+        mResManager.ResCount(
+            CALC_MODE_VALUE,                                        // изменяем на указанное количество
+            resTile.Identity.Common,                                // тип изменяемого ресурса
+            -(deltaSource)  // количество на изменение
+        );
+        ///    при клике можно запустить пересчет в режиме CALC_MODE_CLICK,
+        ///    но при этом буддет использована настройка разового изменения
+        ///    самого ресурса из хранилища, а не индивидуальные параметры
+        ///    самой локации.
+        ///    потому используется режим CALC_MODE_VALUE, чтобы учитивать
+        ///    индивидуальные особенности локаций
 
+        // ставим флаг изменений, чтобы запустить пересчет состояния игры
+        hasChanges := true;
 
-        end;
     end;
+
+    // пересчитываем состояние игры
+    if hasChanges then CalcGameState;
 
 end;
 

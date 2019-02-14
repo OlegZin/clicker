@@ -76,9 +76,6 @@ type
         function CreateRecource(_kind: integer; _count, _increment: real): integer;
                                  // создает новый ресурс
 
-//        procedure SetResData( data: TResource );
-                                 // полные данные по одному из ресурсов дл€ включени€ в массив
-
         /// ћ≈“ќƒџ ”ѕ–ј¬Ћ≈Ќ»я
         procedure OnTimer;       // вычислени€ на тик таймера
 
@@ -192,23 +189,9 @@ begin
     FIELD_MAXIMUM     : fResources[ index ].Resource.Recource[0].Item.Max.current    := value;
     FIELD_MINIMUM     : fResources[ index ].Resource.Recource[0].Item.Min.current    := value;
     FIELD_PASSTICKS   : fResources[ index ].Resource.Recource[0].Item.Period.current := value;
-//    FIELD_USED        : fResources[ index ].used        := value;
     FIELD_VISIBLE     : fResources[ index ].visible     := value;
     end;
 end;
-
-{
-procedure TResourceManager.SetResData(data: TResource);
-///  получаем из внешнего источника данные по одному из ресурсов.
-///  данный ресурс добавл€етс€ в массив в первую свободную €чейку
-var
-    i : integer;
-begin
-    for I := 0 to RES_COUNT - 1 do
-    if not fResources[i].used then
-        fResources[i] := data;
-end;
-}
 
 procedure TResourceManager.SetupComponents(_layout: TLayout; _flayout: TFlowLayout);
 begin

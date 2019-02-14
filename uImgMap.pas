@@ -19,6 +19,13 @@ type
     icon_woman: TImage;
     tile_dead: TImage;
     tile_plane: TImage;
+    tile_mount: TImage;
+    tile_sand: TImage;
+    tile_water: TImage;
+    tile_ice: TImage;
+    tile_tree: TImage;
+    tile_berry: TImage;
+    tile_bush: TImage;
   private
     { Private declarations }
   public

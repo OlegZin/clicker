@@ -169,6 +169,9 @@ type
         ///    раскладывает полученный id на индексы в массиве fObjects и
         ///    возвращают соответсвующий объект
 
+        function PosIsFree( x, y: real; layer: integer ): boolean;
+        ///    проверка, свободна ли указанная позиция на указанном слое
+        ///    используется для избежания наслоения объектов на слое
     end;
 
 var
@@ -197,7 +200,9 @@ function TObjectManager.CreateTile(Kind, X, Y, layer: integer): integer;
 var
     location: TResourcedObject;
 begin
-    result := 0;
+    result := -1;
+
+    if not PosIsFree(x, y, layer) then exit;
 
     // создаем объект локации, определяем тип и положение
     location := TResourcedObject.Create;
@@ -226,6 +231,8 @@ var
     resource : TResource;
     obj : TBaseObject;
 begin
+    if id < 0 then exit;
+
     // находим объект, которому нужно добавить ресурс
     obj := FindObject( id );
 
@@ -256,6 +263,8 @@ function TObjectManager.FindObject(id: integer): TBaseObject;
 var
     layer, index : integer;
 begin
+    if id < 0 then exit;
+
     layer := id mod 1000;
     index := id div 1000;
 
@@ -267,6 +276,8 @@ begin
     result := nil;
 
     if ( layer < 0 ) or ( layer > Length(fObjects)-1 ) then exit;
+
+    if Length(fObjects[layer]) = 0 then exit;
 
     fLayerIndex[layer] := 0;
 
@@ -284,6 +295,24 @@ begin
 
     if   fLayerIndex[layer] <= (Length( fObjects[layer] ) - 1)
     then result := fObjects[layer][fLayerIndex[layer]];
+end;
+
+function TObjectManager.PosIsFree(x, y: real; layer: integer): boolean;
+var
+    obj: TBaseObject;
+begin
+    result := true;
+
+    obj := GetFirstOnLayer( layer );
+    while Assigned( obj ) do
+    begin
+        if (obj.Position.Х = x) and ( obj.Position.Y = y ) then
+        begin
+            result := false;
+            exit;
+        end;
+        obj := GetNextOnLayer( layer );
+    end;
 end;
 
 function TObjectManager.GetId( layer: integer ): integer;
