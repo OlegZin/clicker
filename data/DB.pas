@@ -7,8 +7,8 @@ const
     MAP_COL_COUNT   = 20;
     MAP_ROW_COUNT   = 20;
 
-    TILE_WIDTH      = 50;
-    TILE_HEIGHT     = 50;
+    TILE_WIDTH      = 32;
+    TILE_HEIGHT     = 32;
 
     TABLE_FIELD_NAME       = 0;
     TABLE_FIELD_ICON_IMAGE = 1;

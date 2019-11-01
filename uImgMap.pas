@@ -26,6 +26,8 @@ type
     tile_tree: TImage;
     tile_berry: TImage;
     tile_bush: TImage;
+    Image1: TImage;
+    Image2: TImage;
   private
     { Private declarations }
   public
