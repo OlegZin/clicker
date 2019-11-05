@@ -68,19 +68,92 @@ begin
     end;
 
     // деревья с ресурсами
-    for col := 0 to 100 do
+    for col := 0 to 200 do
     begin
-        id := mngObject.CreateTile( OBJ_TREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 );
-        if id >= 0
-        then mngObject.SetResource( id, RESOURCE_WOOD, 50, -10, 1, 0 );
+        mngObject.SetResource( mngObject.CreateTile( OBJ_TREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_WOOD, 50, -10, 1, 0 );
     end;
 
     for col := 0 to 20 do
     mngObject.SetResource(
-        mngObject.CreateTile( OBJ_BERRY, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        mngObject.CreateTile( OBJ_BUSH, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
         RESOURCE_FOOD, 10, -1, 1, 10
     );
 
+    for col := 0 to 20 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_BIGTREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_WOOD, 10, -1, 1, 10
+    );
+
+    for col := 0 to 20 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_DEADTREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_WOOD, 10, -1, 1, 10
+    );
+
+    for col := 0 to 20 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_PAPOROTNIK, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_GRASS, 10, -1, 1, 10
+    );
+
+    for col := 0 to 20 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_SMALLGRASS, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_GRASS, 10, -1, 1, 10
+    );
+
+
+
+    for col := 0 to 20 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_APPLETREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_FOOD, 10, -1, 1, 10
+    );
+
+
+    for col := 0 to 20 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_GRAYSTONE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_STONE, 10, -1, 1, 10
+    );
+
+    for col := 0 to 20 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_BROVNSTONE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_STONE, 10, -1, 1, 10
+    );
+
+    for col := 0 to 20 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_MUSH, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_FOOD, 10, -1, 1, 10
+    );
+
+
+
+    for col := 0 to 20 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_WOLF, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_BONE, 10, -1, 1, 10
+    );
+    for col := 0 to 20 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_BIZON, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_FOOD, 10, -1, 1, 10
+    );
+    for col := 0 to 20 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_BEAR, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_BONE, 10, -1, 1, 10
+    );
+
+    for col := 0 to 10 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_BLACKWOLF, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_BONE, 10, -1, 1, 10
+    );
 {
     // горы с ресурсами
     for col := 0 to 100 do
@@ -97,8 +170,13 @@ begin
     );
 }
     // туман войны
-    mngObject.CreateTile( OBJ_FOG, 0, 0, 10 );
-    mngObject.CreateTile( OBJ_FOG, 1, 1, 10 );
+    for col := 0 to MAP_COL_COUNT - 1 do
+    for row := 0 to MAP_ROW_COUNT - 1 do
+    if ((col > 2) or (row > 2))
+//    if ((col < MAP_COL_COUNT - 3) or (row < MAP_ROW_COUNT - 3))
+
+    then
+//       mngObject.CreateTile( OBJ_FOG, col, row, 10 );
 end;
 
 procedure TTileModeDrive.UpdateField;

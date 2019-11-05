@@ -23,11 +23,21 @@ type
     tile_sand: TImage;
     tile_water: TImage;
     tile_ice: TImage;
-    tile_tree: TImage;
     tile_berry: TImage;
     tile_bush: TImage;
-    Image1: TImage;
-    Image2: TImage;
+    tile_tree: TImage;
+    tile_bigtree: TImage;
+    tile_deadtree: TImage;
+    tile_paporotnik: TImage;
+    tile_appletree: TImage;
+    tile_graystone: TImage;
+    tile_brovnstone: TImage;
+    tile_smallgrass: TImage;
+    tile_wolf: TImage;
+    tile_bizon: TImage;
+    tile_bear: TImage;
+    tile_mush: TImage;
+    tile_blackwolf: TImage;
   private
     { Private declarations }
   public

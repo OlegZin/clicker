@@ -7,8 +7,8 @@ const
     MAP_COL_COUNT   = 20;
     MAP_ROW_COUNT   = 20;
 
-    TILE_WIDTH      = 32;
-    TILE_HEIGHT     = 32;
+    TILE_WIDTH      = 64;
+    TILE_HEIGHT     = 64;
 
     TABLE_FIELD_NAME       = 0;
     TABLE_FIELD_ICON_IMAGE = 1;
@@ -49,6 +49,18 @@ const
     OBJ_BERRY       = 25;  // ягоды
     OBJ_GRASS       = 26;  // заросли травы
     OBJ_MUSH        = 27;  // грибы
+    OBJ_BIGTREE     = 28;  // большое дерево
+    OBJ_DEADTREE    = 29;  // мертвое дерево
+    OBJ_PAPOROTNIK  = 30;  // папоротник
+    OBJ_APPLETREE   = 31;  // папоротник
+    OBJ_GRAYSTONE   = 32;  // папоротник
+    OBJ_BROVNSTONE  = 33;  // папоротник
+    OBJ_SMALLGRASS  = 34;  // папоротник
+
+    OBJ_WOLF        = 35;  // папоротник
+    OBJ_BIZON       = 36;  // папоротник
+    OBJ_BEAR        = 37;  // папоротник
+    OBJ_BLACKWOLF   = 38;  // папоротник
 
     // типы тесурсов
     RESOURCE_IQ     = 0;
@@ -67,7 +79,7 @@ const
 
 var
     // все существующие игровые объекты
-    TableObjects : array [0..27, 0..2] of string = (
+    TableObjects : array [0..38, 0..2] of string = (
       /// типы местности
       ('Лес',     'tile_forest', '+'),
       ('Равнина', 'tile_plane',  '+'),
@@ -100,7 +112,20 @@ var
       ('Камень', 'tile_rock',  ''),
       ('Ягоды',  'tile_berry', ''),
       ('Трава',  'tile_grass', ''),
-      ('Грибы',  'tile_mush',  '')
+      ('Грибы',  'tile_mush',  ''),
+      ('Большое дерево',  'tile_bigtree',  ''),
+      ('Мертвое дерево',  'tile_deadtree',  ''),
+      ('Папоротник',  'tile_paporotnik',  ''),
+      ('Яблоня',  'tile_appletree',  ''),
+      ('Гранит',  'tile_graystone',  ''),
+      ('Глина',  'tile_brovnstone',  ''),
+      ('Трава',  'tile_smallgrass',  ''),
+
+      ('Волк',  'tile_wolf',  ''),
+      ('Бизон',  'tile_bizon',  ''),
+      ('Медведь',  'tile_bear',  ''),
+      ('Черный волк',  'tile_blackwolf',  '')
+
 
 //    ,('', 'tile_', ''),
 
