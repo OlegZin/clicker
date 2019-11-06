@@ -38,6 +38,8 @@ type
     tile_bear: TImage;
     tile_mush: TImage;
     tile_blackwolf: TImage;
+    Rectangle1: TRectangle;
+    Rectangle2: TRectangle;
   private
     { Private declarations }
   public

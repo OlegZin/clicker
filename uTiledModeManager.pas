@@ -133,25 +133,25 @@ begin
 
 
 
-    for col := 0 to 20 do
+    for col := 0 to 10 do
     mngObject.SetResource(
-        mngObject.CreateTile( OBJ_WOLF, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        mngObject.CreateTile( OBJ_WOLF, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 4 ),
         RESOURCE_BONE, 10, -1, 1, 10
     );
-    for col := 0 to 20 do
+    for col := 0 to 10 do
     mngObject.SetResource(
-        mngObject.CreateTile( OBJ_BIZON, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        mngObject.CreateTile( OBJ_BIZON, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 4 ),
         RESOURCE_FOOD, 10, -1, 1, 10
     );
-    for col := 0 to 20 do
+    for col := 0 to 10 do
     mngObject.SetResource(
-        mngObject.CreateTile( OBJ_BEAR, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        mngObject.CreateTile( OBJ_BEAR, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 4 ),
         RESOURCE_BONE, 10, -1, 1, 10
     );
 
-    for col := 0 to 10 do
+    for col := 0 to 5 do
     mngObject.SetResource(
-        mngObject.CreateTile( OBJ_BLACKWOLF, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        mngObject.CreateTile( OBJ_BLACKWOLF, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 4 ),
         RESOURCE_BONE, 10, -1, 1, 10
     );
 {
