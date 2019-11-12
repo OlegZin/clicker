@@ -78,7 +78,13 @@ begin
         mngObject.CreateTile( OBJ_PLAIN, col, row, 2 );
     end;
 
-    // деревь€ с ресурсами
+    // простые деревь€
+    for col := 0 to 50 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_BUSH, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_WOOD, 10, -1, 0, 0
+    );
+
     for col := 0 to 200 do
     begin
         mngObject.SetResource( mngObject.CreateTile( OBJ_TREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
@@ -87,36 +93,65 @@ begin
 
     for col := 0 to 20 do
     mngObject.SetResource(
-        mngObject.CreateTile( OBJ_BUSH, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_WOOD, 10, -1, 0, 0
-    );
-
-    for col := 0 to 20 do
-    mngObject.SetResource(
         mngObject.CreateTile( OBJ_BIGTREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
         RESOURCE_WOOD, 100, -3, 0, 0
     );
 
-    for col := 0 to 20 do
+    for col := 0 to 10 do
     mngObject.SetResource(
         mngObject.CreateTile( OBJ_DEADTREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_WOOD, 1000, -2, 0, 0
+        RESOURCE_WOOD, 200, -2, 0, 0
     );
 
 
 
+
+    // проста€ трава
     for col := 0 to 20 do
     mngObject.SetResource(
         mngObject.CreateTile( OBJ_PAPOROTNIK, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_GRASS, 10, -1, 1, 10
+        RESOURCE_GRASS, 30, -1, 0, 0
     );
 
     for col := 0 to 20 do
     mngObject.SetResource(
         mngObject.CreateTile( OBJ_SMALLGRASS, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_GRASS, 10, -1, 1, 10
+        RESOURCE_GRASS, 10, -1, 0, 0
     );
 
+
+
+    // простые камни
+    for col := 0 to 20 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_BROVNSTONE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_STONE, 100, -1, 0, 0
+    );
+
+    for col := 0 to 20 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_GRAYSTONE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_STONE, 300, -2, 0, 0
+    );
+
+
+
+    // добыча
+    for col := 0 to 20 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_MUSH, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
+        RESOURCE_FOOD, 10, -1, 0, 5
+    );
+
+
+
+
+    for col := 0 to 10 do
+    begin
+        id := mngObject.CreateTile( OBJ_BIZON, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 4 );
+        mngObject.SetResource( id, RESOURCE_FOOD, 2, -2, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_HIDE, 2, -1, 0, 0 );
+    end;
 
 
     for col := 0 to 20 do
@@ -126,35 +161,10 @@ begin
     );
 
 
-    for col := 0 to 20 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_GRAYSTONE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_STONE, 10, -1, 1, 10
-    );
-
-    for col := 0 to 20 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_BROVNSTONE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_STONE, 10, -1, 1, 10
-    );
-
-    for col := 0 to 20 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_MUSH, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_FOOD, 10, -1, 1, 10
-    );
-
-
-
     for col := 0 to 10 do
     mngObject.SetResource(
         mngObject.CreateTile( OBJ_WOLF, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 4 ),
         RESOURCE_BONE, 10, -1, 1, 10
-    );
-    for col := 0 to 10 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_BIZON, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 4 ),
-        RESOURCE_FOOD, 10, -1, 1, 10
     );
     for col := 0 to 10 do
     mngObject.SetResource(
@@ -199,31 +209,6 @@ var
     obj: TBaseObject;
     I: Integer;
 
-    procedure SetAttr;
-    begin
-        image.Visible := obj.visible;
-        image.Position.X := obj.Position.’ * TILE_WIDTH;
-        image.Position.Y := obj.Position.Y * TILE_HEIGHT;
-        source := TImage(fImgMap.FindComponent( obj.Visualization.Name[ VISUAL_TILE ]) );
-        if assigned(source) then image.bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
-    end;
-
-    procedure CreateImg;
-    begin
-        /// создаетс€ объект картинки, позиционируетс€ на поле, назначаетс€ картинка
-        image := TImage.Create(fViewPort);
-        image.Parent := fViewPort;
-        image.Tag := obj.id;
-        image.OnMouseUp := callback;
-        image.Height := TILE_WIDTH;
-        image.Width := TILE_HEIGHT;
-
-        /// запоминаем сопоставление
-        SetLength(arrImgLink, Length(arrImgLink) + 1);
-        arrImgLink[High(arrImgLink)].id := obj.id;
-        arrImgLink[High(arrImgLink)].img := image;
-    end;
-
 begin
 
     // создание пол€ при запуске
@@ -255,8 +240,27 @@ begin
 
             /// если найдена, приводим в соответствие с состо€нием объекта
             /// или сначала создаем картинку, если объект новый
-            if not assigned( image ) then CreateImg;
-            SetAttr;
+            if not assigned( image ) then
+            begin
+                /// создаетс€ объект картинки, позиционируетс€ на поле, назначаетс€ картинка
+                image := TImage.Create(fViewPort);
+                image.Parent := fViewPort;
+                image.Tag := obj.id;
+                image.OnMouseUp := callback;
+                image.Height := TILE_WIDTH;
+                image.Width := TILE_HEIGHT;
+
+                /// запоминаем сопоставление
+                SetLength(arrImgLink, Length(arrImgLink) + 1);
+                arrImgLink[High(arrImgLink)].id := obj.id;
+                arrImgLink[High(arrImgLink)].img := image;
+            end;
+
+            image.Visible := obj.visible;
+            image.Position.X := obj.Position.’ * TILE_WIDTH;
+            image.Position.Y := obj.Position.Y * TILE_HEIGHT;
+            source := TImage(fImgMap.FindComponent( obj.Visualization.Name[ VISUAL_TILE ]) );
+            if assigned(source) then image.bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
 
             obj := mngObject.GetNextOnLayer( layer ) as TResourcedObject;
         end;

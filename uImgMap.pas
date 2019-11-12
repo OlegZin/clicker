@@ -41,6 +41,10 @@ type
     Rectangle1: TRectangle;
     Rectangle2: TRectangle;
     icon_prod: TImage;
+    icon_grass: TImage;
+    icon_spear: TImage;
+    icon_skin: TImage;
+    icon_hide: TImage;
   private
     { Private declarations }
   public

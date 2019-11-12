@@ -30,7 +30,7 @@ const
 
     // режимы пересчета количества ресурсов.
     CALC_MODE_AUTO  = 0;   // на таймер. брать значение Delta с учетом пропуска тиков
-    CALC_MODE_CKICK = 1;   // клик игрока. брать значение Once
+    CALC_MODE_CLICK = 1;   // клик игрока. брать значение Once
     CALC_MODE_VALUE = 2;   // принудительно. использовать указанное значение
 
 type
@@ -269,7 +269,7 @@ begin
 
     case mode of
         CALC_MODE_AUTO : increment := res.Item.Delta.current;
-        CALC_MODE_CKICK : increment := res.Item.Once.current;
+        CALC_MODE_CLICK : increment := res.Item.Once.current;
         CALC_MODE_VALUE : increment := _increment;
     end;
 

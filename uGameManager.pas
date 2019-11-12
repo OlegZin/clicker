@@ -147,11 +147,17 @@ begin
         CreateRecource( RESOURCE_FOOD,   10, -0.1 );
         CreateRecource( RESOURCE_BONE,    0,   0  );
         CreateRecource( RESOURCE_PRODUCT, 1,   0  );
+        CreateRecource( RESOURCE_SPEAR,   5,   0  );
+        CreateRecource( RESOURCE_SKIN,    3,   0  );
+        CreateRecource( RESOURCE_HIDE,    8,   0  );
 
 
         SetAttr(RESOURCE_HEALTH, FIELD_MAXIMUM, 100);
         SetAttr(RESOURCE_PRODUCT, FIELD_VISIBLE, true);
-//        SetAttr(RESOURCE_FOOD, FIELD_VISIBLE, true);
+        SetAttr(RESOURCE_GRASS, FIELD_VISIBLE, true);
+        SetAttr(RESOURCE_SPEAR, FIELD_VISIBLE, true);
+        SetAttr(RESOURCE_SKIN, FIELD_VISIBLE, true);
+        SetAttr(RESOURCE_HIDE, FIELD_VISIBLE, true);
 
         GameSatate.Potential := 0;
         GameSatate.Era := ERA_PRIMAL;
@@ -169,11 +175,16 @@ var
     deltaSource
    ,deltaTarget : real;
 
-    hasChanges: boolean;
+    hasChanges
+   ,ResIsOut   // признак того, что на объекте закончились ¬—≈ источники ресурсов,
+               // а не только один из имеющихс€. это позвол€ет существовать объекту
+               // до тех пор, пока он не будет исчерпан полностью
+            : boolean;
 
 begin
 
     hasChanges := false;
+    ResIsOut := true;
     result := 0;
 
     // получаем ссылку на объекта из массива
@@ -227,18 +238,37 @@ begin
 
 
 
-        /// если достигнут нижний предел количества ресурса
-        if (resTile.Item.Count.current <= resTile.Item.Min.current) then
-        begin
-            /// некоторые типы объектов при этом должны быть разрушены или заменены другими
-            /// например, дерево становитс€ пеньком, куст с €годами - обычным кустом
-            case obj.Identity.Common of
-                /// простой куст просто удал€етс€
-                OBJ_BUSH: mngObject.RemoveTile( obj.id );
-            end;
+        /// если данный ресурс еще не исчерпан, ставим флаг, что объект не стоит
+        /// уничтожать, несмор€ на возможное исчерпание прочих ресурсов
+        if (resTile.Item.Count.current > resTile.Item.Min.current) then ResIsOut := false;
 
-            result := result + PROCESS_CHANGE_FIELD;
+    end;
+
+    if ResIsOut then
+    begin
+        /// некоторые типы объектов при этом должны быть разрушены или заменены другими
+        /// например, дерево становитс€ пеньком, куст с €годами - обычным кустом
+        case obj.Identity.Common of
+            /// простые источники ресурса просто удал€ютс€
+            OBJ_BUSH,
+            OBJ_TREE,
+            OBJ_BIGTREE,
+            OBJ_DEADTREE,
+
+            OBJ_SMALLGRASS,
+            OBJ_PAPOROTNIK,
+
+            OBJ_BROVNSTONE,
+            OBJ_GRAYSTONE,
+
+            OBJ_MUSH,
+
+            OBJ_BIZON
+            :
+                mngObject.RemoveTile( obj.id );
         end;
+
+        result := result or PROCESS_CHANGE_FIELD;
     end;
 
     // пересчитываем состо€ние игры
