@@ -45,6 +45,10 @@ type
     icon_spear: TImage;
     icon_skin: TImage;
     icon_hide: TImage;
+    Image1: TImage;
+    Image2: TImage;
+    Image3: TImage;
+    Image4: TImage;
   private
     { Private declarations }
   public
