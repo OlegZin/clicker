@@ -14,11 +14,13 @@ unit uTiledModeManager;
 interface
 
 uses
-    FMX.Layouts, FMX.Objects, SysUtils, System.Types, FMX.Graphics, FMX.ImgList, uImgMap;
+    FMX.Layouts, FMX.Objects, SysUtils, System.Types, FMX.Graphics, FMX.ImgList, uImgMap,
+    System.UITypes, System.Classes;
 
 type
 
-    TCallback = procedure (Sender: TObject) of object;
+    TCallback = procedure (Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Single) of object;
 
     TTileModeDrive = class
     private
@@ -44,13 +46,22 @@ var
 implementation
 
 { TTileModeDrive }
-
  uses
     uMain, uGameObjectManager, DB;
+
+ type
+    TImgLink = record
+        id : integer;
+        img : TImage;
+    end;
 
  var
    BitmapSize: TSizeF;
 
+   arrImgLink: array of TImgLink;
+   /// содержит массив связей id с объектами-картинками на поле
+   /// заполняется при первоначальном заполнении поля
+   /// используется для быстрого поиска объектов-картинок при последующих обновлениях
 
 procedure TTileModeDrive.BuildField;
 { формирование игрового поля.
@@ -63,7 +74,7 @@ begin
     for col := 0 to MAP_COL_COUNT - 1 do
     for row := 0 to MAP_ROW_COUNT - 1 do
     begin
-        mngObject.CreateTile( OBJ_DEAD, col, row, 1 );
+//        mngObject.CreateTile( OBJ_DEAD, col, row, 1 );
         mngObject.CreateTile( OBJ_PLAIN, col, row, 2 );
     end;
 
@@ -71,26 +82,28 @@ begin
     for col := 0 to 200 do
     begin
         mngObject.SetResource( mngObject.CreateTile( OBJ_TREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_WOOD, 50, -10, 1, 0 );
+        RESOURCE_WOOD, 50, -2, 0, 0 );
     end;
 
     for col := 0 to 20 do
     mngObject.SetResource(
         mngObject.CreateTile( OBJ_BUSH, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_FOOD, 10, -1, 1, 10
+        RESOURCE_WOOD, 10, -1, 0, 0
     );
 
     for col := 0 to 20 do
     mngObject.SetResource(
         mngObject.CreateTile( OBJ_BIGTREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_WOOD, 10, -1, 1, 10
+        RESOURCE_WOOD, 100, -3, 0, 0
     );
 
     for col := 0 to 20 do
     mngObject.SetResource(
         mngObject.CreateTile( OBJ_DEADTREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_WOOD, 10, -1, 1, 10
+        RESOURCE_WOOD, 1000, -2, 0, 0
     );
+
+
 
     for col := 0 to 20 do
     mngObject.SetResource(
@@ -184,32 +197,66 @@ var
     layer: integer;
     image, source: TImage;
     obj: TBaseObject;
+    I: Integer;
+
+    procedure SetAttr;
+    begin
+        image.Visible := obj.visible;
+        image.Position.X := obj.Position.Х * TILE_WIDTH;
+        image.Position.Y := obj.Position.Y * TILE_HEIGHT;
+        source := TImage(fImgMap.FindComponent( obj.Visualization.Name[ VISUAL_TILE ]) );
+        if assigned(source) then image.bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
+    end;
+
+    procedure CreateImg;
+    begin
+        /// создается объект картинки, позиционируется на поле, назначается картинка
+        image := TImage.Create(fViewPort);
+        image.Parent := fViewPort;
+        image.Tag := obj.id;
+        image.OnMouseUp := callback;
+        image.Height := TILE_WIDTH;
+        image.Width := TILE_HEIGHT;
+
+        /// запоминаем сопоставление
+        SetLength(arrImgLink, Length(arrImgLink) + 1);
+        arrImgLink[High(arrImgLink)].id := obj.id;
+        arrImgLink[High(arrImgLink)].img := image;
+    end;
+
 begin
 
-    // полный сброс отображения текущего поля
-    if Assigned(fViewPort) then FreeAndNil(fViewPort);
-    fViewPort := TLayout.Create(fScreen);
-    fViewPort.Parent := fScreen;
-    fViewPort.Width := MAP_COL_COUNT * TILE_WIDTH;
-    fViewPort.Height := MAP_ROW_COUNT * TILE_HEIGHT;
+    // создание поля при запуске
+    if not Assigned(fViewPort) then
+    begin
+        fViewPort := TLayout.Create(fScreen);
+        fViewPort.Parent := fScreen;
+        fViewPort.Width := MAP_COL_COUNT * TILE_WIDTH;
+        fViewPort.Height := MAP_ROW_COUNT * TILE_HEIGHT;
+    end;
 
-    // вывод объектов по слоям, что обеспечивает их привильное перекрытие
     for layer := 0 to mngObject.GetLayerCount do
     begin
         obj := mngObject.GetFirstOnLayer( layer );
 
         while Assigned( obj ) do
         begin
-            image := TImage.Create(fViewPort);
-            image.Parent := fViewPort;
-            image.Tag := obj.id;
-            image.OnClick := callback;
-            image.Height := TILE_WIDTH;
-            image.Width := TILE_HEIGHT;
-            image.Position.X := obj.Position.Х * TILE_WIDTH;
-            image.Position.Y := obj.Position.Y * TILE_HEIGHT;
-            source := TImage(fImgMap.FindComponent( obj.Visualization.Name[ VISUAL_TILE ]) );
-            if assigned(source) then image.bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
+
+            image := nil;
+
+            /// сопоставляем объект массива с картинкой на поле
+            for I := 0 to High(arrImgLink) do
+            if arrImgLink[i].id = obj.id
+            then
+            begin
+                image := arrImgLink[i].img;
+                break;
+            end;
+
+            /// если найдена, приводим в соответствие с состоянием объекта
+            /// или сначала создаем картинку, если объект новый
+            if not assigned( image ) then CreateImg;
+            SetAttr;
 
             obj := mngObject.GetNextOnLayer( layer ) as TResourcedObject;
         end;

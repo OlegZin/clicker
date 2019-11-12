@@ -19,8 +19,8 @@ const
     VISUAL_ICON = 1;
 
     // поведение при выходе за нижнюю или верхнюю границу количества ресурса
-    BOUND_MODE_CUT   = 0;                    // разрешить с выравниванием итога по границе
-    BOUND_MODE_BLOCK = 1;                    // блокировать данное изменение
+    BOUND_MODE_CUT     = 0;                    // разрешить с выравниванием итога по границе
+    BOUND_MODE_BLOCK   = 1;                    // блокировать данное изменение
 
 type
 
@@ -90,6 +90,8 @@ type
     // объект с набором базовых свойств
     TBaseObject = class
         id: integer;                   // уникальный в рамках всего мира идентификатор
+        visible: boolean;              // глобальный признак видимости. например,
+                                       // при сброшенном, флаге объект не будет отображаться на поле, если является тайлом
         Name : string;
         Description : string;
 
@@ -161,6 +163,8 @@ type
         function CreateTile( Kind, X, Y, layer: integer ): integer;
         ///    создает тайла объекта без ресурса и возвращает его id
 
+        procedure RemoveTile(id : integer);
+
         procedure SetResource( id, Kind: integer; Count, Once, Delta, Period: real );
         ///    инициализирует и привязывает ресурс к указанному объекту, который
         ///    может содержать ресурсы
@@ -221,11 +225,24 @@ begin
     result := location.id;
 end;
 
+procedure TObjectManager.RemoveTile(id: integer);
+var
+    obj: TBaseObject;
+begin
+    obj := FindObject(id);
+
+    if assigned( obj )
+    then obj.visible := false;
+end;
+
 procedure TObjectManager.SetResource(id, Kind: integer; Count,
   Once, Delta, Period: real);
 ///    создание в указанной локации ресурса.
 ///    id - идентификатор объекта в массиве fObjects
 ///    kind - тип ресурса
+///    count - начальное количество
+///    once - количество полученного ресурса при клике по объекту с ним
+///    delta - получение ресурса по таймеру
 var
     location : TResourcedObject;
     resource : TResource;
@@ -330,6 +347,7 @@ end;
 
 constructor TBaseObject.Create;
 begin
+    visible := true;
 end;
 
 { TResource }

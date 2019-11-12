@@ -32,7 +32,8 @@ type
     procedure FormCreate(Sender: TObject);
     procedure tResTimerTimer(Sender: TObject);
     procedure sbItemsHScrollChange(Sender: TObject);
-    procedure OnClickCallback(Sender: TObject);
+    procedure OnClickCallback(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Single);
   private
     { Private declarations }
   public
@@ -135,14 +136,21 @@ function TfMain.GetTileBitmap(index: integer): TBitMap;
 begin
 end;
 
-procedure TfMain.OnClickCallback(Sender: TObject);
+procedure TfMain.OnClickCallback(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Single);
 { ключевой обработчик клика по элементу на игровом поле.
   он привязан как обработчик OnClick всех игровых объектов.
   Sender - объект TImage отображающий объект на поле
   (Sender as TImage).Tag - id объекта в массиве
    }
+var
+    result : integer;
 begin
-    mGameManager.ProcessObjectClick( (Sender as TImage).Tag );
+    result := mGameManager.ProcessObjectClick( (Sender as TImage).Tag );
+
+    if (result and PROCESS_CHANGE_FIELD) <> 0
+    then mTileDrive.UpdateField;
+
 end;
 
 procedure TfMain.InitGame;

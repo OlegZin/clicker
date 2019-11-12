@@ -111,18 +111,18 @@ var
       ('Дерево', 'tile_tree',  ''),
       ('Куст',   'tile_bush',  ''),
       ('Камень', 'tile_rock',  ''),
-      ('Ягоды',  'tile_berry', ''),
+      ('Ягоды',  'tile_berry', ''),          // 25
       ('Трава',  'tile_grass', ''),
       ('Грибы',  'tile_mush',  ''),
       ('Большое дерево',  'tile_bigtree',  ''),
       ('Мертвое дерево',  'tile_deadtree',  ''),
-      ('Папоротник',  'tile_paporotnik',  ''),
+      ('Папоротник',  'tile_paporotnik',  ''),  // 30
       ('Яблоня',  'tile_appletree',  ''),
       ('Гранит',  'tile_graystone',  ''),
       ('Глина',  'tile_brovnstone',  ''),
       ('Трава',  'tile_smallgrass',  ''),
 
-      ('Волк',  'tile_wolf',  ''),
+      ('Волк',  'tile_wolf',  ''),                //35
       ('Бизон',  'tile_bizon',  ''),
       ('Медведь',  'tile_bear',  ''),
       ('Черный волк',  'tile_blackwolf',  '')

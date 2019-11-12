@@ -32,6 +32,12 @@ const
     MODE_COUNTRY   = 2;         // режим управления сообществом (страна, сектор)
     MODE_PLANET    = 4;         // режим управления сообществом (страна, сектор)
 
+    /// набор флагов, показывающий объекту, вызывающему ProcessObjectClick
+    /// какие состояния и элементы игры подвергуты изменениям, чтобы это обработать
+    /// например, изменилась конфигурация или видимость объектов на поле
+
+    PROCESS_CHANGE_FIELD = 1;  // изменилось состояние объекта на поле
+
 type
     TGameState = record
         Potential: Currency;          // текущий потенциал, который не теряется при начале новой игры
@@ -43,7 +49,7 @@ type
     TGameManager = class
         GameSatate : TGameState;
 
-        procedure ProcessObjectClick( id : integer );
+        function ProcessObjectClick( id : integer ): integer;
         procedure InitGame;
         procedure CalcGameState;
     end;
@@ -154,7 +160,7 @@ begin
 
 end;
 
-procedure TGameManager.ProcessObjectClick(id: integer);
+function TGameManager.ProcessObjectClick(id: integer): integer;
 var
     obj : TBaseObject;
     i: integer;
@@ -168,6 +174,7 @@ var
 begin
 
     hasChanges := false;
+    result := 0;
 
     // получаем ссылку на объекта из массива
     obj := mngObject.FindObject( id );
@@ -218,6 +225,20 @@ begin
         // ставим флаг изменений, чтобы запустить пересчет состояния игры
         hasChanges := true;
 
+
+
+        /// если достигнут нижний предел количества ресурса
+        if (resTile.Item.Count.current <= resTile.Item.Min.current) then
+        begin
+            /// некоторые типы объектов при этом должны быть разрушены или заменены другими
+            /// например, дерево становится пеньком, куст с ягодами - обычным кустом
+            case obj.Identity.Common of
+                /// простой куст просто удаляется
+                OBJ_BUSH: mngObject.RemoveTile( obj.id );
+            end;
+
+            result := result + PROCESS_CHANGE_FIELD;
+        end;
     end;
 
     // пересчитываем состояние игры
