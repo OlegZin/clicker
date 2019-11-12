@@ -121,7 +121,7 @@ begin
         Resource.Recource[0].Item.Min.current    := 0;
         Resource.Recource[0].Item.Max.current    := MaxCurrency;
 
-        visible     := false;
+        visible     := false; // _count <> 0;
         virgin      := _count = 0;
     end;
 
@@ -139,7 +139,7 @@ begin
     _layout := TLayout.Create(fFLayout);
     with _layout do
     begin
-        Width := 80;
+        Width := 50;
         height := 17;
     end;
 
@@ -244,14 +244,14 @@ begin
             view.text.Text := Format('%1.1f', [count])
         else
             view.text.Text := Format('%1.0f', [count]);
-
+{
         if round(increment) <> increment
         then
             view.text.Text := view.text.Text + Format(' (%1.1f)', [increment])
         else
         if   increment <> 0
         then view.text.Text := view.text.Text + Format(' (%1.0f)', [increment])
-        else view.text.Text := view.text.Text;
+}
 
     end;
 end;
@@ -322,7 +322,7 @@ begin
         TargetResCount( Resource.Recource[0], mode, _increment );
 
         // радуем игрока появлением нового ресурса (теперь он будет отображаться на панели)
-        if virgin and ( Resource.Recource[0].Item.Count.current > 0 ) then
+        if virgin and ( Resource.Recource[0].Item.Count.current > 0 ) and visible then
         begin
             virgin := false;
             view.layout.Parent := fFLayout;

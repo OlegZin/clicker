@@ -130,7 +130,7 @@ begin
 
         // создаем ресурсы: тип, начальное количество, изменение за тик таймера
         CreateRecource( RESOURCE_IQ,      0,   0  );
-        CreateRecource( RESOURCE_HEALTH, 90,  0.1 );
+        CreateRecource( RESOURCE_HEALTH, 29,  0.1 );
         CreateRecource( RESOURCE_MAN,     1,   0  );
         CreateRecource( RESOURCE_WOMAN,   0,   0  );
         CreateRecource( RESOURCE_WOOD,    0,   0  );
@@ -140,9 +140,12 @@ begin
         CreateRecource( RESOURCE_LAVA,    0,   0  );
         CreateRecource( RESOURCE_FOOD,   10, -0.1 );
         CreateRecource( RESOURCE_BONE,    0,   0  );
+        CreateRecource( RESOURCE_PRODUCT, 1,   0  );
+
 
         SetAttr(RESOURCE_HEALTH, FIELD_MAXIMUM, 100);
-        SetAttr(RESOURCE_FOOD, FIELD_PASSTICKS, 0);
+        SetAttr(RESOURCE_PRODUCT, FIELD_VISIBLE, true);
+//        SetAttr(RESOURCE_FOOD, FIELD_VISIBLE, true);
 
         GameSatate.Potential := 0;
         GameSatate.Era := ERA_PRIMAL;

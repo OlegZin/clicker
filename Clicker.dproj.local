@@ -2,11 +2,11 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>1899.12.30 00:00:00.000.508,=D:\temp\Clicker\clicker.git\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.989,=D:\temp\Clicker\clicker.git\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.690,=D:\temp\Clicker\clicker.git\Unit1.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.078,D:\temp\Clicker\clicker.git\uGameObjectManager.pas=D:\temp\Clicker\clicker.git\Unit1.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.177,D:\temp\Clicker\clicker.git\Unit1.pas=D:\temp\Clicker\clicker.git\uImgMap.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.690,=D:\temp\Clicker\clicker.git\Unit1.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.208,=D:\temp\Clicker\clicker.git\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.989,=D:\temp\Clicker\clicker.git\Unit1.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.374,C:\Users\zinovev\Documents\Embarcadero\Studio\Projects\Unit3.pas=C:\Users\zinovev\delphi\Clicker\uMain.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.519,D:\temp\ZTZ Clicker\idea.txt=</Transaction>
     <Transaction>1899.12.30 00:00:00.000.692,C:\Users\zinovev\Documents\Embarcadero\Studio\Projects\Project2.dproj=C:\Users\zinovev\delphi\Clicker\Clicker.dproj</Transaction>
@@ -14,9 +14,9 @@
     <Transaction>1899.12.30 00:00:00.000.496,=C:\Users\zinovev\Documents\Embarcadero\Studio\Projects\Unit3.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.346,=C:\Users\zinovev\Documents\Embarcadero\Studio\Projects\Unit3.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.190,D:\temp\Clicker\clicker.git\New1.txt=D:\temp\Clicker\clicker.git\Documentation.txt</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.862,=C:\Users\zinovev\delphi\Clicker\Unit1.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.379,=C:\Users\zinovev\delphi\Clicker\Unit1.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.973,=C:\Users\zinovev\delphi\Clicker\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.862,=C:\Users\zinovev\delphi\Clicker\Unit1.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.177,D:\temp\Clicker\clicker.git\Unit1.fmx=D:\temp\Clicker\clicker.git\uImgMap.fmx</Transaction>
     <Transaction>1899.12.30 00:00:00.000.542,D:\temp\Clicker\clicker.git\data\DB.pas=D:\temp\Clicker\clicker.git\Unit1.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.374,C:\Users\zinovev\Documents\Embarcadero\Studio\Projects\Unit3.fmx=C:\Users\zinovev\delphi\Clicker\uMain.fmx</Transaction>

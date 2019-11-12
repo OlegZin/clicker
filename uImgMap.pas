@@ -40,6 +40,7 @@ type
     tile_blackwolf: TImage;
     Rectangle1: TRectangle;
     Rectangle2: TRectangle;
+    icon_prod: TImage;
   private
     { Private declarations }
   public
