@@ -6,7 +6,7 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
   FMX.Controls.Presentation, FMX.Layouts, FMX.TabControl, System.ImageList,
-  FMX.ImgList, FMX.ExtCtrls, FMX.Objects,
+  FMX.ImgList, FMX.ExtCtrls, FMX.Objects, System.Math,
 
   uResourceManager, uTiledModeManager, uGameManager, uGameObjectManager;
 
@@ -17,25 +17,31 @@ type
     sbMenu: TSpeedButton;
     il18: TImageList;
     flResources: TFlowLayout;
-    Image2: TImage;
-    Image3: TImage;
-    Image4: TImage;
-    Image5: TImage;
-    Image6: TImage;
     lItems: TLayout;
-    lTabs: TLayout;
     lResources: TLayout;
     lTabbed: TLayout;
     tResTimer: TTimer;
     sbItems: TScrollBox;
     Image1: TImage;
+    lTabs: TLayout;
+    Image2: TImage;
     procedure FormCreate(Sender: TObject);
     procedure tResTimerTimer(Sender: TObject);
     procedure sbItemsHScrollChange(Sender: TObject);
-    procedure OnClickCallback(Sender: TObject; Button: TMouseButton;
+    procedure OnMouseDownCallback(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Single);
+    procedure OnMouseUpCallback(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Single);
+    procedure OnMouseMoveCallback(Sender: TObject; Shift: TShiftState; X,
+      Y: Single);
+    procedure sbScreenMouseLeave(Sender: TObject);
   private
     { Private declarations }
+    StartDragPos: TPointF;
+    InDrag : boolean;
+    StartDragX,
+    StartDragY
+        : Single;
   public
     { Public declarations }
     function GetTileBitmap(index: integer): TBitMap;
@@ -126,7 +132,9 @@ begin
      // инициализация движка для текущего режима
      mTileDrive := TTileModeDrive.Create;
      mTileDrive.SetupComponents(sbScreen);
-     mTileDrive.callback := OnClickCallback;
+     mTileDrive.DownCallback := OnMouseDownCallback;
+     mTileDrive.MoveCallback := OnMouseMoveCallback;
+     mTileDrive.UpCallback := OnMouseUpCallback;
      mTileDrive.BuildField;
      mTileDrive.UpdateField;
 
@@ -136,7 +144,58 @@ function TfMain.GetTileBitmap(index: integer): TBitMap;
 begin
 end;
 
-procedure TfMain.OnClickCallback(Sender: TObject; Button: TMouseButton;
+procedure TfMain.OnMouseDownCallback(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Single);
+begin
+
+    if Button = TMouseButton.mbRight then
+    begin
+        InDrag := true;
+        StartDragPos := Screen.MousePos;
+        self.Caption := Format('X: %f, Y: %f', [StartDragPos.X, StartDragPos.Y]);
+    end;
+
+end;
+
+
+procedure TfMain.OnMouseMoveCallback(Sender: TObject; Shift: TShiftState; X,
+  Y: Single);
+const
+    MaxDelta = 4;
+var
+    p : TPointF;
+    DeltaX, DeltaY: single;
+begin
+
+    if InDrag then
+    begin
+
+        p := Screen.MousePos;
+
+
+        DeltaX := p.X - StartDragPos.X;
+        DeltaY := p.Y - StartDragPos.Y;
+
+        DeltaX := Min(DeltaX, MaxDelta);
+        DeltaX := Max(DeltaX, -MaxDelta);
+
+        DeltaY := Min(DeltaY, MaxDelta);
+        DeltaY := Max(DeltaY, -MaxDelta);
+
+        self.Caption := Format('X: %f, Y: %f', [DeltaX, DeltaY]);
+
+
+        // прокрутка scrollbox
+        sbScreen.ScrollBy(DeltaX, DeltaY);
+
+        if (( p.X < self.Left + sbScreen.Position.X + 10 ) or ( p.X > self.Left + sbScreen.Width - 10 )) or
+           (( p.Y < self.Top  + sbScreen.Position.Y + 10 ) or ( p.Y > self.Top + sbScreen.Height - 10 ))
+        then InDrag := false;
+    end;
+
+end;
+
+procedure TfMain.OnMouseUpCallback(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Single);
 { ключевой обработчик клика по элементу на игровом поле.
   он привязан как обработчик OnClick всех игровых объектов.
@@ -146,12 +205,19 @@ procedure TfMain.OnClickCallback(Sender: TObject; Button: TMouseButton;
 var
     result : integer;
 begin
-    result := mGameManager.ProcessObjectClick( (Sender as TImage).Tag );
 
-    if (result and PROCESS_CHANGE_FIELD) <> 0
-    then mTileDrive.UpdateField;
+    InDrag := false;
+
+    if Button = TMouseButton.mbLeft then
+    begin
+        result := mGameManager.ProcessObjectClick( (Sender as TImage).Tag );
+
+        if (result and PROCESS_CHANGE_FIELD) <> 0
+        then mTileDrive.UpdateField;
+    end;
 
 end;
+
 
 procedure TfMain.InitGame;
 begin
@@ -184,6 +250,12 @@ begin
     fMain.Caption := 'cx: ' + floattostr(s.Size.cx) + ' cy: ' + floatTostr(s.Size.cy);
 end;
 
+
+procedure TfMain.sbScreenMouseLeave(Sender: TObject);
+begin
+    InDrag := false;
+end;
+
 procedure TfMain.tResTimerTimer(Sender: TObject);
 begin
    mResManager.OnTimer;
@@ -191,7 +263,4 @@ end;
 
 end.
 
-{
-// прокрутка scrollbox
-ScrollBox1.ScrollBy(0, -ScrollBox1.ContentBounds.Height);
-}
+

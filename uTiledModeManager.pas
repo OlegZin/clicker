@@ -21,13 +21,18 @@ type
 
     TCallback = procedure (Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Single) of object;
+    TMoveCallback = procedure (Sender: TObject; Shift: TShiftState; X, Y: Single) of object;
 
     TTileModeDrive = class
     private
         fScreen : TScrollBox;
         fViewPort: TLayout;
     public
-        callback : TCallback;
+        UpCallback,
+        DownCallback
+                : TCallback;
+        MoveCallback
+                : TMoveCallback;
                  // внешний обработчик, вызываемый при клике по картинке объекта
 
         procedure SetupComponents(screen: TObject);
@@ -80,63 +85,71 @@ begin
 
     // простые деревья
     for col := 0 to 50 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_BUSH, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_WOOD, 10, -1, 0, 0
-    );
+    begin
+        id := mngObject.CreateTile( OBJ_BUSH, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 );
+        mngObject.SetResource( id, RESOURCE_WOOD, 10, -1, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+    end;
 
     for col := 0 to 200 do
     begin
-        mngObject.SetResource( mngObject.CreateTile( OBJ_TREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_WOOD, 50, -2, 0, 0 );
+        id := mngObject.CreateTile( OBJ_TREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 );
+        mngObject.SetResource( id, RESOURCE_WOOD, 50, -2, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
     end;
 
     for col := 0 to 20 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_BIGTREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_WOOD, 100, -3, 0, 0
-    );
+    begin
+        id := mngObject.CreateTile( OBJ_BIGTREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 );
+        mngObject.SetResource( id, RESOURCE_WOOD, 100, -3, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+    end;
 
     for col := 0 to 10 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_DEADTREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_WOOD, 200, -2, 0, 0
-    );
+    begin
+        ID := mngObject.CreateTile( OBJ_DEADTREE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 );
+        mngObject.SetResource( id, RESOURCE_WOOD, 200, -2, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+    end;
 
 
 
 
     // простая трава
     for col := 0 to 20 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_PAPOROTNIK, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_GRASS, 30, -1, 0, 0
-    );
+    begin
+        id := mngObject.CreateTile( OBJ_PAPOROTNIK, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 );
+        mngObject.SetResource( id, RESOURCE_GRASS, 30, -1, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+    end;
 
     for col := 0 to 20 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_SMALLGRASS, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_GRASS, 10, -1, 0, 0
-    );
+    begin
+        id := mngObject.CreateTile( OBJ_SMALLGRASS, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 );
+        mngObject.SetResource( id,RESOURCE_GRASS, 10, -1, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+    end;
 
 
 
     // простые камни
     for col := 0 to 20 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_BROVNSTONE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_STONE, 100, -1, 0, 0
-    );
+    begin
+        id := mngObject.CreateTile( OBJ_BROVNSTONE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 );
+        mngObject.SetResource( id, RESOURCE_STONE, 100, -1, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.2, 0, 0, false );
+    end;
 
     for col := 0 to 20 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_GRAYSTONE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
-        RESOURCE_STONE, 300, -2, 0, 0
-    );
+    begin
+        id := mngObject.CreateTile( OBJ_GRAYSTONE, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 );
+        mngObject.SetResource( id, RESOURCE_STONE, 300, -2, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.3, 0, 0, false );
+    end;
 
 
 
-    // добыча
+    // еда с растений
     for col := 0 to 20 do
     mngObject.SetResource(
         mngObject.CreateTile( OBJ_MUSH, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 3 ),
@@ -149,8 +162,9 @@ begin
     for col := 0 to 10 do
     begin
         id := mngObject.CreateTile( OBJ_BIZON, Random(MAP_COL_COUNT), Random(MAP_ROW_COUNT), 4 );
-        mngObject.SetResource( id, RESOURCE_FOOD, 2, -2, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_HIDE, 2, -1, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_FOOD, 100, -2, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_HIDE, 50, -1, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_HEALTH, 0, 1, 0, 0, false );
     end;
 
 
@@ -218,6 +232,7 @@ begin
         fViewPort.Parent := fScreen;
         fViewPort.Width := MAP_COL_COUNT * TILE_WIDTH;
         fViewPort.Height := MAP_ROW_COUNT * TILE_HEIGHT;
+        fViewPort.SendToBack;
     end;
 
     for layer := 0 to mngObject.GetLayerCount do
@@ -246,7 +261,9 @@ begin
                 image := TImage.Create(fViewPort);
                 image.Parent := fViewPort;
                 image.Tag := obj.id;
-                image.OnMouseUp := callback;
+                image.OnMouseDown := DownCallback;
+                image.OnMouseMove := MoveCallback;
+                image.OnMouseUp := UpCallback;
                 image.Height := TILE_WIDTH;
                 image.Width := TILE_HEIGHT;
 

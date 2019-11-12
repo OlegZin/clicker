@@ -19,8 +19,8 @@ const
     VISUAL_ICON = 1;
 
     // поведение при выходе за нижнюю или верхнюю границу количества ресурса
-    BOUND_MODE_CUT     = 0;                    // разрешить с выравниванием итога по границе
-    BOUND_MODE_BLOCK   = 1;                    // блокировать данное изменение
+//    BOUND_MODE_CUT     = 0;                    // разрешить с выравниванием итога по границе
+//    BOUND_MODE_BLOCK   = 1;                    // блокировать данное изменение
 
 type
 
@@ -107,6 +107,8 @@ type
 
     TResource = class(TBaseObject)
         Item: TCount;
+        Valued: boolean;               // не имеющие "ценности" ресурсы не учитываются при проверке
+                                       // на истощение всех источников на объекте для его уничтожения
         constructor Create(kind: integer); overload;
     end;
 
@@ -165,7 +167,7 @@ type
 
         procedure RemoveTile(id : integer);
 
-        procedure SetResource( id, Kind: integer; Count, Once, Delta, Period: real );
+        procedure SetResource( id, Kind: integer; Count, Once, Delta, Period: real; valued: boolean = true );
         ///    инициализирует и привязывает ресурс к указанному объекту, который
         ///    может содержать ресурсы
 
@@ -236,7 +238,7 @@ begin
 end;
 
 procedure TObjectManager.SetResource(id, Kind: integer; Count,
-  Once, Delta, Period: real);
+  Once, Delta, Period: real; valued: boolean = true);
 ///    создание в указанной локации ресурса.
 ///    id - идентификатор объекта в массиве fObjects
 ///    kind - тип ресурса
@@ -246,6 +248,10 @@ procedure TObjectManager.SetResource(id, Kind: integer; Count,
 ///    period - сколько тиков пропускать перед вычислением изменения количества
 ///             так же влияет на скорость получения при кликах, пока период не
 ///             закончится, начисление за последующие клики игнорируются
+///    vaued - признак, нужно ли будет учитывать данный ресурс при проверке
+///            на исчерпание всех источников ресурсов объекта. незначимые ресурсы
+///            используются для постоянного эффекта до истощения всех значимых ресурсов.
+///            например, в качестве снижения здоровья при стражении с монстрами
 var
     location : TResourcedObject;
     resource : TResource;
@@ -275,6 +281,7 @@ begin
     resource.Item.Period.current := Period;      // через сколько тиков применять Delta
     resource.Item.PassTicks      := 0;           // инициализация счетчика пропущенных тиков
     resource.Item.Max.current    := MaxCurrency; // максимальный предел
+    resource.Valued              := valued;      // признак важного ресурса для проверки на истощение (будет ли учитываться)
 
 end;
 

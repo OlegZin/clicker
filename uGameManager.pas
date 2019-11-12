@@ -180,7 +180,6 @@ var
                // а не только один из имеющихся. это позволяет существовать объекту
                // до тех пор, пока он не будет исчерпан полностью
             : boolean;
-
 begin
 
     hasChanges := false;
@@ -240,7 +239,9 @@ begin
 
         /// если данный ресурс еще не исчерпан, ставим флаг, что объект не стоит
         /// уничтожать, несморя на возможное исчерпание прочих ресурсов
-        if (resTile.Item.Count.current > resTile.Item.Min.current) then ResIsOut := false;
+        if ( resTile.Item.Count.current > resTile.Item.Min.current ) and
+           ( resTile.Valued )
+        then ResIsOut := false;
 
     end;
 
