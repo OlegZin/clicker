@@ -249,7 +249,7 @@ begin
     begin
         /// некоторые типы объектов при этом должны быть разрушены или заменены другими
         /// например, дерево становитс€ пеньком, куст с €годами - обычным кустом
-        case obj.Identity.Common of
+{        case obj.Identity.Common of
             /// простые источники ресурса просто удал€ютс€
             OBJ_BUSH,
             OBJ_TREE,
@@ -269,6 +269,9 @@ begin
                 mngObject.RemoveTile( obj.id );
             else mngObject.RemoveTile( obj.id );
         end;
+}
+        /// пока что уничтожаютс€ все объекты, кроме ландшафта
+        if obj.Identity.Common > OBJ_DEAD then mngObject.RemoveTile( obj.id );
 
         result := result or PROCESS_CHANGE_FIELD;
     end;
