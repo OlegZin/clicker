@@ -38,8 +38,6 @@ type
     tile_bear: TImage;
     tile_mush: TImage;
     tile_blackwolf: TImage;
-    Rectangle1: TRectangle;
-    Rectangle2: TRectangle;
     icon_prod: TImage;
     icon_grass: TImage;
     icon_spear: TImage;
@@ -53,7 +51,6 @@ type
     Image6: TImage;
     Image7: TImage;
     Image8: TImage;
-    Image9: TImage;
     Image10: TImage;
     Image11: TImage;
     Image12: TImage;

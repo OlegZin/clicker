@@ -11,6 +11,7 @@ object fMain: TfMain
   DesignerMasterStyle = 0
   object sbScreen: TScrollBox
     Align = Client
+    ClipChildren = True
     Size.Width = 360.000000000000000000
     Size.Height = 470.000000000000000000
     Size.PlatformDefault = False

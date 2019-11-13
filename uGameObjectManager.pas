@@ -101,7 +101,6 @@ type
         Dependence: TRelations;        // набор зависимостей объектов. например,
                                        // дерево технологий, набор ресурсов для крафта
         Visualization: TVisualization; // ссылки на способы отображения в разных состояниях
-
         constructor Create; overload;
     end;
 
@@ -178,6 +177,8 @@ type
         function PosIsFree( x, y: real; layer: integer ): boolean;
         ///    проверка, свободна ли указанная позиция на указанном слое
         ///    используется для избежания наслоения объектов на слое
+
+        procedure OptimizeObjects;
     end;
 
 var
@@ -208,7 +209,7 @@ var
 begin
     result := -1;
 
-    if not PosIsFree(x, y, layer) then exit;
+//    if not PosIsFree(x, y, layer) then exit;
 
     // создаем объект локации, определяем тип и положение
     location := TResourcedObject.Create;
@@ -292,8 +293,8 @@ var
 begin
     if id < 0 then exit;
 
-    layer := id mod 1000;
-    index := id div 1000;
+    layer := id mod 1000000;
+    index := id div 1000000;
 
     result := fObjects[layer][index];
 end;
@@ -324,6 +325,41 @@ begin
     then result := fObjects[layer][fLayerIndex[layer]];
 end;
 
+procedure TObjectManager.OptimizeObjects;
+/// механизм выравнивания глубины объектов
+/// проблема: после рандомной генерации объектов в динамическом массиве объектов
+/// координата Y идет в перемешку. При генерации игрового поля эта чехорда
+/// приведет к тому, что "ближние" к игроку объекты (с большим Y) будут
+/// перекрываться "дальними" объектами, поскольку они находятся дальше к концу
+/// массива объектов.
+/// решение - сортировкой пузырьком на всех слоях раскладываем объекты в порядке
+/// возрастания координаты Y
+var
+    layer, i, j, idj, idi: integer;
+    buffObj: TBaseObject;
+
+begin
+///
+    for layer := Low(fObjects) to High(fObjects) do
+    if Length(fObjects[layer]) > 1 then
+    begin
+        for I := High(fObjects[layer]) downto Low(fObjects[layer])+1 do
+        for J := Low(fObjects[layer]) to I-1 do
+        if fObjects[layer][j].Position.Y > fObjects[layer][i].Position.Y then
+        begin
+            idj := fObjects[layer][j].id;
+            idi := fObjects[layer][i].id;
+
+            buffObj := fObjects[layer][j];
+            fObjects[layer][j] := fObjects[layer][i];
+            fObjects[layer][i] := buffObj;
+
+            fObjects[layer][i].id := idi;
+            fObjects[layer][j].id := idj;
+        end;
+    end;
+end;
+
 function TObjectManager.PosIsFree(x, y: real; layer: integer): boolean;
 var
     obj: TBaseObject;
@@ -345,7 +381,7 @@ end;
 function TObjectManager.GetId( layer: integer ): integer;
 begin
     result := ( Length( fObjects[layer] ) );
-    result := layer + ( result * 1000 );
+    result := layer + ( result * 1000000 );
 end;
 
 function TObjectManager.GetLayerCount: integer;
