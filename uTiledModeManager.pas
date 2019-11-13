@@ -74,55 +74,95 @@ procedure TTileModeDrive.BuildField;
 var
     col, row, id: integer;
     ColMax, RowMax: integer;
+    currLayer: integer;
 begin
+
+////////////////////////////////////////////////////////////////////////////////
+    currLayer := 2;
 
     // основа карты
     for col := 0 to MAP_COL_COUNT - 1 do
     for row := 0 to MAP_ROW_COUNT - 1 do
     begin
 //        mngObject.CreateTile( OBJ_DEAD, col, row, 1 );
-        mngObject.CreateTile( OBJ_PLAIN, col * TILE_WIDTH, row * TILE_HEIGHT, 2 );
+        mngObject.CreateTile( OBJ_PLAIN, col * TILE_WIDTH, row * TILE_HEIGHT, currLayer );
     end;
 
     RowMax := MAP_COL_COUNT * TILE_WIDTH + TILE_WIDTH;
     ColMax := MAP_ROW_COUNT * TILE_HEIGHT + TILE_HEIGHT;
 
-    // простая трава
-    for col := 0 to 20 do
-    begin
-        id := mngObject.CreateTile( OBJ_PAPOROTNIK, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, 3 );
-        mngObject.SetResource( id, RESOURCE_GRASS, 30, -1, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
-    end;
 
+
+////////////////////////////////////////////////////////////////////////////////
+    currLayer := 3;
+
+    // простая трава
     for col := 0 to 2000 do
     begin
-        id := mngObject.CreateTile( OBJ_SMALLGRASS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, 3 );
+        id := mngObject.CreateTile( OBJ_SMALLGRASS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
         mngObject.SetResource( id,RESOURCE_GRASS, 10, -1, 0, 0 );
         mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
     end;
 
 
 
-    // еда с растений
+////////////////////////////////////////////////////////////////////////////////
+    currLayer := 4;
+
+    // более редкие растения
+    for col := 0 to 20 do
+    begin
+        id := mngObject.CreateTile( OBJ_PAPOROTNIK, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
+        mngObject.SetResource( id, RESOURCE_GRASS, 30, -1, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+    end;
+
     for col := 0 to 20 do
     mngObject.SetResource(
-        mngObject.CreateTile( OBJ_MUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, 5 ),
+        mngObject.CreateTile( OBJ_MUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
+        RESOURCE_FOOD, 10, -1, 0, 5
+    );
+
+    for col := 0 to 50 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_WHITE_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
+        RESOURCE_FOOD, 10, -1, 0, 5
+    );
+
+    for col := 0 to 50 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_YELLOW_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
+        RESOURCE_FOOD, 10, -1, 0, 5
+    );
+
+    for col := 0 to 30 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_BROWN_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
+        RESOURCE_FOOD, 10, -1, 0, 5
+    );
+
+    for col := 0 to 30 do
+    mngObject.SetResource(
+        mngObject.CreateTile( OBJ_BROWN_MUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
         RESOURCE_FOOD, 10, -1, 0, 5
     );
 
 
+
+////////////////////////////////////////////////////////////////////////////////
+    currLayer := 5;
+
     // простые камни
     for col := 0 to 20 do
     begin
-        id := mngObject.CreateTile( OBJ_BROVNSTONE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, 6 );
+        id := mngObject.CreateTile( OBJ_BROVNSTONE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
         mngObject.SetResource( id, RESOURCE_STONE, 100, -1, 0, 0 );
         mngObject.SetResource( id, RESOURCE_IQ, 999, -0.2, 0, 0, false );
     end;
 
     for col := 0 to 20 do
     begin
-        id := mngObject.CreateTile( OBJ_GRAYSTONE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, 6 );
+        id := mngObject.CreateTile( OBJ_GRAYSTONE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
         mngObject.SetResource( id, RESOURCE_STONE, 300, -2, 0, 0 );
         mngObject.SetResource( id, RESOURCE_IQ, 999, -0.3, 0, 0, false );
     end;
@@ -131,28 +171,28 @@ begin
     // простые деревья
     for col := 0 to 50 do
     begin
-        id := mngObject.CreateTile( OBJ_BUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, 6 );
+        id := mngObject.CreateTile( OBJ_BUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
         mngObject.SetResource( id, RESOURCE_WOOD, 10, -1, 0, 0 );
         mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
     end;
 
     for col := 0 to 200 do
     begin
-        id := mngObject.CreateTile( OBJ_TREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, 6 );
+        id := mngObject.CreateTile( OBJ_TREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
         mngObject.SetResource( id, RESOURCE_WOOD, 50, -2, 0, 0 );
         mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
     end;
 
     for col := 0 to 20 do
     begin
-        id := mngObject.CreateTile( OBJ_BIGTREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, 6 );
+        id := mngObject.CreateTile( OBJ_BIGTREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
         mngObject.SetResource( id, RESOURCE_WOOD, 100, -3, 0, 0 );
         mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
     end;
 
     for col := 0 to 10 do
     begin
-        ID := mngObject.CreateTile( OBJ_DEADTREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, 6 );
+        ID := mngObject.CreateTile( OBJ_DEADTREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
         mngObject.SetResource( id, RESOURCE_WOOD, 200, -2, 0, 0 );
         mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
     end;
@@ -161,7 +201,7 @@ begin
 
     for col := 0 to 20 do
     mngObject.SetResource(
-        mngObject.CreateTile( OBJ_APPLETREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, 6 ),
+        mngObject.CreateTile( OBJ_APPLETREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
         RESOURCE_FOOD, 10, -1, 1, 10
     );
 
@@ -170,7 +210,7 @@ begin
 
     for col := 0 to 10 do
     begin
-        id := mngObject.CreateTile( OBJ_BIZON, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, 6 );
+        id := mngObject.CreateTile( OBJ_BIZON, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
         mngObject.SetResource( id, RESOURCE_FOOD, 100, -2, 0, 0 );
         mngObject.SetResource( id, RESOURCE_HIDE, 50, -1, 0, 0 );
         mngObject.SetResource( id, RESOURCE_HEALTH, 0, 1, 0, 0, false );
@@ -178,18 +218,18 @@ begin
 
     for col := 0 to 10 do
     mngObject.SetResource(
-        mngObject.CreateTile( OBJ_WOLF, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, 6 ),
+        mngObject.CreateTile( OBJ_WOLF, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
         RESOURCE_BONE, 10, -1, 1, 10
     );
     for col := 0 to 10 do
     mngObject.SetResource(
-        mngObject.CreateTile( OBJ_BEAR, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, 6 ),
+        mngObject.CreateTile( OBJ_BEAR, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
         RESOURCE_BONE, 10, -1, 1, 10
     );
 
     for col := 0 to 5 do
     mngObject.SetResource(
-        mngObject.CreateTile( OBJ_BLACKWOLF, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, 6 ),
+        mngObject.CreateTile( OBJ_BLACKWOLF, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
         RESOURCE_BONE, 10, -1, 1, 10
     );
 
@@ -264,7 +304,7 @@ begin
 
             image.Visible := obj.visible;
             image.Position.X := obj.Position.Х;
-            image.Position.Y := obj.Position.Y;
+            image.Position.Y := obj.Position.Y;// - image.Height;
             source := TImage(fImgMap.FindComponent( obj.Visualization.Name[ VISUAL_TILE ]) );
             if assigned(source) then
             begin

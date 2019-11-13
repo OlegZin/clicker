@@ -61,6 +61,11 @@ const
     OBJ_BIZON       = 36;  // папоротник
     OBJ_BEAR        = 37;  // папоротник
     OBJ_BLACKWOLF   = 38;  // папоротник
+    OBJ_WHITE_FLOWERS = 39;
+    OBJ_YELLOW_FLOWERS = 40;
+    OBJ_BROWN_FLOWERS = 41;
+    OBJ_BROWN_MUSH = 42;
+
 
     // типы тесурсов
     // синонимы индексов в массиве TableResource
@@ -84,7 +89,7 @@ const
 
 var
     // все существующие игровые объекты
-    TableObjects : array [0..38, 0..2] of string = (
+    TableObjects : array [0..42, 0..2] of string = (
       /// типы местности
       ('Лес',     'tile_forest', '+'),
       ('Равнина', 'tile_plane',  '+'),
@@ -129,7 +134,12 @@ var
       ('Волк',  'tile_wolf',  ''),                //35
       ('Бизон',  'tile_bizon',  ''),
       ('Медведь',  'tile_bear',  ''),
-      ('Черный волк',  'tile_blackwolf',  '')
+      ('Черный волк',  'tile_blackwolf',  ''),
+      ('Белые цветы',  'tile_w_flover',  ''),
+      ('Желтые цветы',  'tile_y_flower',  ''),
+      ('Бурые цветы',  'tile_b_flower',  ''),
+      ('Белые грибы',  'tile_b_mush',  '')
+
 
 
 //    ,('', 'tile_', ''),

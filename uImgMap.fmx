@@ -3143,8 +3143,8 @@ object fImgMap: TfImgMap
           D58C524CAAE90000000049454E44AE426082}
         FileName = 'C:\SmartGit\clicker\img\bush_1.png'
       end>
-    Position.X = 632.000000000000000000
-    Position.Y = 264.000000000000000000
+    Position.X = 488.000000000000000000
+    Position.Y = 400.000000000000000000
     Size.Width = 32.000000000000000000
     Size.Height = 32.000000000000000000
     Size.PlatformDefault = False
@@ -3248,8 +3248,8 @@ object fImgMap: TfImgMap
           405E0000000049454E44AE426082}
         FileName = 'C:\SmartGit\clicker\img\bush_2.png'
       end>
-    Position.X = 672.000000000000000000
-    Position.Y = 224.000000000000000000
+    Position.X = 528.000000000000000000
+    Position.Y = 360.000000000000000000
     Size.Width = 32.000000000000000000
     Size.Height = 32.000000000000000000
     Size.PlatformDefault = False
@@ -3351,8 +3351,8 @@ object fImgMap: TfImgMap
           AE426082}
         FileName = 'C:\SmartGit\clicker\img\bush_3.png'
       end>
-    Position.X = 672.000000000000000000
-    Position.Y = 264.000000000000000000
+    Position.X = 528.000000000000000000
+    Position.Y = 400.000000000000000000
     Size.Width = 32.000000000000000000
     Size.Height = 32.000000000000000000
     Size.PlatformDefault = False
@@ -3459,8 +3459,8 @@ object fImgMap: TfImgMap
           0000000049454E44AE426082}
         FileName = 'C:\SmartGit\clicker\img\bush_4.png'
       end>
-    Position.X = 712.000000000000000000
-    Position.Y = 224.000000000000000000
+    Position.X = 568.000000000000000000
+    Position.Y = 360.000000000000000000
     Size.Width = 32.000000000000000000
     Size.Height = 32.000000000000000000
     Size.PlatformDefault = False
@@ -3576,8 +3576,8 @@ object fImgMap: TfImgMap
           450000000049454E44AE426082}
         FileName = 'C:\SmartGit\clicker\img\01.png'
       end>
-    Position.X = 712.000000000000000000
-    Position.Y = 264.000000000000000000
+    Position.X = 568.000000000000000000
+    Position.Y = 400.000000000000000000
     Size.Width = 32.000000000000000000
     Size.Height = 32.000000000000000000
     Size.PlatformDefault = False
@@ -3704,14 +3704,14 @@ object fImgMap: TfImgMap
           4C3F910000000049454E44AE426082}
         FileName = 'C:\SmartGit\clicker\img\02.png'
       end>
-    Position.X = 752.000000000000000000
-    Position.Y = 224.000000000000000000
+    Position.X = 608.000000000000000000
+    Position.Y = 360.000000000000000000
     Size.Width = 32.000000000000000000
     Size.Height = 32.000000000000000000
     Size.PlatformDefault = False
     WrapMode = Center
   end
-  object Image7: TImage
+  object tile_b_mush: TImage
     MultiResBitmap.LoadSize = 1
     MultiResBitmap.TransparentColor = 536870912
     MultiResBitmap = <
@@ -3787,10 +3787,10 @@ object fImgMap: TfImgMap
           000049454E44AE426082}
         FileName = 'C:\SmartGit\clicker\img\03.png'
       end>
-    Position.X = 792.000000000000000000
-    Position.Y = 224.000000000000000000
-    Size.Width = 32.000000000000000000
-    Size.Height = 32.000000000000000000
+    Position.X = 608.000000000000000000
+    Position.Y = 216.000000000000000000
+    Size.Width = 64.000000000000000000
+    Size.Height = 64.000000000000000000
     Size.PlatformDefault = False
     WrapMode = Center
   end
@@ -3857,14 +3857,14 @@ object fImgMap: TfImgMap
           C03F006D2B5A235237EA380000000049454E44AE426082}
         FileName = 'C:\SmartGit\clicker\img\04.png'
       end>
-    Position.X = 832.000000000000000000
-    Position.Y = 264.000000000000000000
+    Position.X = 688.000000000000000000
+    Position.Y = 400.000000000000000000
     Size.Width = 32.000000000000000000
     Size.Height = 32.000000000000000000
     Size.PlatformDefault = False
     WrapMode = Center
   end
-  object Image10: TImage
+  object tile_w_flover: TImage
     MultiResBitmap.LoadSize = 1
     MultiResBitmap.TransparentColor = 536870912
     MultiResBitmap = <
@@ -3935,14 +3935,14 @@ object fImgMap: TfImgMap
           AE426082}
         FileName = 'C:\SmartGit\clicker\img\06.png'
       end>
-    Position.X = 752.000000000000000000
-    Position.Y = 264.000000000000000000
-    Size.Width = 32.000000000000000000
-    Size.Height = 32.000000000000000000
+    Position.X = 392.000000000000000000
+    Position.Y = 216.000000000000000000
+    Size.Width = 64.000000000000000000
+    Size.Height = 64.000000000000000000
     Size.PlatformDefault = False
     WrapMode = Center
   end
-  object Image11: TImage
+  object tile_y_flower: TImage
     MultiResBitmap.LoadSize = 1
     MultiResBitmap.TransparentColor = 536870912
     MultiResBitmap = <
@@ -4002,14 +4002,14 @@ object fImgMap: TfImgMap
           DD2AB045EDC0910000000049454E44AE426082}
         FileName = 'C:\SmartGit\clicker\img\07.png'
       end>
-    Position.X = 792.000000000000000000
-    Position.Y = 264.000000000000000000
-    Size.Width = 32.000000000000000000
-    Size.Height = 33.000000000000000000
+    Position.X = 464.000000000000000000
+    Position.Y = 216.000000000000000000
+    Size.Width = 64.000000000000000000
+    Size.Height = 64.000000000000000000
     Size.PlatformDefault = False
     WrapMode = Center
   end
-  object Image12: TImage
+  object tile_b_flower: TImage
     MultiResBitmap.LoadSize = 1
     MultiResBitmap.TransparentColor = 536870912
     MultiResBitmap = <
@@ -4093,10 +4093,10 @@ object fImgMap: TfImgMap
           F25902F837E9404E99BA3E4B4F0000000049454E44AE426082}
         FileName = 'C:\SmartGit\clicker\img\08.png'
       end>
-    Position.X = 832.000000000000000000
-    Position.Y = 224.000000000000000000
-    Size.Width = 32.000000000000000000
-    Size.Height = 32.000000000000000000
+    Position.X = 536.000000000000000000
+    Position.Y = 216.000000000000000000
+    Size.Width = 64.000000000000000000
+    Size.Height = 64.000000000000000000
     Size.PlatformDefault = False
     WrapMode = Center
   end

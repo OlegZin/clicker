@@ -267,6 +267,7 @@ begin
             OBJ_BIZON
             :
                 mngObject.RemoveTile( obj.id );
+            else mngObject.RemoveTile( obj.id );
         end;
 
         result := result or PROCESS_CHANGE_FIELD;

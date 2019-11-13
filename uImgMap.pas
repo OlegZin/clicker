@@ -49,11 +49,11 @@ type
     Image4: TImage;
     Image5: TImage;
     Image6: TImage;
-    Image7: TImage;
+    tile_b_mush: TImage;
     Image8: TImage;
-    Image10: TImage;
-    Image11: TImage;
-    Image12: TImage;
+    tile_w_flover: TImage;
+    tile_y_flower: TImage;
+    tile_b_flower: TImage;
   private
     { Private declarations }
   public

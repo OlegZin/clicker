@@ -94,7 +94,6 @@ type
                                        // при сброшенном, флаге объект не будет отображатьс€ на поле, если €вл€етс€ тайлом
         Name : string;
         Description : string;
-
         Identity: TIdentity;           // определ€ющий набор признаков
         Relation: TRelations;          // набор св€зей с прочими объектами
         Position: TPosition;           // положение в общем игровом пространстве
