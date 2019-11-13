@@ -49,6 +49,14 @@ type
     Image2: TImage;
     Image3: TImage;
     Image4: TImage;
+    Image5: TImage;
+    Image6: TImage;
+    Image7: TImage;
+    Image8: TImage;
+    Image9: TImage;
+    Image10: TImage;
+    Image11: TImage;
+    Image12: TImage;
   private
     { Private declarations }
   public
