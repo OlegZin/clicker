@@ -3,9 +3,9 @@ unit uToolPanelManager;
 interface
 
 uses
-    FMX.TabControl, FMX.Layouts, FMX.Objects,
+    FMX.TabControl, FMX.Layouts, FMX.Objects, FMX.StdCtrls,
 
-    uGameObjectManager;
+    uGameObjectManager, DB;
 
 type
     TImageArr = array of TImage;
@@ -24,12 +24,15 @@ type
         fObjectPreview : TImage;
 
         fCurrObject: TResourcedObject;
+        fObjectName: TLabel;
         /// текущий выбранный на карте объект, на каждый тик его данные будут обновляться
 
       public
         procedure ObjectSelect( obj: TResourcedObject );
+        procedure ObjectUnselect;
+
         procedure SetupComponents( tabButtonPanel: TLayout; tabPanel: TTabControl; buttons, active, unactive: TImageArr );
-        procedure SetupObjectPanelComponents( preview: TImage );
+        procedure SetupObjectPanelComponents( preview: TImage; objectName: TLabel );
         procedure Init;
     end;
 
@@ -59,9 +62,10 @@ begin
     fButtonsUnactive := unactive;
 end;
 
-procedure TToolPanelManager.SetupObjectPanelComponents(preview: TImage);
+procedure TToolPanelManager.SetupObjectPanelComponents(preview: TImage; objectName: TLabel);
 begin
     fObjectPreview := preview;
+    fObjectName := objectName;
 end;
 
 procedure TToolPanelManager.Init;
@@ -74,7 +78,9 @@ begin
     for I := 0 to High(fButtons) do
     if i = 0
     then fButtons[i].bitmap.Assign( fButtonsActive[i].MultiResBitmap.Bitmaps[1.0] )
-    else fButtons[i].bitmap.Assign( fButtonsUnactive[i].MultiResBitmap.Bitmaps[1.0] )
+    else fButtons[i].bitmap.Assign( fButtonsUnactive[i].MultiResBitmap.Bitmaps[1.0] );
+
+    fObjectName.Text := '';
 
 end;
 
@@ -84,6 +90,14 @@ begin
     fObjectPreview.bitmap.Assign( TImage(obj.Image).MultiResBitmap.Bitmaps[1.0] );
 
     fCurrObject := obj;
+    fObjectName.Text := TableObjects[obj.Identity.Common, OBJECTS_FIELD_NAME];
+end;
+
+procedure TToolPanelManager.ObjectUnselect;
+/// сбрасывает выделение текущего объекта, очищая панели от данных
+begin
+    fCurrObject := nil;
+    fObjectPreview.Bitmap := nil;
 end;
 
 initialization

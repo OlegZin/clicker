@@ -15,7 +15,6 @@ type
     icon_man: TImage;
     icon_wood: TImage;
     icon_stone: TImage;
-    icon_woman: TImage;
     tile_dead: TImage;
     tile_plane: TImage;
     tile_bush: TImage;
@@ -56,6 +55,13 @@ type
     iProductionUnactive: TImage;
     iOperationActive: TImage;
     iOperationUnactive: TImage;
+    action_hand: TImage;
+    action_weapon: TImage;
+    action_axe: TImage;
+    action_pick: TImage;
+    action_shovel: TImage;
+    action_talk: TImage;
+    action_grow: TImage;
   private
     { Private declarations }
   public

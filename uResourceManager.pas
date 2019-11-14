@@ -9,7 +9,7 @@ interface
 
 uses
 
-    FMX.Layouts, FMX.Types, FMX.Objects, FMX.StdCtrls, SysUtils, System.Types,
+    FMX.Layouts, FMX.Types, FMX.Objects, FMX.StdCtrls, SysUtils, System.Types, System.UITypes,
 
     uGameObjectManager;
 
@@ -139,7 +139,7 @@ begin
     _layout := TLayout.Create(fFLayout);
     with _layout do
     begin
-        Width := 50;
+        Width := 60;
         height := 17;
     end;
 
@@ -153,8 +153,6 @@ begin
         Position.Y := 1;
         source := TImage(fImgMap.FindComponent( icon ));
         if assigned(source) then bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
-
-//        Bitmap.Assign( fMain.ilResources.Bitmap(BitmapSize, icon) );
     end;
 
     _label := TLabel.Create(_layout);
@@ -165,6 +163,7 @@ begin
         Width := 63;
         Position.X := 17;
         Position.Y := 1;
+        TextSettings.FontColor := $B8860B;
     end;
 
     fResources[ index ].view.layout := _layout;

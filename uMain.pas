@@ -13,8 +13,6 @@ uses
 type
   TfMain = class(TForm)
     sbScreen: TScrollBox;
-    lNavigation: TLayout;
-    sbMenu: TSpeedButton;
     il18: TImageList;
     flResources: TFlowLayout;
     lResources: TLayout;
@@ -32,6 +30,14 @@ type
     iProduction: TImage;
     iOperation: TImage;
     Rectangle2: TRectangle;
+    lObjectName: TLabel;
+    Image1: TImage;
+    Image2: TImage;
+    Image3: TImage;
+    Image4: TImage;
+    Image5: TImage;
+    Image6: TImage;
+    Rectangle3: TRectangle;
     procedure FormCreate(Sender: TObject);
     procedure tResTimerTimer(Sender: TObject);
     procedure OnMouseDownCallback(Sender: TObject; Button: TMouseButton;
@@ -242,7 +248,7 @@ begin
         [fImgMap.iObjectActive, fImgMap.iOperationActive, fImgMap.iScienceActive, fImgMap.iProductionActive],
         [fImgMap.iObjectUnactive, fImgMap.iOperationUnactive, fImgMap.iScienceUnactive, fImgMap.iProductionUnactive]
     );
-    mToolPanel.SetupObjectPanelComponents( imgPreview );
+    mToolPanel.SetupObjectPanelComponents( imgPreview, lObjectName );
     mToolPanel.Init;
 end;
 

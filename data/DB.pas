@@ -10,6 +10,9 @@ const
     TILE_WIDTH      = 64;
     TILE_HEIGHT     = 64;
 
+    OBJECTS_FIELD_NAME = 0;
+    OBJECTS_FIELD_DESCRIP = 2;
+
     TABLE_FIELD_NAME       = 0;
     TABLE_FIELD_ICON_IMAGE = 1;
     TABLE_FIELD_TILE_IMAGE = 1;
@@ -90,56 +93,56 @@ const
 
 var
     // все существующие игровые объекты
-    TableObjects : array [0..42, 0..2] of string = (
+    TableObjects : array [0..42, 0..3] of string = (
       /// типы местности
-      ('Лес',     'tile_forest', '+'),
-      ('Равнина', 'tile_plane',  '+'),
-      ('Горы',    'tile_mount',  '+'),
-      ('Пустыня', 'tile_sand',   '+'),
-      ('Ледник',  'tile_ice',    '+'),
-      ('Разлом',  'tile_canyon', ''),
-      ('Лава',    'tile_lava',   ''),
-      ('Вода',    'tile_water',  '+'),
-      ('Плита',   'tile_dead',   '+'),
-      ('Туман',   'tile_fog',    '+'),
+      ('Лес',     'tile_forest', '+', ''),
+      ('Равнина', 'tile_plane',  '+', ''),
+      ('Горы',    'tile_mount',  '+', ''),
+      ('Пустыня', 'tile_sand',   '+', ''),
+      ('Ледник',  'tile_ice',    '+', ''),
+      ('Разлом',  'tile_canyon', '', ''),
+      ('Лава',    'tile_lava',   '', ''),
+      ('Вода',    'tile_water',  '+', ''),
+      ('Плита',   'tile_dead',   '+', ''),
+      ('Туман',   'tile_fog',    '+', ''),
       /// естественные объекты
-      ('Хищник', 'tile_predator', ''),      //10
-      ('Мамонт', 'tile_mamont', ''),
-      ('Пещера', 'tile_cave', ''),
-      ('Стадо', 'tile_herd', ''),
+      ('Хищник', 'tile_predator', '', ''),      //10
+      ('Мамонт', 'tile_mamont', '', ''),
+      ('Пещера', 'tile_cave', '', ''),
+      ('Стадо', 'tile_herd', '', ''),
       /// относящиеся к деятельности человека
-      ('Маленькое поселение', 'tile_town_small', ''),
-      ('Среднее поселение',   'tile_town_medium', ''),
-      ('Большое поселение',   'tile_town_big', ''),
-      ('Огромное поселение',  'tile_town_great', ''),
+      ('Маленькое поселение', 'tile_town_small', '', ''),
+      ('Среднее поселение',   'tile_town_medium', '', ''),
+      ('Большое поселение',   'tile_town_big', '', ''),
+      ('Огромное поселение',  'tile_town_great', '', ''),
       /// группы, бродящие по карте
-      ('Житель', 'tile_pesant', ''),
-      ('Рейдер', 'tile_raider', ''),
-      ('Отряд',  'tile_band', ''),          // 20
-      ('Армия',  'tile_army', ''),
+      ('Житель', 'tile_pesant', '', ''),
+      ('Рейдер', 'tile_raider', '', ''),
+      ('Отряд',  'tile_band', '', ''),          // 20
+      ('Армия',  'tile_army', '', ''),
       // локальный режим
-      ('Дерево', 'tile_tree',  ''),
-      ('Куст',   'tile_bush',  ''),
-      ('Камень', 'tile_rock',  ''),
-      ('Ягоды',  'tile_berry', ''),          // 25
-      ('Трава',  'tile_grass', ''),
-      ('Грибы',  'tile_mush',  ''),
-      ('Большое дерево',  'tile_bigtree',  ''),
-      ('Мертвое дерево',  'tile_deadtree',  ''),
-      ('Папоротник',  'tile_paporotnik',  ''),  // 30
-      ('Яблоня',  'tile_appletree',  ''),
-      ('Гранит',  'tile_graystone',  ''),
-      ('Глина',  'tile_brovnstone',  ''),
-      ('Трава',  'tile_smallgrass',  ''),
+      ('Дерево', 'tile_tree',  '', ''),
+      ('Куст',   'tile_bush',  '', ''),
+      ('Камень', 'tile_rock',  '', ''),
+      ('Ягоды',  'tile_berry', '', ''),          // 25
+      ('Трава',  'tile_grass', '', ''),
+      ('Грибы',  'tile_mush',  '', ''),
+      ('Большое дерево',  'tile_bigtree',  '', ''),
+      ('Мертвое дерево',  'tile_deadtree',  '', ''),
+      ('Папоротник',  'tile_paporotnik',  '', ''),  // 30
+      ('Яблоня',  'tile_appletree',  '', ''),
+      ('Гранит',  'tile_graystone',  'Твердый камень. Нужны инструменты', ''),
+      ('Песчаник',  'tile_brovnstone',  'Обычный камень. Трудно сбрать руками', ''),
+      ('Трава',  'tile_smallgrass',  'Обычная свежая трава', ''),
 
-      ('Волк',  'tile_wolf',  ''),                //35
-      ('Бизон',  'tile_bizon',  ''),
-      ('Медведь',  'tile_bear',  ''),
-      ('Черный волк',  'tile_blackwolf',  ''),
-      ('Белые цветы',  'tile_w_flover',  ''),
-      ('Желтые цветы',  'tile_y_flower',  ''),
-      ('Бурые цветы',  'tile_b_flower',  ''),
-      ('Белые грибы',  'tile_b_mush',  '')
+      ('Волк',  'tile_wolf',  'Волчонок', ''),                //35
+      ('Бизон',  'tile_bizon',  'Бизон', ''),
+      ('Медведь',  'tile_bear',  '', ''),
+      ('Черный волк',  'tile_blackwolf',  '', ''),
+      ('Белые цветы',  'tile_w_flover',  '', ''),
+      ('Желтые цветы',  'tile_y_flower',  '', ''),
+      ('Бурые цветы',  'tile_b_flower',  '', ''),
+      ('Белые грибы',  'tile_b_mush',  '', '')
 
 
 

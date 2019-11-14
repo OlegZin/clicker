@@ -286,6 +286,7 @@ begin
         begin
            mngObject.RemoveTile( obj.id );
            mTileDrive.DropSelection;
+           mToolPanel.ObjectUnselect;
         end;
 
         result := result or PROCESS_CHANGE_FIELD;
