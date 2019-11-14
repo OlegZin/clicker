@@ -24,7 +24,8 @@ type
     sbItems: TScrollBox;
     Image1: TImage;
     lTabs: TLayout;
-    Image2: TImage;
+    Image7: TImage;
+    Rectangle1: TRectangle;
     procedure FormCreate(Sender: TObject);
     procedure tResTimerTimer(Sender: TObject);
     procedure sbItemsHScrollChange(Sender: TObject);

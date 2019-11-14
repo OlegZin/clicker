@@ -54,6 +54,7 @@ type
     tile_w_flover: TImage;
     tile_y_flower: TImage;
     tile_b_flower: TImage;
+    Image7: TImage;
   private
     { Private declarations }
   public
