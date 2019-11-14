@@ -63,7 +63,7 @@ implementation
 { TGameManager }
 
 uses
-    uGameObjectManager, uResourceManager, uTiledModeManager, DB;
+    uGameObjectManager, uResourceManager, uTiledModeManager, DB, uToolPanelManager;
 
 procedure TGameManager.CalcGameState;
 ///    логическое ядро.
@@ -191,9 +191,14 @@ begin
     // получаем ссылку на объекта из массива
     obj := mngObject.FindObject( id );
 
-    /// выделяем кликнутый объект, если до сих пор не выбран
-    if   mGameManager.GameSatate.CurSelObjectId <> id
-    then mTileDrive.SetSelection( obj as TResourcedObject );
+    /// текущий выделенный объект не совпадает с предыдущим
+    if   mGameManager.GameSatate.CurSelObjectId <> id then
+    begin
+        // выделяем кликнутый объект, если до сих пор не выбран
+        mTileDrive.SetSelection( obj as TResourcedObject );
+        // показываем его на панели свойств/действий
+        mToolPanel.ObjectSelect( obj as TResourcedObject );
+    end;
 
     // будем обрабатывать, если он может содержать и содержит ресурсы
     if obj is TResourcedObject then

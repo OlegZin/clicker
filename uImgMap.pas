@@ -8,7 +8,6 @@ uses
 
 type
   TfImgMap = class(TForm)
-    tile_forest: TImage;
     tile_fog: TImage;
     icon_iq: TImage;
     icon_food: TImage;
@@ -19,11 +18,6 @@ type
     icon_woman: TImage;
     tile_dead: TImage;
     tile_plane: TImage;
-    tile_mount: TImage;
-    tile_sand: TImage;
-    tile_water: TImage;
-    tile_ice: TImage;
-    tile_berry: TImage;
     tile_bush: TImage;
     tile_tree: TImage;
     tile_bigtree: TImage;
@@ -54,7 +48,14 @@ type
     tile_w_flover: TImage;
     tile_y_flower: TImage;
     tile_b_flower: TImage;
-    Image7: TImage;
+    iObjectActive: TImage;
+    iObjectUnactive: TImage;
+    iScienceUnactive: TImage;
+    iScienceActive: TImage;
+    iProductionActive: TImage;
+    iProductionUnactive: TImage;
+    iOperationActive: TImage;
+    iOperationUnactive: TImage;
   private
     { Private declarations }
   public

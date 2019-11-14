@@ -8,7 +8,7 @@ uses
   FMX.Controls.Presentation, FMX.Layouts, FMX.TabControl, System.ImageList,
   FMX.ImgList, FMX.ExtCtrls, FMX.Objects, System.Math,
 
-  uResourceManager, uTiledModeManager, uGameManager, uGameObjectManager;
+  uResourceManager, uTiledModeManager, uGameManager, uGameObjectManager, uToolPanelManager;
 
 type
   TfMain = class(TForm)
@@ -17,18 +17,23 @@ type
     sbMenu: TSpeedButton;
     il18: TImageList;
     flResources: TFlowLayout;
-    lItems: TLayout;
     lResources: TLayout;
-    lTabbed: TLayout;
     tResTimer: TTimer;
-    sbItems: TScrollBox;
-    Image1: TImage;
+    imgPreview: TImage;
     lTabs: TLayout;
-    Image7: TImage;
+    iObject: TImage;
     Rectangle1: TRectangle;
+    TabControl1: TTabControl;
+    tabObject: TTabItem;
+    tabScience: TTabItem;
+    tabProduction: TTabItem;
+    Layout1: TLayout;
+    iScience: TImage;
+    iProduction: TImage;
+    iOperation: TImage;
+    Rectangle2: TRectangle;
     procedure FormCreate(Sender: TObject);
     procedure tResTimerTimer(Sender: TObject);
-    procedure sbItemsHScrollChange(Sender: TObject);
     procedure OnMouseDownCallback(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Single);
     procedure OnMouseUpCallback(Sender: TObject; Button: TMouseButton;
@@ -45,8 +50,6 @@ type
         : Single;
   public
     { Public declarations }
-    function GetTileBitmap(index: integer): TBitMap;
-
     procedure InitGame;
     procedure SetGameState;
     procedure StartGame;
@@ -141,10 +144,6 @@ begin
 
 end;
 
-function TfMain.GetTileBitmap(index: integer): TBitMap;
-begin
-end;
-
 procedure TfMain.OnMouseDownCallback(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Single);
 begin
@@ -153,7 +152,7 @@ begin
     begin
         InDrag := true;
         StartDragPos := Screen.MousePos;
-        self.Caption := Format('X: %f, Y: %f', [StartDragPos.X, StartDragPos.Y]);
+//        self.Caption := Format('X: %f, Y: %f', [StartDragPos.X, StartDragPos.Y]);
     end;
 
 end;
@@ -183,7 +182,7 @@ begin
         DeltaY := Min(DeltaY, MaxDelta);
         DeltaY := Max(DeltaY, -MaxDelta);
 
-        self.Caption := Format('X: %f, Y: %f', [DeltaX, DeltaY]);
+//        self.Caption := Format('X: %f, Y: %f', [DeltaX, DeltaY]);
 
 
         // прокрутка scrollbox
@@ -236,21 +235,21 @@ begin
     // инициализируем игру
     mGameManager.InitGame;
 
+    mToolPanel.SetupComponents(
+        lTabs,
+        TabControl1,
+        [iObject, iOperation, iScience, iProduction],
+        [fImgMap.iObjectActive, fImgMap.iOperationActive, fImgMap.iScienceActive, fImgMap.iProductionActive],
+        [fImgMap.iObjectUnactive, fImgMap.iOperationUnactive, fImgMap.iScienceUnactive, fImgMap.iProductionUnactive]
+    );
+    mToolPanel.SetupObjectPanelComponents( imgPreview );
+    mToolPanel.Init;
 end;
 
 procedure TfMain.StartGame;
 begin
     tResTimer.Enabled := true;
 end;
-
-procedure TfMain.sbItemsHScrollChange(Sender: TObject);
-var
-    s: TControlSize;
-begin
-    s := fMain.sbScreen.Size;
-    fMain.Caption := 'cx: ' + floattostr(s.Size.cx) + ' cy: ' + floatTostr(s.Size.cy);
-end;
-
 
 procedure TfMain.sbScreenMouseLeave(Sender: TObject);
 begin
