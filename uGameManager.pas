@@ -43,7 +43,8 @@ type
         Potential: Currency;          // текущий потенциал, который не теряется при начале новой игры
                                        // и является одним из ресурсов
         Era      : Integer;           // текущая игровая эра. соответсвует константе TAG_ERA_XXX
-        Mode     : Integer            // текущий игровой режим. соответсвует константе TAG_MODE_XXX
+        Mode     : Integer;            // текущий игровой режим. соответсвует константе TAG_MODE_XXX
+        CurSelObjectId: integer;      // текущий выбранный на игровом поле объект. 0 - не выбран
     end;
 
     TGameManager = class
@@ -62,7 +63,7 @@ implementation
 { TGameManager }
 
 uses
-    uGameObjectManager, uResourceManager, DB;
+    uGameObjectManager, uResourceManager, uTiledModeManager, DB;
 
 procedure TGameManager.CalcGameState;
 ///    логическое ядро.
@@ -182,12 +183,17 @@ var
             : boolean;
 begin
 
+
     hasChanges := false;
     ResIsOut := true;
     result := 0;
 
     // получаем ссылку на объекта из массива
     obj := mngObject.FindObject( id );
+
+    /// выделяем кликнутый объект, если до сих пор не выбран
+    if   mGameManager.GameSatate.CurSelObjectId <> id
+    then mTileDrive.SetSelection( obj as TResourcedObject );
 
     // будем обрабатывать, если он может содержать и содержит ресурсы
     if obj is TResourcedObject then
@@ -271,7 +277,11 @@ begin
         end;
 }
         /// пока что уничтожаются все объекты, кроме ландшафта
-        if obj.Identity.Common > OBJ_DEAD then mngObject.RemoveTile( obj.id );
+        if obj.Identity.Common > OBJ_DEAD then
+        begin
+           mngObject.RemoveTile( obj.id );
+           mTileDrive.DropSelection;
+        end;
 
         result := result or PROCESS_CHANGE_FIELD;
     end;

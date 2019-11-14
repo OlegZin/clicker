@@ -15,7 +15,7 @@ interface
 
 uses
     FMX.Layouts, FMX.Objects, SysUtils, System.Types, FMX.Graphics, FMX.ImgList, uImgMap,
-    System.UITypes, System.Classes;
+    System.UITypes, System.Classes, uGameObjectManager;
 
 type
 
@@ -27,6 +27,12 @@ type
     private
         fScreen : TScrollBox;
         fViewPort: TLayout;
+
+        fSelect_top,
+        fSelect_bottom,
+        fSelect_right,
+        fSelect_left
+                : TRectangle;
     public
         UpCallback,
         DownCallback
@@ -43,6 +49,10 @@ type
 
         procedure UpdateField;
                  // строим / обновляем игровое поле
+
+        procedure SetSelection( obj: TResourcedObject );
+                 // выделяем кликнутый объект рамкой
+        procedure DropSelection;
     end;
 
 var
@@ -52,7 +62,7 @@ implementation
 
 { TTileModeDrive }
  uses
-    uMain, uGameObjectManager, DB;
+    uMain, DB;
 
  type
     TImgLink = record
@@ -118,34 +128,39 @@ begin
     end;
 
     for col := 0 to 20 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_MUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
-        RESOURCE_FOOD, 10, -1, 0, 5
-    );
+    begin
+        id := mngObject.CreateTile( OBJ_MUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
+        mngObject.SetResource( id, RESOURCE_FOOD, 10, -1, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+    end;
 
     for col := 0 to 50 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_WHITE_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
-        RESOURCE_FOOD, 10, -1, 0, 5
-    );
+    begin
+        id := mngObject.CreateTile( OBJ_WHITE_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
+        mngObject.SetResource( id, RESOURCE_FOOD, 10, -1, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+    end;
 
     for col := 0 to 50 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_YELLOW_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
-        RESOURCE_FOOD, 10, -1, 0, 5
-    );
+    begin
+        id := mngObject.CreateTile( OBJ_YELLOW_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
+        mngObject.SetResource( id, RESOURCE_FOOD, 10, -1, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+    end;
 
     for col := 0 to 30 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_BROWN_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
-        RESOURCE_FOOD, 10, -1, 0, 5
-    );
+    begin
+        id := mngObject.CreateTile( OBJ_BROWN_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
+        mngObject.SetResource( id, RESOURCE_FOOD, 10, -1, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+    end;
 
     for col := 0 to 30 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_BROWN_MUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
-        RESOURCE_FOOD, 10, -1, 0, 5
-    );
+    begin
+        id := mngObject.CreateTile( OBJ_BROWN_MUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
+        mngObject.SetResource( id, RESOURCE_FOOD, 10, -1, 0, 0 );
+        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+    end;
 
 
 
@@ -202,7 +217,7 @@ begin
     for col := 0 to 20 do
     mngObject.SetResource(
         mngObject.CreateTile( OBJ_APPLETREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
-        RESOURCE_FOOD, 10, -1, 1, 10
+        RESOURCE_FOOD, 10, -1, 0.01, 0
     );
 
 
@@ -238,7 +253,7 @@ begin
 
 ////////////////////////////////////////////////////////////////////////////////
     currLayer := 98;
-
+{
     // туман войны
     for col := 0 to MAP_COL_COUNT - 1 do
     for row := 0 to MAP_ROW_COUNT - 1 do
@@ -250,7 +265,7 @@ begin
        id := mngObject.CreateTile( OBJ_FOG, col * TILE_WIDTH, row * TILE_HEIGHT, currLayer );
         mngObject.SetResource( id, RESOURCE_IQ, 5, -1, 0, 0 );
     end;
-
+}
     /// оптимизируем порядок объектов по слоям для корректной отрисовки по глубине
     mngObject.OptimizeObjects;
 end;
@@ -258,7 +273,7 @@ end;
 procedure TTileModeDrive.UpdateField;
 var
     layer: integer;
-    image, source: TImage;
+    source: TImage;
     obj: TBaseObject;
     I, J: Integer;
 
@@ -282,52 +297,102 @@ begin
         while Assigned( obj ) do
         begin
 
-            image := nil;
-
-            /// сопоставляем объект массива с картинкой на поле
-            for I := 0 to High(arrImgLink) do
-            if arrImgLink[i].id = obj.id
-            then
-            begin
-                image := arrImgLink[i].img;
-                break;
-            end;
-
-            /// если найдена, приводим в соответствие с состоянием объекта
             /// или сначала создаем картинку, если объект новый
-            if not assigned( image ) then
+            if not assigned( obj.image ) then
             begin
                 /// создается объект картинки, позиционируется на поле, назначается картинка
-                image := TImage.Create(fViewPort);
-                image.Parent := fViewPort;
-                image.Tag := obj.id;
-                image.OnMouseDown := DownCallback;
-                image.OnMouseMove := MoveCallback;
-                image.OnMouseUp := UpCallback;
-
-                /// запоминаем сопоставление
-                SetLength(arrImgLink, Length(arrImgLink) + 1);
-                arrImgLink[High(arrImgLink)].id := obj.id;
-                arrImgLink[High(arrImgLink)].img := image;
+                obj.image := TImage.Create(fViewPort);
+                TImage(obj.image).Parent := fViewPort;
+                TImage(obj.image).Tag := obj.id;
+                TImage(obj.image).OnMouseDown := DownCallback;
+                TImage(obj.image).OnMouseMove := MoveCallback;
+                TImage(obj.image).OnMouseUp := UpCallback;
             end;
 
-            image.Visible := obj.visible;
-            image.Position.X := obj.Position.Х;
-            image.Position.Y := obj.Position.Y;// - image.Height;
+            /// приводим в соответствие с состоянием объекта
+            TImage(obj.image).Visible := obj.visible;
+            TImage(obj.image).Position.X := obj.Position.Х;
+            TImage(obj.image).Position.Y := obj.Position.Y;// - image.Height;
             source := TImage(fImgMap.FindComponent( obj.Visualization.Name[ VISUAL_TILE ]) );
             if assigned(source) then
             begin
-                image.Height := source.Height;
-                image.Width := Source.Width;
-                image.bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
+                TImage(obj.image).Height := source.Height;
+                TImage(obj.image).Width := Source.Width;
+                TImage(obj.image).bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
             end;
 
-
-
+            /// берем следующий объект слоя
             obj := mngObject.GetNextOnLayer( layer ) as TResourcedObject;
 
         end;
     end;
+end;
+
+procedure TTileModeDrive.DropSelection;
+/// сбрасываем выделение с текущего объекта
+begin
+    if not Assigned(fSelect_top) then exit;
+    fSelect_top.Visible := false;
+    fSelect_bottom.Visible := false;
+    fSelect_right.Visible := false;
+    fSelect_left.Visible := false;
+end;
+
+procedure TTileModeDrive.SetSelection( obj: TResourcedObject );
+/// программно создаем рамку выделения на указанном объекте
+/// уже известно, что данный объект еще не выделен
+var
+    shift : integer;
+
+    procedure CreateElement( var rect: TRectangle );
+    begin
+        rect := TRectangle.Create(nil);
+        rect.Parent := fViewPort;
+        rect.Visible := false;
+        rect.Stroke.Kind := TBrushKind.None;
+        rect.Fill.Color := TAlphaColorRec.White;
+    end;
+begin
+    if not assigned(obj.Image) then exit;
+
+    shift := 5;
+
+    /// проверка на существование объектов, из которых состояит выделение
+    if not Assigned(fSelect_top) then
+    begin
+        CreateElement( fSelect_top );
+        CreateElement( fSelect_bottom );
+        CreateElement( fSelect_left );
+        CreateElement( fSelect_right );
+    end;
+
+    fSelect_top.BringToFront;
+    fSelect_top.Position.X := TImage(obj.Image).Position.X + shift;
+    fSelect_top.Position.Y := TImage(obj.Image).Position.Y;
+    fSelect_top.Height := 1;
+    fSelect_top.Width := TImage(obj.Image).Width - shift * 2;
+    fSelect_top.Visible := true;
+
+    fSelect_bottom.BringToFront;
+    fSelect_bottom.Position.X := TImage(obj.Image).Position.X + shift;
+    fSelect_bottom.Position.Y := TImage(obj.Image).Position.Y + TImage(obj.Image).Height;
+    fSelect_bottom.Height := 1;
+    fSelect_bottom.Width := TImage(obj.Image).Width - shift * 2;
+    fSelect_bottom.Visible := true;
+
+    fSelect_left.BringToFront;
+    fSelect_left.Position.X := TImage(obj.Image).Position.X;
+    fSelect_left.Position.Y := TImage(obj.Image).Position.Y + shift;
+    fSelect_left.Height := TImage(obj.Image).Height - shift * 2;
+    fSelect_left.Width := 1;
+    fSelect_left.Visible := true;
+
+    fSelect_right.BringToFront;
+    fSelect_right.Position.X := TImage(obj.Image).Position.X + TImage(obj.Image).Width;
+    fSelect_right.Position.Y := TImage(obj.Image).Position.Y + shift;
+    fSelect_right.Height := TImage(obj.Image).Height - shift * 2;
+    fSelect_right.Width := 1;
+    fSelect_right.Visible := true;
 end;
 
 procedure TTileModeDrive.SetupComponents(screen: TObject);
