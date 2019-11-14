@@ -97,7 +97,7 @@ begin
     currLayer := 3;
 
     // простая трава
-    for col := 0 to 2000 do
+    for col := 0 to 1000 do
     begin
         id := mngObject.CreateTile( OBJ_SMALLGRASS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
         mngObject.SetResource( id,RESOURCE_GRASS, 10, -1, 0, 0 );
@@ -233,6 +233,12 @@ begin
         RESOURCE_BONE, 10, -1, 1, 10
     );
 
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+    currLayer := 98;
+
     // туман войны
     for col := 0 to MAP_COL_COUNT - 1 do
     for row := 0 to MAP_ROW_COUNT - 1 do
@@ -240,7 +246,10 @@ begin
 //    if ((col < MAP_COL_COUNT - 3) or (row < MAP_ROW_COUNT - 3))
 
     then
-//       mngObject.CreateTile( OBJ_FOG, col, row, 10 );
+    begin
+       id := mngObject.CreateTile( OBJ_FOG, col * TILE_WIDTH, row * TILE_HEIGHT, currLayer );
+        mngObject.SetResource( id, RESOURCE_IQ, 5, -1, 0, 0 );
+    end;
 
     /// оптимизируем порядок объектов по слоям для корректной отрисовки по глубине
     mngObject.OptimizeObjects;
