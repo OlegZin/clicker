@@ -62,6 +62,7 @@ type
     action_shovel: TImage;
     action_talk: TImage;
     action_grow: TImage;
+    action_investigation: TImage;
   private
     { Private declarations }
   public
