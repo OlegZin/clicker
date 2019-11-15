@@ -55,14 +55,16 @@ type
     iProductionUnactive: TImage;
     iOperationActive: TImage;
     iOperationUnactive: TImage;
-    action_hand: TImage;
-    action_weapon: TImage;
-    action_axe: TImage;
-    action_pick: TImage;
-    action_shovel: TImage;
-    action_talk: TImage;
-    action_grow: TImage;
-    action_investigation: TImage;
+    action_1: TImage;
+    action_2: TImage;
+    action_3: TImage;
+    action_4: TImage;
+    action_5: TImage;
+    action_6: TImage;
+    action_7: TImage;
+    action_9: TImage;
+    action_8: TImage;
+    tile_deadanimal: TImage;
   private
     { Private declarations }
   public

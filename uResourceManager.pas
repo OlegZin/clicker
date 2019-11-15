@@ -115,11 +115,10 @@ begin
     begin
         Resource := TResourcedObject.Create;
         SetLength(Resource.Recource, 1 );
-        Resource.Recource[0] := uGameObjectManager.TResource.Create( _kind );
-        Resource.Recource[0].Item.Count.current  := _count;
-        Resource.Recource[0].Item.Delta.current  := _increment;
-        Resource.Recource[0].Item.Min.current    := 0;
-        Resource.Recource[0].Item.Max.current    := MaxCurrency;
+        Resource.Recource[0] :=
+            uGameObjectManager.TResource
+                .Create( _kind, _count )
+                .Growing( _increment, 0 );
 
         visible     := false; // _count <> 0;
         virgin      := _count = 0;

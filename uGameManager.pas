@@ -168,24 +168,28 @@ begin
 end;
 
 function TGameManager.ProcessObjectClick(id: integer): integer;
+/// обработка клика мышкой/тапа по объекту
 var
     obj : TBaseObject;
     i: integer;
     resTile: uGameObjectManager.TResource;
 
     deltaSource
-   ,deltaTarget : real;
+   ,deltaTarget
+            : real;
 
-    hasChanges
-   ,ResIsOut   // признак того, что на объекте закончились ВСЕ источники ресурсов,
-               // а не только один из имеющихся. это позволяет существовать объекту
-               // до тех пор, пока он не будет исчерпан полностью
-            : boolean;
+    actClick : TObjAction;
+
+    hasChanges : boolean;
+
+   ResPresent    /// при обработке ресурсов проверяем какое количество из них
+                  /// еще не закончилось
+            : integer;
 begin
 
 
     hasChanges := false;
-    ResIsOut := true;
+    ResPresent := 0;
     result := 0;
 
     // получаем ссылку на объекта из массива
@@ -207,6 +211,9 @@ begin
     // перебираем все имеющиеся в локации ресурсы и отправляем на пересчет
     for I := 0 to High((obj as TResourcedObject).Recource) do
     begin
+
+        Inc(ResPresent);    // найденный ресурс заведомо считаем не истощившимся
+
         // получаем лаконичное имя
         resTile := (obj as TResourcedObject).Recource[i];
 
@@ -217,46 +224,56 @@ begin
         ///    и на оборот, что делает клик по локации ресурсопотребляющим
         ///    например, это монстр и для его атаки расходуется что-то из ресурсов
 
-        // проверяем возможность взятия ресурса
-        // персчитываем ресурс в локации
-        deltaSource :=
-        mResManager.TargetResCount(
-            resTile,                                                // изменяемый ресурс
-            CALC_MODE_VALUE,                                        // изменяем на указанное количество
-            resTile.Item.Once.current + resTile.Item.Once.bonus     // количество на изменение
-        );
+        /// проверяем наличие привязанного действия ACT_CLICK. если нет - пропускаем ресурс
+        actClick.Item.Count.current := 0;
+        actClick.Item.Count.bonus := 0;
+        actClick := resTile.GetAction( ACT_CLICK );
 
-        // если изменения локального ресурса не произошло (достигнут верхний или нижний лимит)
-        // в глобальном хранилише менять тоже не будем
-        if deltaSource <> 0 then
+        if actClick.Item.Count.current + actClick.Item.Count.bonus <> 0 then
+        begin
+            // проверяем возможность взятия ресурса
+            // персчитываем ресурс в локации
+            deltaSource :=
+            mResManager.TargetResCount(
+                resTile,                                                // изменяемый ресурс
+                CALC_MODE_VALUE,                                        // изменяем на указанное количество
+                actClick.Item.Count.current + actClick.Item.Count.bonus  // количество на изменение
+            );
 
-        // пересчитываем в глобальном хранилище
-        mResManager.ResCount(
-            CALC_MODE_VALUE,                                        // изменяем на указанное количество
-            resTile.Identity.Common,                                // тип изменяемого ресурса
-            -(deltaSource)  // количество на изменение
-        );
-        ///    при клике можно запустить пересчет в режиме CALC_MODE_CLICK,
-        ///    но при этом буддет использована настройка разового изменения
-        ///    самого ресурса из хранилища, а не индивидуальные параметры
-        ///    самой локации.
-        ///    потому используется режим CALC_MODE_VALUE, чтобы учитивать
-        ///    индивидуальные особенности локаций
+            // если изменения локального ресурса не произошло (достигнут верхний или нижний лимит)
+            // в глобальном хранилише менять тоже не будем
+            if deltaSource <> 0 then
 
-        // ставим флаг изменений, чтобы запустить пересчет состояния игры
-        hasChanges := true;
+            // пересчитываем в глобальном хранилище
+            mResManager.ResCount(
+                CALC_MODE_VALUE,                                        // изменяем на указанное количество
+                resTile.Identity.Common,                                // тип изменяемого ресурса
+                -(deltaSource)  // количество на изменение
+            );
+            ///    при клике можно запустить пересчет в режиме CALC_MODE_CLICK,
+            ///    но при этом буддет использована настройка разового изменения
+            ///    самого ресурса из хранилища, а не индивидуальные параметры
+            ///    самой локации.
+            ///    потому используется режим CALC_MODE_VALUE, чтобы учитивать
+            ///    индивидуальные особенности локаций
+
+            // ставим флаг изменений, чтобы запустить пересчет состояния игры
+            hasChanges := true;
 
 
 
-        /// если данный ресурс еще не исчерпан, ставим флаг, что объект не стоит
-        /// уничтожать, несморя на возможное исчерпание прочих ресурсов
-        if ( resTile.Item.Count.current > resTile.Item.Min.current ) and
-           ( resTile.Valued )
-        then ResIsOut := false;
-
+            /// если данный ресурс исчерпан или не имеет значения, игнорируем его
+            /// в количестве неисчерпавшихся
+            if ( resTile.Item.Count.current <= resTile.Item.Min.current ) and
+               ( resTile.Valued )
+            then Dec(ResPresent)
+            else
+            if not resTile.Valued then Dec(ResPresent);
+        end;
     end;
 
-    if ResIsOut then
+    /// если не осталось значимых ресурсов - удаляем объект
+    if ResPresent = 0 then
     begin
         /// некоторые типы объектов при этом должны быть разрушены или заменены другими
         /// например, дерево становится пеньком, куст с ягодами - обычным кустом

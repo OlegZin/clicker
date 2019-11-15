@@ -69,6 +69,7 @@ const
     OBJ_YELLOW_FLOWERS = 40;
     OBJ_BROWN_FLOWERS = 41;
     OBJ_BROWN_MUSH = 42;
+    OBJ_DEADANIMAL = 43;
 
 
     // типы тесурсов
@@ -93,7 +94,7 @@ const
 
 var
     // все существующие игровые объекты
-    TableObjects : array [0..42, 0..3] of string = (
+    TableObjects : array [0..43, 0..3] of string = (
       /// типы местности
       ('Лес',     'tile_forest', '+', ''),
       ('Равнина', 'tile_plane',  '+', ''),
@@ -142,7 +143,8 @@ var
       ('Белые цветы',  'tile_w_flover',  '', ''),
       ('Желтые цветы',  'tile_y_flower',  '', ''),
       ('Бурые цветы',  'tile_b_flower',  '', ''),
-      ('Белые грибы',  'tile_b_mush',  '', '')
+      ('Белые грибы',  'tile_b_mush',  '', ''),
+      ('Туша животного',  'tile_deadanimal',  '', '')
 
 
 

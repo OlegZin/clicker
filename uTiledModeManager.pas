@@ -110,8 +110,7 @@ begin
     for col := 0 to 1000 do
     begin
         id := mngObject.CreateTile( OBJ_SMALLGRASS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
-        mngObject.SetResource( id,RESOURCE_GRASS, 10, -1, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_GRASS, 10 ) .Action( ACT_CLICK, -1,  0.1 ) );
     end;
 
 
@@ -123,43 +122,37 @@ begin
     for col := 0 to 20 do
     begin
         id := mngObject.CreateTile( OBJ_PAPOROTNIK, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
-        mngObject.SetResource( id, RESOURCE_GRASS, 30, -1, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_GRASS, 30 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
     for col := 0 to 20 do
     begin
         id := mngObject.CreateTile( OBJ_MUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
-        mngObject.SetResource( id, RESOURCE_FOOD, 10, -1, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
     for col := 0 to 50 do
     begin
         id := mngObject.CreateTile( OBJ_WHITE_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
-        mngObject.SetResource( id, RESOURCE_FOOD, 10, -1, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
     for col := 0 to 50 do
     begin
         id := mngObject.CreateTile( OBJ_YELLOW_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
-        mngObject.SetResource( id, RESOURCE_FOOD, 10, -1, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
     for col := 0 to 30 do
     begin
         id := mngObject.CreateTile( OBJ_BROWN_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
-        mngObject.SetResource( id, RESOURCE_FOOD, 10, -1, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
     for col := 0 to 30 do
     begin
         id := mngObject.CreateTile( OBJ_BROWN_MUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
-        mngObject.SetResource( id, RESOURCE_FOOD, 10, -1, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
 
@@ -171,15 +164,19 @@ begin
     for col := 0 to 20 do
     begin
         id := mngObject.CreateTile( OBJ_BROVNSTONE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
-        mngObject.SetResource( id, RESOURCE_STONE, 100, -1, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.2, 0, 0, false );
+        /// часть ресурса, которую можно собрать быстро
+        mngObject.SetResource( id, TResource.Create( RESOURCE_STONE, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
+        /// основная часть ресурса
+        mngObject.SetResource( id, TResource.Create( RESOURCE_STONE, 500 ).Action( ACT_CLICK, -0.1, 0.1 ).Action( ACT_PICK, -2, 0.2, 10 ) );
     end;
 
     for col := 0 to 20 do
     begin
         id := mngObject.CreateTile( OBJ_GRAYSTONE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
-        mngObject.SetResource( id, RESOURCE_STONE, 300, -2, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.3, 0, 0, false );
+        /// часть ресурса, которую можно собрать быстро
+        mngObject.SetResource( id, TResource.Create( RESOURCE_STONE, 30 ) .Action( ACT_CLICK, -1, 0.1 ) );
+        /// основная часть ресурса
+        mngObject.SetResource( id, TResource.Create( RESOURCE_STONE, 1000 ).Action( ACT_CLICK, -0.1, 0.1 ).Action( ACT_PICK, -2, 0.3, 20 ) );
     end;
 
 
@@ -187,66 +184,75 @@ begin
     for col := 0 to 50 do
     begin
         id := mngObject.CreateTile( OBJ_BUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
-        mngObject.SetResource( id, RESOURCE_WOOD, 10, -1, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_WOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
     for col := 0 to 200 do
     begin
         id := mngObject.CreateTile( OBJ_TREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
-        mngObject.SetResource( id, RESOURCE_WOOD, 50, -2, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+        /// часть ресурса, которую можно собрать быстро
+        mngObject.SetResource( id, TResource.Create( RESOURCE_WOOD,  10 ).Action( ACT_CLICK, -1, 0.1 ) );
+        /// основная часть ресурса
+        mngObject.SetResource( id, TResource.Create( RESOURCE_WOOD,  500 ).Action( ACT_CLICK, -0.1, 0.1 ).Action( ACT_AXE, -10, 1, 15 ) );
     end;
 
     for col := 0 to 20 do
     begin
         id := mngObject.CreateTile( OBJ_BIGTREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
-        mngObject.SetResource( id, RESOURCE_WOOD, 100, -3, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+        /// часть ресурса, которую можно собрать быстро
+        mngObject.SetResource( id, TResource.Create( RESOURCE_WOOD,  20 ) .Action( ACT_CLICK, -1, 0.1 ) );
+        /// основная часть ресурса
+        mngObject.SetResource( id, TResource.Create( RESOURCE_WOOD,  1000 ).Action( ACT_CLICK, -0.1, 0.1 ).Action( ACT_AXE, -15, 2, 25 ) );
     end;
 
     for col := 0 to 10 do
     begin
         ID := mngObject.CreateTile( OBJ_DEADTREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
-        mngObject.SetResource( id, RESOURCE_WOOD, 200, -2, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_IQ, 999, -0.1, 0, 0, false );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_WOOD,  800 ).Action( ACT_CLICK, -0.1, 0.1 ).Action( ACT_AXE, -5, 1, 10 ) );
     end;
 
 
 
     for col := 0 to 20 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_APPLETREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
-        RESOURCE_FOOD, 10, -1, 0.01, 0
-    );
-
-
+    begin
+        id := mngObject.CreateTile( OBJ_APPLETREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 30 ).Maximum( 30 ).Growing( 0.01, 10 ).Action( ACT_CLICK, -1, 0.1 ) );
+    end;
 
 
     for col := 0 to 10 do
     begin
         id := mngObject.CreateTile( OBJ_BIZON, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
-        mngObject.SetResource( id, RESOURCE_FOOD, 100, -2, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_HIDE, 50, -1, 0, 0 );
-        mngObject.SetResource( id, RESOURCE_HEALTH, 0, 1, 0, 0, false );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_IQ, 20 ).Action( ACT_CLICK, -0.03, 0.01 ).Action( ACT_SPEAR, -1, 0, 3 ) );
     end;
 
     for col := 0 to 10 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_WOLF, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
-        RESOURCE_BONE, 10, -1, 1, 10
-    );
+    begin
+        id := mngObject.CreateTile( OBJ_WOLF, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_IQ, 10 ).Action( ACT_CLICK, -0.03, 0.01 ).Action( ACT_SPEAR, -1, 0, 3 ) );
+    end;
+
     for col := 0 to 10 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_BEAR, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
-        RESOURCE_BONE, 10, -1, 1, 10
-    );
+    begin
+        id := mngObject.CreateTile( OBJ_BEAR, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_IQ, 50 ).Action( ACT_CLICK, -0.03, 0.01 ).Action( ACT_SPEAR, -1, 0, 3 ) );
+    end;
 
     for col := 0 to 5 do
-    mngObject.SetResource(
-        mngObject.CreateTile( OBJ_BLACKWOLF, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer ),
-        RESOURCE_BONE, 10, -1, 1, 10
-    );
+    begin
+        id := mngObject.CreateTile( OBJ_BLACKWOLF, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_IQ, 30 ).Action( ACT_CLICK, -0.03, 0.01 ).Action( ACT_SPEAR, -1, 0, 3 ) );
+    end;
+
+
+    for col := 0 to 5 do
+    begin
+        id := mngObject.CreateTile( OBJ_DEADANIMAL, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 20 ).Action( ACT_CLICK, -0.3, 0.01 ).Action( ACT_HAND, -2, 0.5, 5 ) );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_HIDE, 10 ).Action( ACT_CLICK, -0.015, 0.02 ).Action( ACT_KNIFE, -1, 0.5, 5 ) );
+    end;
+
+
 
 
 

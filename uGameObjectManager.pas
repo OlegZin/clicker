@@ -18,6 +18,19 @@ const
     VISUAL_TILE = 0;
     VISUAL_ICON = 1;
 
+    /// типы возможных действий с объектом/ресурсом
+    ACT_CLICK  = 0;  // обычный клик, без использования панели действий
+    ACT_HAND   = 1;  // базовая операция без инструментов
+    ACT_SPEAR  = 2;  // использование оружия (атака/взлом/запугивание/...)
+    ACT_AXE    = 3;  // использование топора (атака/рубка/...)
+    ACT_PICK   = 4;  // использование кирки (добыча/копка/...)
+    ACT_SHOVEL = 5;  // использование лопаты (земледелие/копка/...)
+    ACT_TALK   = 6;  // использование речи (разговор/приручение/заклинание/...)
+    ACT_GROW   = 7;  // земледелие (уход/посадка/...)
+    ACT_EXAME  = 8;  // изучение объекта (туман/артефакт/...)
+    ACT_KNIFE  = 9;  // использование ножа (снятие шкуры/...)
+
+
     // поведение при выходе за нижнюю или верхнюю границу количества ресурса
 //    BOUND_MODE_CUT     = 0;                    // разрешить с выравниванием итога по границе
 //    BOUND_MODE_BLOCK   = 1;                    // блокировать данное изменение
@@ -87,6 +100,16 @@ type
                 : integer;
     end;
 
+    // действие над объектом или ресурсом
+    TObjAction = record
+        Kind : integer;     // тип действия (иконка на панели действий). привязан к имеющимся знаниям и ресурсам)
+        Cost: TCount;       // стоимость действия в единицах производства. влияет на скорость завершения действия.
+                            // например, если у игрока всего одна единица производства, а стиомость действия 10, то
+                            // действие завершится через 10 тиков таймера
+        Exp: TCount;        // базовое количество опыта за успешное завершение действия
+        Item : TCount;      // количественное изменение ресурса при завершения действия
+    end;
+
     // объект с набором базовых свойств
     TBaseObject = class
         id: integer;                   // уникальный в рамках всего мира идентификатор
@@ -108,7 +131,21 @@ type
         Item: TCount;
         Valued: boolean;               // не имеющие "ценности" ресурсы не учитываются при проверке
                                        // на истощение всех источников на объекте для его уничтожения
-        constructor Create(kind: integer); overload;
+        Actions: array of TObjAction;  // массив действий, которые можно совершать с этим ресурсом.
+                                       // Влияет на формирование панели выбранного объекта
+
+        constructor Create(kind: integer; Count: real; valued: boolean = true ); overload;
+
+        function Maximum( max: real ):TResource;
+        /// установка максимума ресурса
+
+        function Growing( Delta, Period: real ): TResource;
+        /// дает ресурсу возможность автоматического прироста/истощения с течением времени
+
+        function Action( Kind: integer; Count, Exp: real; Cost: real = 0 ): TResource;
+        /// привязывает к ресурсу какое-либо действие
+
+        function GetAction( Kind: integer ): TObjAction;
     end;
 
     // объект, отображающий элемент/область игрового мира с характерной экосистемой
@@ -166,9 +203,9 @@ type
 
         procedure RemoveTile(id : integer);
 
-        procedure SetResource( id, Kind: integer; Count, Once, Delta, Period: real; valued: boolean = true );
-        ///    инициализирует и привязывает ресурс к указанному объекту, который
-        ///    может содержать ресурсы
+        procedure SetResource( id: integer; res: TResource );
+        ///    инициализирует и привязывает ресурс к указанному объекту (id), который
+        ///    может содержать ресурсы. возвращает созданный ресурс для возможной более тонкой настройки
 
         function FindObject( id : integer ): TBaseObject;
         ///    раскладывает полученный id на индексы в массиве fObjects и
@@ -238,8 +275,7 @@ begin
     then obj.visible := false;
 end;
 
-procedure TObjectManager.SetResource(id, Kind: integer; Count,
-  Once, Delta, Period: real; valued: boolean = true);
+procedure TObjectManager.SetResource(id: integer; res: TResource);
 ///    создание в указанной локации ресурса.
 ///    id - идентификатор объекта в массиве fObjects
 ///    kind - тип ресурса
@@ -254,7 +290,6 @@ procedure TObjectManager.SetResource(id, Kind: integer; Count,
 ///            например, в качестве снижения здоровья при стражении с монстрами
 var
     location : TResourcedObject;
-    resource : TResource;
     obj : TBaseObject;
 begin
     if id < 0 then exit;
@@ -270,19 +305,8 @@ begin
     location := obj as TResourcedObject;
 
     // добавляем новый ресурс в массив ресурсов данного объекта
-    resource := TResource.Create( kind );
     SetLength(location.Recource, Length(location.Recource)+1);
-    location.Recource[ High(location.Recource) ] := resource;
-
-    // инициализируем параметры ресурса
-    resource.Item.Count.current  := Count;       // стартовое значение объема ресурса
-    resource.Item.Once.current   := Once;        // добыча при клике
-    resource.Item.Delta.current  := Delta;       // изменение по таймеру (прирост/убытие)
-    resource.Item.Period.current := Period;      // через сколько тиков применять Delta
-    resource.Item.PassTicks      := 0;           // инициализация счетчика пропущенных тиков
-    resource.Item.Max.current    := MaxCurrency; // максимальный предел
-    resource.Valued              := valued;      // признак важного ресурса для проверки на истощение (будет ли учитываться)
-
+    location.Recource[ High(location.Recource) ] := res;
 end;
 
 function TObjectManager.FindObject(id: integer): TBaseObject;
@@ -397,12 +421,64 @@ end;
 
 { TResource }
 
-constructor TResource.Create(kind: integer);
+constructor TResource.Create(kind: integer; Count: real; valued: boolean = true);
 { по указанному типу заполняет базовые поля }
 begin
+
     self.Identity.Common := kind;
     self.Name := TableResource[ kind, TABLE_FIELD_NAME ];
     self.Visualization.Name[ VISUAL_ICON ] := TableResource[ kind, TABLE_FIELD_ICON_IMAGE ];
+
+    // инициализируем параметры ресурса
+    self.Item.Count.current  := Count;       // стартовое значение объема ресурса
+    self.Item.Once.current   := 0;           // добыча при клике
+    self.Item.Delta.current  := 0;           // изменение по таймеру (прирост/убытие)
+    self.Item.Period.current := 0;           // через сколько тиков применять Delta
+    self.Item.PassTicks      := 0;           // инициализация счетчика пропущенных тиков
+    self.Item.Max.current    := MaxCurrency; // максимальный предел
+    self.Item.Min.current    := 0;           // минимальный предел
+    self.Valued              := valued;      // признак важного ресурса для проверки на истощение (будет ли учитываться)
+end;
+
+function TResource.GetAction(Kind: integer): TObjAction;
+/// получаем данные действия по его типу
+var
+    i : integer;
+begin
+    for i := 0 to High(Actions) do
+    if Actions[i].Kind = Kind then
+    begin
+        result := Actions[i];
+        break;
+    end;
+end;
+
+function TResource.Growing(Delta, Period: real): TResource;
+begin
+    result := self;
+    Item.Delta.current  := Delta;           // изменение по таймеру (прирост/убытие)
+    Item.Period.current := Period;           // через сколько тиков применять Delta
+end;
+
+function TResource.Maximum(max: real): TResource;
+begin
+    result := self;
+    Item.Max.current := max;
+end;
+
+function TResource.Action(Kind: integer; Count, Exp: real; Cost: real = 0 ): TResource;
+/// привязывает действие к ресурсу
+///    kind - тип действия. константа ACT_XXX
+///    count - количественное изменение ресурса при завершении действия
+///    exp - базовое количество опыта за завершенное действие
+///    cost - стоимость в единицах производства для завершения действия
+begin
+    result := self;
+    SetLength(Actions, Length(Actions) + 1);
+    Actions[High(Actions)].Kind := Kind;
+    Actions[High(Actions)].Item.Count.current := Count;
+    Actions[High(Actions)].Exp.Count.current := Exp;
+    Actions[High(Actions)].Cost.Count.current := Cost;
 end;
 
 initialization

@@ -31,12 +31,12 @@ type
     iOperation: TImage;
     Rectangle2: TRectangle;
     lObjectName: TLabel;
-    Image1: TImage;
-    Image2: TImage;
-    Image3: TImage;
-    Image4: TImage;
-    Image5: TImage;
-    Image6: TImage;
+    iact1: TImage;
+    iact2: TImage;
+    iact3: TImage;
+    iact4: TImage;
+    iact5: TImage;
+    iact6: TImage;
     Rectangle3: TRectangle;
     procedure FormCreate(Sender: TObject);
     procedure tResTimerTimer(Sender: TObject);
@@ -248,7 +248,7 @@ begin
         [fImgMap.iObjectActive, fImgMap.iOperationActive, fImgMap.iScienceActive, fImgMap.iProductionActive],
         [fImgMap.iObjectUnactive, fImgMap.iOperationUnactive, fImgMap.iScienceUnactive, fImgMap.iProductionUnactive]
     );
-    mToolPanel.SetupObjectPanelComponents( imgPreview, lObjectName );
+    mToolPanel.SetupObjectPanelComponents( imgPreview, lObjectName, [iact1,iact2,iact3,iact4,iact5,iact6 ] );
     mToolPanel.Init;
 end;
 
