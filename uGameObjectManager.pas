@@ -116,6 +116,7 @@ type
         visible: boolean;              // глобальный признак видимости. например,
                                        // при сброшенном, флаге объект не будет отображаться на поле, если является тайлом
         Image: TObject;                // объект-картинка, которой отображается
+        Heihgt: real;                  // высота объекта-картинки
         Name : string;
         Description : string;
         Identity: TIdentity;           // определяющий набор признаков
@@ -356,29 +357,33 @@ procedure TObjectManager.OptimizeObjects;
 /// перекрываться "дальними" объектами, поскольку они находятся дальше к концу
 /// массива объектов.
 /// решение - сортировкой пузырьком на всех слоях раскладываем объекты в порядке
-/// возрастания координаты Y
+/// возрастания координаты Y (с учетом высоты объекта)
+///
+/// поскольку id объектов, это их координаты в массиве всех объектов, то при
+/// обмене объектов местами в массиве, id нужно переставить обратно, на правильные места
 var
     layer, i, j, idj, idi: integer;
     buffObj: TBaseObject;
-
+    highLayerIndex: integer;
 begin
 ///
     for layer := Low(fObjects) to High(fObjects) do
     if Length(fObjects[layer]) > 1 then
     begin
-        for I := High(fObjects[layer]) downto Low(fObjects[layer])+1 do
-        for J := Low(fObjects[layer]) to I-1 do
-        if fObjects[layer][j].Position.Y > fObjects[layer][i].Position.Y then
+        highLayerIndex := High(fObjects[layer]);
+        for I := highLayerIndex downto 1 do
+        for J := 0 to I-1 do
+        if (fObjects[layer][j].Position.Y + fObjects[layer][j].Heihgt) >= (fObjects[layer][j+1].Position.Y  + fObjects[layer][j+1].Heihgt) then
         begin
             idj := fObjects[layer][j].id;
-            idi := fObjects[layer][i].id;
+            idi := fObjects[layer][j+1].id;
 
             buffObj := fObjects[layer][j];
-            fObjects[layer][j] := fObjects[layer][i];
-            fObjects[layer][i] := buffObj;
+            fObjects[layer][j] := fObjects[layer][j+1];
+            fObjects[layer][j+1] := buffObj;
 
-            fObjects[layer][i].id := idi;
             fObjects[layer][j].id := idj;
+            fObjects[layer][j+1].id := idi;
         end;
     end;
 end;

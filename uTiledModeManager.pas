@@ -325,6 +325,7 @@ begin
                 TImage(obj.image).Height := source.Height;
                 TImage(obj.image).Width := Source.Width;
                 TImage(obj.image).bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
+                obj.Heihgt := source.Height;
             end;
 
             /// берем следующий объект слоя
