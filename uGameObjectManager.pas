@@ -116,7 +116,7 @@ type
         visible: boolean;              // глобальный признак видимости. например,
                                        // при сброшенном, флаге объект не будет отображаться на поле, если является тайлом
         Image: TObject;                // объект-картинка, которой отображается
-        Heihgt: real;                  // высота объекта-картинки
+        FullY: real;                   // положение по Y нижнего края картинки
         Name : string;
         Description : string;
         Identity: TIdentity;           // определяющий набор признаков
@@ -199,7 +199,7 @@ type
         ///    методы, позволяющие последовательно перебрать все объекты
         ///    указанного слоя, что полезно, на пример, при отрисовке поля
 
-        function CreateTile( Kind, X, Y, layer: integer ): integer;
+        function CreateTile( Kind, X, Y, layer: integer; H: real ): integer;
         ///    создает тайла объекта без ресурса и возвращает его id
 
         procedure RemoveTile(id : integer);
@@ -236,7 +236,7 @@ begin
     fObjects[layer][High(fObjects[layer])] := obj;
 end;
 
-function TObjectManager.CreateTile(Kind, X, Y, layer: integer): integer;
+function TObjectManager.CreateTile(Kind, X, Y, layer: integer; H: real): integer;
 ///    создает тайловую локацию указанного типа и добавляет ее в массив объектов
 ///    kind - тип объекта
 ///    x, y - положение на карте
@@ -255,6 +255,7 @@ begin
     location.Identity.Common := Kind;
     location.Position.Х := X;
     location.Position.Y := Y;
+    location.FullY := Y + H;
 
     // задаем имя, имя компонента, картинку для данного типа объекта
     location.Visualization.Name[ VISUAL_TILE ]  := TableObjects[ Kind, TABLE_FIELD_TILE_IMAGE ];
@@ -373,7 +374,7 @@ begin
         highLayerIndex := High(fObjects[layer]);
         for I := highLayerIndex downto 1 do
         for J := 0 to I-1 do
-        if (fObjects[layer][j].Position.Y + fObjects[layer][j].Heihgt) >= (fObjects[layer][j+1].Position.Y  + fObjects[layer][j+1].Heihgt) then
+        if (fObjects[layer][j].FullY) >= (fObjects[layer][j+1].FullY) then
         begin
             idj := fObjects[layer][j].id;
             idi := fObjects[layer][j+1].id;
