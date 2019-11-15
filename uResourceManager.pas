@@ -163,7 +163,10 @@ begin
         Width := 63;
         Position.X := 17;
         Position.Y := 1;
-        TextSettings.FontColor := $B8860B;
+        StyledSettings := StyledSettings - [TStyledSetting.FontColor] - [TStyledSetting.Style];
+        TextSettings.Font.Style := TextSettings.Font.Style + [TFontStyle.fsBold];
+        TextSettings.FontColor := TAlphaColorRec.Cornsilk;//$B8860B;
+
     end;
 
     fResources[ index ].view.layout := _layout;
