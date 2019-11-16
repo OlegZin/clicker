@@ -149,7 +149,7 @@ begin
     for col := 0 to 30 do
     begin
         id := mngObject.CreateTile( OBJ_BROWN_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BROWN_FLOWERS) );
-        mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_HEALTH, 10 ).Maximum(10).Growing(0.001, 0).Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
     for col := 0 to 30 do

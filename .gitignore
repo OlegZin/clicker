@@ -1,3 +1,4 @@
 *.dproj
 *.dproj.local
 *.identcache
+*.rsm

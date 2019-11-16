@@ -21,7 +21,7 @@ type
     lTabs: TLayout;
     iObject: TImage;
     Rectangle1: TRectangle;
-    TabControl1: TTabControl;
+    tabsTool: TTabControl;
     tabObject: TTabItem;
     tabScience: TTabItem;
     tabProduction: TTabItem;
@@ -38,7 +38,17 @@ type
     iact5: TImage;
     iact6: TImage;
     Rectangle3: TRectangle;
-    procedure FormCreate(Sender: TObject);
+    tabsScreen: TTabControl;
+    tabGame: TTabItem;
+    tabMenu: TTabItem;
+    Image1: TImage;
+    Image2: TImage;
+    iNewGame: TImage;
+    iOptions: TImage;
+    iExit: TImage;
+    Image7: TImage;
+    Label1: TLabel;
+    Label2: TLabel;procedure FormCreate(Sender: TObject);
     procedure tResTimerTimer(Sender: TObject);
     procedure OnMouseDownCallback(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Single);
@@ -47,6 +57,15 @@ type
     procedure OnMouseMoveCallback(Sender: TObject; Shift: TShiftState; X,
       Y: Single);
     procedure sbScreenMouseLeave(Sender: TObject);
+    procedure iNewGameMouseEnter(Sender: TObject);
+    procedure iNewGameMouseLeave(Sender: TObject);
+    procedure iOptionsMouseEnter(Sender: TObject);
+    procedure iOptionsMouseLeave(Sender: TObject);
+    procedure iExitMouseEnter(Sender: TObject);
+    procedure iExitMouseLeave(Sender: TObject);
+    procedure iExitClick(Sender: TObject);
+    procedure iNewGameClick(Sender: TObject);
+    procedure Image7Click(Sender: TObject);
   private
     { Private declarations }
     StartDragPos: TPointF;
@@ -225,6 +244,41 @@ begin
 end;
 
 
+procedure TfMain.iExitClick(Sender: TObject);
+begin
+    close;
+end;
+
+procedure TfMain.iExitMouseEnter(Sender: TObject);
+begin
+    fImgMap.AssignImage(iExit, 'menu_active_exit');
+end;
+
+procedure TfMain.iExitMouseLeave(Sender: TObject);
+begin
+    fImgMap.AssignImage(iExit, 'menu_unactive_exit');
+end;
+
+procedure TfMain.Image7Click(Sender: TObject);
+begin
+    tabsScreen.ActiveTab := tabMenu;
+end;
+
+procedure TfMain.iNewGameClick(Sender: TObject);
+begin
+    tabsScreen.ActiveTab := tabGame;
+end;
+
+procedure TfMain.iNewGameMouseEnter(Sender: TObject);
+begin
+    fImgMap.AssignImage(iNewGame, 'menu_active_newgame');
+end;
+
+procedure TfMain.iNewGameMouseLeave(Sender: TObject);
+begin
+    fImgMap.AssignImage(iNewGame, 'menu_unactive_newgame');
+end;
+
 procedure TfMain.InitGame;
 begin
 
@@ -243,13 +297,23 @@ begin
 
     mToolPanel.SetupComponents(
         lTabs,
-        TabControl1,
+        tabsTool,
         [iObject, iOperation, iScience, iProduction],
         [fImgMap.iObjectActive, fImgMap.iOperationActive, fImgMap.iScienceActive, fImgMap.iProductionActive],
         [fImgMap.iObjectUnactive, fImgMap.iOperationUnactive, fImgMap.iScienceUnactive, fImgMap.iProductionUnactive]
     );
     mToolPanel.SetupObjectPanelComponents( imgPreview, lObjectName, [iact1,iact2,iact3,iact4,iact5,iact6 ] );
     mToolPanel.Init;
+end;
+
+procedure TfMain.iOptionsMouseEnter(Sender: TObject);
+begin
+    fImgMap.AssignImage(iOptions, 'menu_active_options');
+end;
+
+procedure TfMain.iOptionsMouseLeave(Sender: TObject);
+begin
+    fImgMap.AssignImage(iOptions, 'menu_unactive_options');
 end;
 
 procedure TfMain.StartGame;

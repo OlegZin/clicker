@@ -64,11 +64,18 @@ type
     action_7: TImage;
     action_9: TImage;
     action_8: TImage;
-    tile_deadanimal: TImage;
+    menu_active_newgame: TImage;
+    menu_unactive_newgame: TImage;
+    menu_active_options: TImage;
+    menu_unactive_options: TImage;
+    menu_active_exit: TImage;
+    menu_unactive_exit: TImage;
+    Image7: TImage;
   private
     { Private declarations }
   public
     { Public declarations }
+    procedure AssignImage( target_img: TImage; source_img: string );
   end;
 
 var
@@ -77,5 +84,17 @@ var
 implementation
 
 {$R *.fmx}
+
+{ TfImgMap }
+
+procedure TfImgMap.AssignImage(target_img: TImage; source_img: string);
+var
+   source: TImage;
+begin
+  source := TImage(FindComponent( source_img ));
+
+  if assigned(source) then
+  target_img.bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
+end;
 
 end.
