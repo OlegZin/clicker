@@ -11,7 +11,7 @@ uses
 
     FMX.Layouts, FMX.Types, FMX.Objects, FMX.StdCtrls, SysUtils, System.Types, System.UITypes,
 
-    uGameObjectManager;
+    uGameObjectManager, DB;
 
 const
 
@@ -20,13 +20,14 @@ const
     FIELD_DESCRIP     = 1;
     FIELD_TAGS        = 2;
     FIELD_COUNT       = 3;
-    FIELD_INCREMENT   = 4;
-    FIELD_MAXIMUM     = 5;
-    FIELD_MINIMUM     = 6;
-    FIELD_USED        = 7;
-    FIELD_VISIBLE     = 8;
-    FIELD_ICON        = 9;
-    FIELD_PASSTICKS   = 10;
+    FIELD_COUNT_BONUS = 4;
+    FIELD_INCREMENT   = 5;
+    FIELD_MAXIMUM     = 6;
+    FIELD_MINIMUM     = 7;
+    FIELD_USED        = 8;
+    FIELD_VISIBLE     = 9;
+    FIELD_ICON        = 10;
+    FIELD_PASSTICKS   = 11;
 
     // режимы пересчета количества ресурсов.
     CALC_MODE_AUTO  = 0;   // на таймер. брать значение Delta с учетом пропуска тиков
@@ -88,6 +89,7 @@ type
 
         procedure SetAttr( index: integer; field: integer; value: variant );
                                  // устанавливаем значение одного из параметров ресурса
+        function GetAttr( index: integer; field: integer ): variant;
 
         function GetCount( index: integer ): real;
     end;
@@ -174,6 +176,22 @@ begin
 
 end;
 
+function TResourceManager.GetAttr(index, field: integer): variant;
+/// получаем значение указанного атрибута указанного ресурса
+begin
+    case field of
+        FIELD_CAPTION     : result := fResources[ index ].Resource.Recource[0].Name;
+        FIELD_DESCRIP     : result := fResources[ index ].Resource.Recource[0].Description;
+        FIELD_COUNT       : result := fResources[ index ].Resource.Recource[0].Item.Count.current;
+        FIELD_COUNT_BONUS : result := fResources[ index ].Resource.Recource[0].Item.Count.bonus;
+        FIELD_INCREMENT   : result := fResources[ index ].Resource.Recource[0].Item.Delta.current;
+        FIELD_MAXIMUM     : result := fResources[ index ].Resource.Recource[0].Item.Max.current;
+        FIELD_MINIMUM     : result := fResources[ index ].Resource.Recource[0].Item.Min.current;
+        FIELD_PASSTICKS   : result := fResources[ index ].Resource.Recource[0].Item.Period.current;
+        FIELD_VISIBLE     : result := fResources[ index ].visible;
+    end;
+end;
+
 function TResourceManager.GetCount(index: integer): real;
 begin
     result := fResources[ index ].Resource.Recource[0].Item.count.current;
@@ -186,6 +204,7 @@ begin
     FIELD_CAPTION     : fResources[ index ].Resource.Recource[0].Name                := value;
     FIELD_DESCRIP     : fResources[ index ].Resource.Recource[0].Description         := value;
     FIELD_COUNT       : fResources[ index ].Resource.Recource[0].Item.Count.current  := value;
+    FIELD_COUNT_BONUS : fResources[ index ].Resource.Recource[0].Item.Count.bonus    := value;
     FIELD_INCREMENT   : fResources[ index ].Resource.Recource[0].Item.Delta.current  := value;
     FIELD_MAXIMUM     : fResources[ index ].Resource.Recource[0].Item.Max.current    := value;
     FIELD_MINIMUM     : fResources[ index ].Resource.Recource[0].Item.Min.current    := value;
@@ -371,14 +390,12 @@ begin
             obj := mngObject.GetNextOnLayer( layer ) as TResourcedObject;
         end;
     end;
-
-
 end;
 
 initialization
 
-    BitmapSize.cx := 20;
-    BitmapSize.cy := 20;
+    BitmapSize.cx := RES_ICON_SIZE;
+    BitmapSize.cy := RES_ICON_SIZE;
 
 finalization
 

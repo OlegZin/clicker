@@ -48,7 +48,7 @@ type
     iExit: TImage;
     Image7: TImage;
     Label1: TLabel;
-    Label2: TLabel;procedure FormCreate(Sender: TObject);
+    Label2: TLabel;
     procedure tResTimerTimer(Sender: TObject);
     procedure OnMouseDownCallback(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Single);
@@ -66,6 +66,8 @@ type
     procedure iExitClick(Sender: TObject);
     procedure iNewGameClick(Sender: TObject);
     procedure Image7Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure tabsScreenChange(Sender: TObject);
   private
     { Private declarations }
     StartDragPos: TPointF;
@@ -89,18 +91,6 @@ implementation
 
 uses uImgMap, DB;
 {$R *.Macintosh.fmx MACOS}
-
-procedure TfMain.FormCreate(Sender: TObject);
-begin
-    // загружаем данные автосейва, или инициализируем новую игру
-    InitGame;
-
-    // исходя их загруженных или инициализированных данных, приводим игру в соответсвующее состояние
-    SetGameState;
-
-    // запускаем веселье (стартуем таймеры и все такое)
-    StartGame;
-end;
 
 procedure TfMain.SetGameState;
 { настройка менеджеров и внешнего вида формы, соглвсно текущему стсоянию: эре, режиму.
@@ -244,6 +234,13 @@ begin
 end;
 
 
+procedure TfMain.FormCreate(Sender: TObject);
+begin
+    // загружаем данные автосейва, или инициализируем новую игру
+    InitGame;
+
+end;
+
 procedure TfMain.iExitClick(Sender: TObject);
 begin
     close;
@@ -266,6 +263,12 @@ end;
 
 procedure TfMain.iNewGameClick(Sender: TObject);
 begin
+    // исходя их загруженных или инициализированных данных, приводим игру в соответсвующее состояние
+    SetGameState;
+
+    // запускаем веселье (стартуем таймеры и все такое)
+    StartGame;
+
     tabsScreen.ActiveTab := tabGame;
 end;
 
@@ -304,6 +307,8 @@ begin
     );
     mToolPanel.SetupObjectPanelComponents( imgPreview, lObjectName, [iact1,iact2,iact3,iact4,iact5,iact6 ] );
     mToolPanel.Init;
+
+    tabsScreen.ActiveTab := tabMenu;
 end;
 
 procedure TfMain.iOptionsMouseEnter(Sender: TObject);
@@ -326,9 +331,17 @@ begin
     InDrag := false;
 end;
 
+procedure TfMain.tabsScreenChange(Sender: TObject);
+begin
+    if   tabsScreen.ActiveTab = tabMenu
+    then tResTimer.Enabled := false;
+
+end;
+
 procedure TfMain.tResTimerTimer(Sender: TObject);
 begin
    mResManager.OnTimer;
+   mGameManager.CalcGameState;
 end;
 
 end.

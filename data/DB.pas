@@ -10,12 +10,16 @@ const
     TILE_WIDTH      = 64;
     TILE_HEIGHT     = 64;
 
+    RES_ICON_SIZE = 20;
+
     OBJECTS_FIELD_NAME = 0;
     OBJECTS_FIELD_DESCRIP = 2;
 
     TABLE_FIELD_NAME       = 0;
     TABLE_FIELD_ICON_IMAGE = 1;
     TABLE_FIELD_TILE_IMAGE = 1;
+
+    HEALTH_FUNGRY_DEBUFF = -0.1;
 
     // типы объектов
     OBJ_FOREST      =  0;  // лес
