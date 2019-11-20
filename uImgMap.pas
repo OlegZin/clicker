@@ -64,13 +64,15 @@ type
     action_7: TImage;
     action_9: TImage;
     action_8: TImage;
-    menu_active_newgame: TImage;
-    menu_unactive_newgame: TImage;
-    menu_active_options: TImage;
-    menu_unactive_options: TImage;
-    menu_active_exit: TImage;
-    menu_unactive_exit: TImage;
+    iNewGame_active: TImage;
+    iNewGame_unactive: TImage;
+    iOptions_active: TImage;
+    iOptions_unactive: TImage;
+    iExit_active: TImage;
+    iExit_unactive: TImage;
     Image7: TImage;
+    iContinue_unactive: TImage;
+    iContinue_active: TImage;
   private
     { Private declarations }
   public

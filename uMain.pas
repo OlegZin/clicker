@@ -49,6 +49,7 @@ type
     Image7: TImage;
     Label1: TLabel;
     Label2: TLabel;
+    iContinue: TImage;
     procedure tResTimerTimer(Sender: TObject);
     procedure OnMouseDownCallback(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Single);
@@ -59,10 +60,6 @@ type
     procedure sbScreenMouseLeave(Sender: TObject);
     procedure iNewGameMouseEnter(Sender: TObject);
     procedure iNewGameMouseLeave(Sender: TObject);
-    procedure iOptionsMouseEnter(Sender: TObject);
-    procedure iOptionsMouseLeave(Sender: TObject);
-    procedure iExitMouseEnter(Sender: TObject);
-    procedure iExitMouseLeave(Sender: TObject);
     procedure iExitClick(Sender: TObject);
     procedure iNewGameClick(Sender: TObject);
     procedure Image7Click(Sender: TObject);
@@ -246,16 +243,6 @@ begin
     close;
 end;
 
-procedure TfMain.iExitMouseEnter(Sender: TObject);
-begin
-    fImgMap.AssignImage(iExit, 'menu_active_exit');
-end;
-
-procedure TfMain.iExitMouseLeave(Sender: TObject);
-begin
-    fImgMap.AssignImage(iExit, 'menu_unactive_exit');
-end;
-
 procedure TfMain.Image7Click(Sender: TObject);
 begin
     tabsScreen.ActiveTab := tabMenu;
@@ -274,12 +261,12 @@ end;
 
 procedure TfMain.iNewGameMouseEnter(Sender: TObject);
 begin
-    fImgMap.AssignImage(iNewGame, 'menu_active_newgame');
+    fImgMap.AssignImage((Sender as TImage), (Sender as TComponent).Name + '_active');
 end;
 
 procedure TfMain.iNewGameMouseLeave(Sender: TObject);
 begin
-    fImgMap.AssignImage(iNewGame, 'menu_unactive_newgame');
+    fImgMap.AssignImage((Sender as TImage), (Sender as TComponent).Name + '_unactive');
 end;
 
 procedure TfMain.InitGame;
@@ -309,16 +296,6 @@ begin
     mToolPanel.Init;
 
     tabsScreen.ActiveTab := tabMenu;
-end;
-
-procedure TfMain.iOptionsMouseEnter(Sender: TObject);
-begin
-    fImgMap.AssignImage(iOptions, 'menu_active_options');
-end;
-
-procedure TfMain.iOptionsMouseLeave(Sender: TObject);
-begin
-    fImgMap.AssignImage(iOptions, 'menu_unactive_options');
 end;
 
 procedure TfMain.StartGame;
