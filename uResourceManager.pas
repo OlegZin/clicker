@@ -13,27 +13,6 @@ uses
 
     uGameObjectManager, DB;
 
-const
-
-    // синонимы полей записи ресурса
-    FIELD_CAPTION     = 0;
-    FIELD_DESCRIP     = 1;
-    FIELD_TAGS        = 2;
-    FIELD_COUNT       = 3;
-    FIELD_COUNT_BONUS = 4;
-    FIELD_INCREMENT   = 5;
-    FIELD_MAXIMUM     = 6;
-    FIELD_MINIMUM     = 7;
-    FIELD_USED        = 8;
-    FIELD_VISIBLE     = 9;
-    FIELD_ICON        = 10;
-    FIELD_PASSTICKS   = 11;
-
-    // режимы пересчета количества ресурсов.
-    CALC_MODE_AUTO  = 0;   // на таймер. брать значение Delta с учетом пропуска тиков
-    CALC_MODE_CLICK = 1;   // клик игрока. брать значение Once
-    CALC_MODE_VALUE = 2;   // принудительно. использовать указанное значение
-
 type
 
     TComponents = record
@@ -42,7 +21,7 @@ type
         text: Tlabel;
     end;
 
-    TResource = record
+    TSoredResource = record
         Resource: TResourcedObject;    // основные числовые атрибуты ресурса
 
         view : TComponents;      // ссылка на структуру компонент, которая представляет данный ресурс
@@ -59,7 +38,7 @@ type
         fLayout  : TLayout;      // родительская панель для блока ресурсов (с кнопкой меню)
         fFLayout : TFlowLayout;  // рабочая панель для блока ресурсов
 
-        fResources : array of TResource;
+        fResources : array of TSoredResource;
                                  // массив со всеми существующими ресурсами
 
         procedure UpdateView( index: integer );
@@ -92,6 +71,9 @@ type
         function GetAttr( index: integer; field: integer ): variant;
 
         function GetCount( index: integer ): real;
+
+        procedure AddBonus(res_index, field: integer; bonus_name: string; bonus_value: real );
+        procedure DelBonus(res_index, field: integer; bonus_name: string );
     end;
 
 var
@@ -106,6 +88,74 @@ uses
 
 var
    BitmapSize: TSizeF;
+
+procedure TResourceManager.AddBonus(res_index, field: integer;
+  bonus_name: string; bonus_value: real);
+/// добавляет бонус, привязанный к указанному ресурсу и пересчитывает значение с учетом бонуса
+var
+    res: TCount;
+    i, freeSlot: integer;
+    found : boolean;
+
+begin
+    res := fResources[res_index].Resource.Recource[0].Item;
+    freeSlot := -1;
+
+    /// проверяем, есть ли уже такой бонус, чтобы не накладывать повторно
+    found := false;
+    for I := 0 to High( res.Bonus ) do
+    begin
+        /// запоминаем свободный слот в массиве, если нужно будет добавлять новый
+        if res.Bonus[i].deleted then freeSlot := i;
+        /// запоминаем, если такой бонус уже есть в массиве
+        if (res.Bonus[i].field = field) and (res.Bonus[i].name = bonus_name) then found := true;
+    end;
+
+    /// бонус отсутствует и нет свободных слотов
+    if not found and (freeSlot < 0) then
+    begin
+        SetLength(res.Bonus, Length(res.Bonus)+1);
+        freeSlot := high(res.Bonus);
+    end;
+
+    /// бонус отсутствует и известно в какой слот вставлять
+    if not found then
+    begin
+        /// добавляем бонус
+        res.Bonus[freeSlot].field := field;
+        res.Bonus[freeSlot].name := bonus_name;
+        res.Bonus[freeSlot].value := bonus_value;
+        res.Bonus[freeSlot].period := -1;
+        res.Bonus[freeSlot].active := true;
+        res.Bonus[freeSlot].deleted := false;
+
+        /// пересчитываем параметры ресурса, исходя из обновленного набора бонусов
+        mngObject.CalcBonus(res);
+    end;
+
+    fResources[res_index].Resource.Recource[0].Item := res;
+end;
+
+procedure TResourceManager.DelBonus(res_index, field: integer; bonus_name: string );
+/// удаляем бонус. на самом деле просто ставится признак удаления, чтобы не тратить
+/// время на медленные перестановки в динамическом массиве. при добавлении новых
+/// бонусов свободные слоты будут перезаписаны
+var
+    res: TCount;
+    i: integer;
+begin
+    res := fResources[res_index].Resource.Recource[0].Item;
+
+    /// ищем указанный бонус привязанный к указанному полю, если находим - удаляем его (ставим признак)
+    for i := 0 to High(res.Bonus ) do
+    if (res.Bonus[i].field = field) and (res.Bonus[i].name = bonus_name) then
+    begin
+        res.Bonus[i].deleted := true;
+        mngObject.CalcBonus(res);
+    end;
+
+    fResources[res_index].Resource.Recource[0].Item := res;
+end;
 
 function TResourceManager.CreateRecource(_kind: integer; _count, _increment: real): integer;
 { инициализирование ресурса: параметры и создание пердставления }
@@ -176,39 +226,40 @@ begin
 
 end;
 
+
 function TResourceManager.GetAttr(index, field: integer): variant;
 /// получаем значение указанного атрибута указанного ресурса
 begin
     case field of
         FIELD_CAPTION     : result := fResources[ index ].Resource.Recource[0].Name;
         FIELD_DESCRIP     : result := fResources[ index ].Resource.Recource[0].Description;
-        FIELD_COUNT       : result := fResources[ index ].Resource.Recource[0].Item.Count.current;
-        FIELD_COUNT_BONUS : result := fResources[ index ].Resource.Recource[0].Item.Count.bonus;
-        FIELD_INCREMENT   : result := fResources[ index ].Resource.Recource[0].Item.Delta.current;
-        FIELD_MAXIMUM     : result := fResources[ index ].Resource.Recource[0].Item.Max.current;
-        FIELD_MINIMUM     : result := fResources[ index ].Resource.Recource[0].Item.Min.current;
-        FIELD_PASSTICKS   : result := fResources[ index ].Resource.Recource[0].Item.Period.current;
+        FIELD_COUNT       : result := fResources[ index ].Resource.Recource[0].Item.Count;
+        FIELD_DELTA       : result := fResources[ index ].Resource.Recource[0].Item.Delta;
+        FIELD_ONCE        : result := fResources[ index ].Resource.Recource[0].Item.Once;
+        FIELD_MAXIMUM     : result := fResources[ index ].Resource.Recource[0].Item.Max;
+        FIELD_MINIMUM     : result := fResources[ index ].Resource.Recource[0].Item.Min;
+        FIELD_PERIOD      : result := fResources[ index ].Resource.Recource[0].Item.Period;
         FIELD_VISIBLE     : result := fResources[ index ].visible;
     end;
 end;
 
 function TResourceManager.GetCount(index: integer): real;
 begin
-    result := fResources[ index ].Resource.Recource[0].Item.count.current;
+    result := fResources[ index ].Resource.Recource[0].Item.count;
 end;
 
 procedure TResourceManager.SetAttr(index, field: integer; value: variant);
 { меняем значение одного из полей ресурса }
 begin
     case field of
-    FIELD_CAPTION     : fResources[ index ].Resource.Recource[0].Name                := value;
-    FIELD_DESCRIP     : fResources[ index ].Resource.Recource[0].Description         := value;
-    FIELD_COUNT       : fResources[ index ].Resource.Recource[0].Item.Count.current  := value;
-    FIELD_COUNT_BONUS : fResources[ index ].Resource.Recource[0].Item.Count.bonus    := value;
-    FIELD_INCREMENT   : fResources[ index ].Resource.Recource[0].Item.Delta.current  := value;
-    FIELD_MAXIMUM     : fResources[ index ].Resource.Recource[0].Item.Max.current    := value;
-    FIELD_MINIMUM     : fResources[ index ].Resource.Recource[0].Item.Min.current    := value;
-    FIELD_PASSTICKS   : fResources[ index ].Resource.Recource[0].Item.Period.current := value;
+    FIELD_CAPTION     : fResources[ index ].Resource.Recource[0].Name        := value;
+    FIELD_DESCRIP     : fResources[ index ].Resource.Recource[0].Description := value;
+    FIELD_COUNT       : fResources[ index ].Resource.Recource[0].Item.Count  := value;
+    FIELD_DELTA       : fResources[ index ].Resource.Recource[0].Item.Delta  := value;
+    FIELD_ONCE        : fResources[ index ].Resource.Recource[0].Item.Once   := value;
+    FIELD_MAXIMUM     : fResources[ index ].Resource.Recource[0].Item.Max    := value;
+    FIELD_MINIMUM     : fResources[ index ].Resource.Recource[0].Item.Min    := value;
+    FIELD_PERIOD      : fResources[ index ].Resource.Recource[0].Item.Period := value;
     FIELD_VISIBLE     : fResources[ index ].visible     := value;
     end;
 end;
@@ -256,8 +307,8 @@ begin
     if visible then
     begin
 
-        count := Resource.Recource[0].Item.count.current;
-        increment := Resource.Recource[0].Item.Delta.current;
+        count := Resource.Recource[0].Item.count;
+        increment := Resource.Recource[0].Item.Delta;
 
         if round(count) <> count
         then
@@ -285,16 +336,16 @@ var
    : real;
 begin
 
-    count := res.Item.count.current;
+    count := res.Item.count;
 
     case mode of
-        CALC_MODE_AUTO : increment := res.Item.Delta.current;
-        CALC_MODE_CLICK : increment := res.Item.Once.current;
+        CALC_MODE_AUTO : increment := res.Item.bDelta;
+        CALC_MODE_CLICK : increment := res.Item.bOnce;
         CALC_MODE_VALUE : increment := _increment;
     end;
 
-    minimum := res.Item.Min.current;
-    maximum := res.Item.Max.current;
+    minimum := res.Item.Min;
+    maximum := res.Item.Max;
 
     count := count + increment;
 
@@ -302,9 +353,9 @@ begin
     if count > maximum then count := maximum;
 
     // возвращаем величину фактического изменения
-    result := count - res.Item.count.current;
+    result := count - res.Item.count;
 
-    res.Item.Count.current := count;
+    res.Item.Count := count;
 
 end;
 
@@ -319,7 +370,7 @@ begin
     begin
 
         // проверяем на наличие настройки тиков ресурса
-        period := Resource.Recource[0].Item.Period.current + Resource.Recource[0].Item.Period.bonus;
+        period := Resource.Recource[0].Item.bPeriod;
 
         // если указан ненулевой период (отработка каждый тик)
         // проверяем не достигло ли количество пропущенных тиков нужного значения
@@ -342,7 +393,7 @@ begin
         TargetResCount( Resource.Recource[0], mode, _increment );
 
         // радуем игрока появлением нового ресурса (теперь он будет отображаться на панели)
-        if virgin and ( Resource.Recource[0].Item.Count.current > 0 ) and visible then
+        if virgin and ( Resource.Recource[0].Item.Count > 0 ) and visible then
         begin
             virgin := false;
             view.layout.Parent := fFLayout;
@@ -378,11 +429,9 @@ begin
             begin
 
                 mResManager.TargetResCount(
-                    (obj as TResourcedObject).Recource[index],                                                // изменяемый ресурс
+                    (obj as TResourcedObject).Recource[index],              // изменяемый ресурс
                     CALC_MODE_VALUE,                                        // изменяем на указанное количество
-
-                    (obj as TResourcedObject).Recource[index].Item.Delta.current +
-                    (obj as TResourcedObject).Recource[index].Item.Delta.bonus     // количество на изменение
+                    (obj as TResourcedObject).Recource[index].Item.bDelta    // количество на изменение
                 );
 
             end;

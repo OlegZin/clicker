@@ -219,32 +219,57 @@ begin
     for col := 0 to 20 do
     begin
         id := mngObject.CreateTile( OBJ_APPLETREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_APPLETREE) );
-        mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 30 ).Maximum( 30 ).Growing( 0.01, 10 ).Action( ACT_CLICK, -1, 0.1 ) );
+        mngObject.SetResource( id,
+            TResource.Create( RESOURCE_FOOD, 30 ).
+            Maximum( 30 ).
+            Growing( 0.01, 10 ).
+            Action( ACT_CLICK, -1, 0.1 )
+        );
     end;
 
 
     for col := 0 to 10 do
     begin
         id := mngObject.CreateTile( OBJ_BIZON, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BIZON) );
-        mngObject.SetResource( id, TResource.Create( RESOURCE_IQ, 20 ).Action( ACT_CLICK, -0.03, 0.01 ).Action( ACT_SPEAR, -1, 0, 3 ) );
+        mngObject.SetResource( id,
+            TResource.Create( RESOURCE_IQ, 20 ).
+            Action( ACT_CLICK, -0.03, 0.01    ).
+            Action( ACT_HAND,  -0.03, 0.01, 1 ).
+            Action( ACT_SPEAR,    -1,    0, 3 )
+        );
     end;
 
     for col := 0 to 10 do
     begin
         id := mngObject.CreateTile( OBJ_WOLF, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_WOLF) );
-        mngObject.SetResource( id, TResource.Create( RESOURCE_IQ, 10 ).Action( ACT_CLICK, -0.03, 0.01 ).Action( ACT_SPEAR, -1, 0, 3 ) );
+        mngObject.SetResource( id,
+            TResource.Create( RESOURCE_IQ, 10 ).
+            Action( ACT_CLICK, -0.03, 0.01    ).
+            Action( ACT_HAND,  -0.03, 0.01, 1 ).
+            Action( ACT_SPEAR,    -1,    0, 3 )
+        );
     end;
 
     for col := 0 to 10 do
     begin
         id := mngObject.CreateTile( OBJ_BEAR, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BEAR) );
-        mngObject.SetResource( id, TResource.Create( RESOURCE_IQ, 50 ).Action( ACT_CLICK, -0.03, 0.01 ).Action( ACT_SPEAR, -1, 0, 3 ) );
+        mngObject.SetResource( id,
+            TResource.Create( RESOURCE_IQ, 50 ).
+            Action( ACT_CLICK, -0.03, 0.01    ).
+            Action( ACT_HAND,  -0.03, 0.01, 1 ).
+            Action( ACT_SPEAR,    -1,    0, 3 )
+        );
     end;
 
     for col := 0 to 5 do
     begin
         id := mngObject.CreateTile( OBJ_BLACKWOLF, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BLACKWOLF) );
-        mngObject.SetResource( id, TResource.Create( RESOURCE_IQ, 30 ).Action( ACT_CLICK, -0.03, 0.01 ).Action( ACT_SPEAR, -1, 0, 3 ) );
+        mngObject.SetResource( id,
+            TResource.Create( RESOURCE_IQ, 30 ).
+            Action( ACT_CLICK, -0.03, 0.01    ).
+            Action( ACT_HAND,  -0.03, 0.01, 1 ).
+            Action( ACT_SPEAR,    -1,    0, 3 )
+        );
     end;
 
 

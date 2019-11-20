@@ -19,7 +19,26 @@ const
     TABLE_FIELD_ICON_IMAGE = 1;
     TABLE_FIELD_TILE_IMAGE = 1;
 
-    HEALTH_FUNGRY_DEBUFF = -0.1;
+    FUNGRY_VALUE = -0.2;
+
+    // синонимы полей записи ресурса
+    FIELD_CAPTION     = 0;
+    FIELD_DESCRIP     = 1;
+    FIELD_TAGS        = 2;
+    FIELD_COUNT       = 3;
+    FIELD_DELTA       = 5;
+    FIELD_ONCE        = 6;
+    FIELD_MAXIMUM     = 7;
+    FIELD_MINIMUM     = 8;
+    FIELD_USED        = 9;
+    FIELD_VISIBLE     = 10;
+    FIELD_ICON        = 11;
+    FIELD_PERIOD      = 12;
+
+    // режимы пересчета количества ресурсов.
+    CALC_MODE_AUTO  = 0;   // на таймер. брать значение Delta с учетом пропуска тиков
+    CALC_MODE_CLICK = 1;   // клик игрока. брать значение Once
+    CALC_MODE_VALUE = 2;   // принудительно. использовать указанное значение
 
     // типы объектов
     OBJ_FOREST      =  0;  // лес

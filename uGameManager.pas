@@ -82,20 +82,12 @@ begin
     /// контроль по количеству еды:
     ///    при нулевом или ниже количестве - накладывается штраф на скорость прироста здоровья
     ///    при нелулевом - снимается штраф на скорость прироста здоровья
-    if   mResManager.GetAttr(RESOURCE_FOOD, FIELD_COUNT) <= 0
-    then mResManager.SetBonus(
-             RESOURCE_HEALTH,
-             FIELD_COUNT,
-             FUNGRY_NAME,
-             FUNGRY_VALUE
-         );
 
     if   mResManager.GetAttr(RESOURCE_FOOD, FIELD_COUNT) <= 0
-    then mResManager.RemoveBonus(
-             RESOURCE_HEALTH,
-             FIELD_COUNT,
-             HEALTH_FUNGRY_DEBUFF_NAME
-         );
+    then mResManager.AddBonus( RESOURCE_HEALTH, FIELD_DELTA, 'hungry', FUNGRY_VALUE );
+
+    if   mResManager.GetAttr(RESOURCE_FOOD, FIELD_COUNT) > 0
+    then mResManager.DelBonus( RESOURCE_HEALTH, FIELD_DELTA, 'hungry' );
 
     /// проверка на выполнение условий завершения игры - ПОРАЖЕНИЕ.
     /// к ним относится сочетние парметров: текущее здоровье = 0, количество людей = 0, еда = 0
@@ -163,7 +155,7 @@ begin
         CreateRecource( RESOURCE_STONE,   0,   0  );
         CreateRecource( RESOURCE_ICE,     0,   0  );
         CreateRecource( RESOURCE_LAVA,    0,   0  );
-        CreateRecource( RESOURCE_FOOD,   10, -0.1 );
+        CreateRecource( RESOURCE_FOOD,  0.5, -0.1 );
         CreateRecource( RESOURCE_BONE,    0,   0  );
         CreateRecource( RESOURCE_PRODUCT, 1,   0  );
         CreateRecource( RESOURCE_SPEAR,   5,   0  );
@@ -243,19 +235,19 @@ begin
         ///    например, это монстр и для его атаки расходуется что-то из ресурсов
 
         /// проверяем наличие привязанного действия ACT_CLICK. если нет - пропускаем ресурс
-        actClick.Item.Count.current := 0;
-        actClick.Item.Count.bonus := 0;
         actClick := resTile.GetAction( ACT_CLICK );
 
-        if actClick.Item.Count.current + actClick.Item.Count.bonus <> 0 then
+        if actClick.Item.bCount <> 0 then
         begin
             // проверяем возможность взятия ресурса
-            // персчитываем ресурс в локации
+            // персчитываем ресурс в локации. не факт, что удастся изменить
+            // ресурс на величину actClick.Item.Count. например пытаемся отнять 10 от 1 или
+            // ресурс достиг своего нижнего предела
             deltaSource :=
             mResManager.TargetResCount(
-                resTile,                                                // изменяемый ресурс
-                CALC_MODE_VALUE,                                        // изменяем на указанное количество
-                actClick.Item.Count.current + actClick.Item.Count.bonus  // количество на изменение
+                resTile,                           // изменяемый ресурс
+                CALC_MODE_VALUE,                   // изменяем на указанное количество
+                actClick.Item.bCount                // количество на изменение
             );
 
             // если изменения локального ресурса не произошло (достигнут верхний или нижний лимит)
@@ -266,7 +258,7 @@ begin
             mResManager.ResCount(
                 CALC_MODE_VALUE,                                        // изменяем на указанное количество
                 resTile.Identity.Common,                                // тип изменяемого ресурса
-                -(deltaSource)  // количество на изменение
+                -(deltaSource)                                          // количество на изменение
             );
             ///    при клике можно запустить пересчет в режиме CALC_MODE_CLICK,
             ///    но при этом буддет использована настройка разового изменения
@@ -282,7 +274,7 @@ begin
 
             /// если данный ресурс исчерпан или не имеет значения, игнорируем его
             /// в количестве неисчерпавшихся
-            if ( resTile.Item.Count.current <= resTile.Item.Min.current ) and
+            if ( resTile.Item.Count <= resTile.Item.Min ) and
                ( resTile.Valued )
             then Dec(ResPresent)
             else

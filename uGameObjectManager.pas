@@ -68,27 +68,41 @@ type
         Id  : array [0..99] of integer; // набор индексов отображения для различных режимов
     end;
 
-    TFloatValue = record
-        current                      // текущее значение
-       ,delta                        // величина разового изменения (+/-) при прокачке
-       ,bonus                        // текущий временный бонус
-       ,bonusPeriod                  // оставшееся врямя временного бонуса в тиках
-                : real;
+    /// описание модификатора, наложенного на какое-либо значение
+    TBonus = record
+        field: integer;  /// поле значения из TCount. Индексируется набором констант uResourceManager.FIELD_XXX
+        name: string;    /// идентификатор типа бонуса. по нему отсекаются повторные наложения, если не допустимы и проводится поиск в наложенных бонусаъ
+        value: real;     /// величина изменения. при наложении модификатора, количество в указанном поле
+                         /// сразу меняется на это значение через (+). при снятии, прозводится
+                         /// обратное изменение через (-).
+        period: real;    /// период существования данного модификатора в тиках, после чего будет автоматически удален
+                         /// при значении -1 - постоянный
+        active: boolean; /// является ли активным. false - не учитывается в расчетах, но и не удаляется, period не изменяется.
+                         /// true - в обычном режиме. используется для эффектов временного отключения модификаторов
+        deleted: boolean;/// флаг того, что данный бонус в массиве не используется и может быть перезаписан новым
     end;
 
     // описывает текущее состояние и модель поведения отдельного значения
     TCount = record
-        Count                        // текущее значение
-       ,Period                       // период в тиках таймера обновления значения
+       Count                        // текущее значение (базовое)
+      ,Period                       // период в тиках таймера обновления значения (базовое)
 
-       ,Delta                        // размер базового разового изменения при тике.
+       ,Delta                        // размер базового разового изменения при тике. (базовое)
        ,Once                         // размер базового разового изменения при участии игрока.
                                      // например, при клике по лесу сколько будет добыто древисины
 
-       ,Max                          // максимально возможное базовое значение
+       ,Max                          // максимально возможное базовое значение (базовое)
 
-       ,Min                          // минимально возможное базовое значение
-                : TFloatValue;
+       ,Min                          // минимально возможное базовое значение (базовое)
+
+        /// значения измененные с учетом всех активных на данный момент бонусов
+       ,bCount                       // текущее значение
+       ,bPeriod                      // период в тиках таймера обновления значения
+       ,bDelta                       // размер базового разового изменения при тике.
+       ,bOnce                        // размер базового разового изменения при участии игрока.
+       ,bMax                         // максимально возможное базовое значение
+       ,bMin                         // минимально возможное базовое значение
+                : real;
 
         PassTicks                    // счетчик пропущенных тиков. когда сравнивается с
                                      // Period.current, сбрасывается на 0 и производится
@@ -98,6 +112,8 @@ type
        ,HighBoundMode                // что делать при выходе за верхнюю границу
                                      // одно из значений флагов BOUND_MODE_XXX
                 : integer;
+
+        Bonus : array of TBonus;
     end;
 
     // действие над объектом или ресурсом
@@ -217,6 +233,8 @@ type
         ///    используется для избежания наслоения объектов на слое
 
         procedure OptimizeObjects;
+
+        procedure CalcBonus( var item: TCount );
     end;
 
 var
@@ -234,6 +252,27 @@ procedure TObjectManager.AddObjectToArray(obj: TBaseObject; layer: integer);
 begin
     SetLength(fObjects[layer], Length(fObjects[layer]) + 1 );
     fObjects[layer][High(fObjects[layer])] := obj;
+end;
+
+procedure TObjectManager.CalcBonus(var item: TCount);
+var
+    i : integer;
+begin
+    ///обнуляем текущий расчет бонусов
+    item.bCount := item.Count;
+    item.bPeriod := item.Period;
+    item.bDelta := item.Delta;
+    item.Once := item.Once;
+
+    for I := 0 to High(item.Bonus) do
+    if item.Bonus[i].active and not item.Bonus[i].deleted then
+    case item.Bonus[i].field of
+        FIELD_COUNT : item.bCount  := item.bCount  + item.Bonus[i].value;
+        FIELD_PERIOD: item.bPeriod := item.bPeriod + item.Bonus[i].value;
+        FIELD_DELTA : item.bDelta  := item.bDelta  + item.Bonus[i].value;
+        FIELD_ONCE  : item.bOnce   := item.bOnce   + item.Bonus[i].value;
+    end;
+
 end;
 
 function TObjectManager.CreateTile(Kind, X, Y, layer: integer; H: real): integer;
@@ -436,13 +475,21 @@ begin
     self.Visualization.Name[ VISUAL_ICON ] := TableResource[ kind, TABLE_FIELD_ICON_IMAGE ];
 
     // инициализируем параметры ресурса
-    self.Item.Count.current  := Count;       // стартовое значение объема ресурса
-    self.Item.Once.current   := 0;           // добыча при клике
-    self.Item.Delta.current  := 0;           // изменение по таймеру (прирост/убытие)
-    self.Item.Period.current := 0;           // через сколько тиков применять Delta
+    /// базовые значения, без учета бонусов
+    self.Item.Count  := Count;       // стартовое значение объема ресурса
+    self.Item.Once   := 0;           // добыча при клике
+    self.Item.Delta  := 0;           // изменение по таймеру (прирост/убытие)
+    self.Item.Period := 0;           // через сколько тиков применять Delta
+
+    /// значения, с учетом бонусов
+    self.Item.bCount  := Count;       // стартовое значение объема ресурса
+    self.Item.bOnce   := 0;           // добыча при клике
+    self.Item.bDelta  := 0;           // изменение по таймеру (прирост/убытие)
+    self.Item.bPeriod := 0;           // через сколько тиков применять Delta
+
     self.Item.PassTicks      := 0;           // инициализация счетчика пропущенных тиков
-    self.Item.Max.current    := MaxCurrency; // максимальный предел
-    self.Item.Min.current    := 0;           // минимальный предел
+    self.Item.Max    := MaxCurrency; // максимальный предел
+    self.Item.Min    := 0;           // минимальный предел
     self.Valued              := valued;      // признак важного ресурса для проверки на истощение (будет ли учитываться)
 end;
 
@@ -462,14 +509,17 @@ end;
 function TResource.Growing(Delta, Period: real): TResource;
 begin
     result := self;
-    Item.Delta.current  := Delta;           // изменение по таймеру (прирост/убытие)
-    Item.Period.current := Period;           // через сколько тиков применять Delta
+    Item.Delta  := Delta;           // изменение по таймеру (прирост/убытие)
+    Item.Period := Period;           // через сколько тиков применять Delta
+
+    Item.bDelta  := Delta;           // изменение по таймеру (прирост/убытие)
+    Item.bPeriod := Period;           // через сколько тиков применять Delta
 end;
 
 function TResource.Maximum(max: real): TResource;
 begin
     result := self;
-    Item.Max.current := max;
+    Item.Max := max;
 end;
 
 function TResource.Action(Kind: integer; Count, Exp: real; Cost: real = 0 ): TResource;
@@ -482,9 +532,16 @@ begin
     result := self;
     SetLength(Actions, Length(Actions) + 1);
     Actions[High(Actions)].Kind := Kind;
-    Actions[High(Actions)].Item.Count.current := Count;
-    Actions[High(Actions)].Exp.Count.current := Exp;
-    Actions[High(Actions)].Cost.Count.current := Cost;
+
+    /// выставляем базовые значения (которые неизменны)
+    Actions[High(Actions)].Item.Count := Count;
+    Actions[High(Actions)].Exp.Count := Exp;
+    Actions[High(Actions)].Cost.Count := Cost;
+
+    /// выставляем значения с учетом бонусов (если они появятся, будут пересчитываться)
+    Actions[High(Actions)].Item.bCount := Count;
+    Actions[High(Actions)].Exp.bCount := Exp;
+    Actions[High(Actions)].Cost.bCount := Cost;
 end;
 
 initialization
