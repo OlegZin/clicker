@@ -45,6 +45,10 @@ type
         Era      : Integer;           // текущая игровая эра. соответсвует константе TAG_ERA_XXX
         Mode     : Integer;            // текущий игровой режим. соответсвует константе TAG_MODE_XXX
         CurSelObjectId: integer;      // текущий выбранный на игровом поле объект. 0 - не выбран
+
+        isHungry : boolean;           // флаг отсекает лишние вычисления при неизменности статуса голода:
+                                      // запас еды нулевой. позволяет произвоить действия перехода из/в состояние только один
+                                      // раз в момент изменения условий
     end;
 
     TGameManager = class
@@ -83,14 +87,21 @@ begin
     ///    при нулевом или ниже количестве - накладывается штраф на скорость прироста здоровья
     ///    при нелулевом - снимается штраф на скорость прироста здоровья
 
-    if   mResManager.GetAttr(RESOURCE_FOOD, FIELD_COUNT) <= 0
-    then mResManager.AddBonus( RESOURCE_HEALTH, FIELD_DELTA, 'hungry', FUNGRY_VALUE );
+    if (mResManager.GetAttr(RESOURCE_FOOD, FIELD_COUNT) <= 0) and not GameSatate.isHungry then
+    begin
+        mResManager.AddBonus( RESOURCE_HEALTH, FIELD_DELTA, 'hungry', FUNGRY_VALUE );
+        GameSatate.isHungry := true;
+    end;
 
-    if   mResManager.GetAttr(RESOURCE_FOOD, FIELD_COUNT) > 0
-    then mResManager.DelBonus( RESOURCE_HEALTH, FIELD_DELTA, 'hungry' );
+    if (mResManager.GetAttr(RESOURCE_FOOD, FIELD_COUNT) > 0) and GameSatate.isHungry then
+    begin
+        mResManager.DelBonus( RESOURCE_HEALTH, FIELD_DELTA, 'hungry' );
+        GameSatate.isHungry := false;
+    end;
 
     /// проверка на выполнение условий завершения игры - ПОРАЖЕНИЕ.
     /// к ним относится сочетние парметров: текущее здоровье = 0, количество людей = 0, еда = 0
+
 
 end;
 
@@ -173,6 +184,8 @@ begin
         GameSatate.Potential := 0;
         GameSatate.Era := ERA_PRIMAL;
         GameSatate.Mode := MODE_LOCAL;
+
+        GameSatate.isHungry := false;
     end;
 
 end;
