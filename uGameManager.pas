@@ -49,14 +49,25 @@ type
         isHungry : boolean;           // флаг отсекает лишние вычисления при неизменности статуса голода:
                                       // запас еды нулевой. позволяет произвоить действия перехода из/в состояние только один
                                       // раз в момент изменения условий
+
+        isGameInProcess : boolean;    // флаг указывает, что игра начата и в процессе. учитывается в главном меню
+                                      // при определении доступности кнопок
     end;
 
     TGameManager = class
-        GameSatate : TGameState;
+      private
+        procedure SetIsHungry(val: boolean);
+        procedure SetIsGameInProcess(val: boolean);
+      public
+        GameState : TGameState;
+
+        property isHungry: boolean read GameState.isHungry write SetIsHungry;
+        property isGameInProcess: boolean read GameState.isGameInProcess write SetIsGameInProcess;
 
         function ProcessObjectClick( id : integer ): integer;
         procedure InitGame;
         procedure CalcGameState;
+
     end;
 
 var
@@ -67,7 +78,7 @@ implementation
 { TGameManager }
 
 uses
-    uGameObjectManager, uResourceManager, uTiledModeManager, DB, uToolPanelManager;
+    uGameObjectManager, uResourceManager, uTiledModeManager, DB, uToolPanelManager, uMain;
 
 procedure TGameManager.CalcGameState;
 ///    логическое ядро.
@@ -87,20 +98,23 @@ begin
     ///    при нулевом или ниже количестве - накладывается штраф на скорость прироста здоровья
     ///    при нелулевом - снимается штраф на скорость прироста здоровья
 
-    if (mResManager.GetAttr(RESOURCE_FOOD, FIELD_COUNT) <= 0) and not GameSatate.isHungry then
+    if (mResManager.GetAttr(RESOURCE_FOOD, FIELD_COUNT) <= 0) and not isHungry then
     begin
         mResManager.AddBonus( RESOURCE_HEALTH, FIELD_DELTA, 'hungry', FUNGRY_VALUE );
-        GameSatate.isHungry := true;
+        isHungry := true;
     end;
 
-    if (mResManager.GetAttr(RESOURCE_FOOD, FIELD_COUNT) > 0) and GameSatate.isHungry then
+    if (mResManager.GetAttr(RESOURCE_FOOD, FIELD_COUNT) > 0) and isHungry then
     begin
         mResManager.DelBonus( RESOURCE_HEALTH, FIELD_DELTA, 'hungry' );
-        GameSatate.isHungry := false;
+        isHungry := false;
     end;
+
+
 
     /// проверка на выполнение условий завершения игры - ПОРАЖЕНИЕ.
     /// к ним относится сочетние парметров: текущее здоровье = 0, количество людей = 0, еда = 0
+//    if True then
 
 
 end;
@@ -175,17 +189,18 @@ begin
 
 
         SetAttr(RESOURCE_HEALTH, FIELD_MAXIMUM, 100);
-        SetAttr(RESOURCE_PRODUCT, FIELD_VISIBLE, true);
+{        SetAttr(RESOURCE_PRODUCT, FIELD_VISIBLE, true);
         SetAttr(RESOURCE_GRASS, FIELD_VISIBLE, true);
         SetAttr(RESOURCE_SPEAR, FIELD_VISIBLE, true);
         SetAttr(RESOURCE_SKIN, FIELD_VISIBLE, true);
         SetAttr(RESOURCE_HIDE, FIELD_VISIBLE, true);
+}
+//        GameState.Potential := 0;
+//        GameState.Era := ERA_PRIMAL;
+//        GameState.Mode := MODE_LOCAL;
 
-        GameSatate.Potential := 0;
-        GameSatate.Era := ERA_PRIMAL;
-        GameSatate.Mode := MODE_LOCAL;
-
-        GameSatate.isHungry := false;
+        isHungry := false;
+        isGameInProcess := false;
     end;
 
 end;
@@ -219,7 +234,7 @@ begin
     obj := mngObject.FindObject( id );
 
     /// текущий выделенный объект не совпадает с предыдущим
-    if   mGameManager.GameSatate.CurSelObjectId <> id then
+    if   mGameManager.GameState.CurSelObjectId <> id then
     begin
         // выделяем кликнутый объект, если до сих пор не выбран
         mTileDrive.SetSelection( obj as TResourcedObject );
@@ -336,6 +351,17 @@ begin
     // пересчитываем состояние игры
     if hasChanges then CalcGameState;
 
+end;
+
+procedure TGameManager.SetIsGameInProcess(val: boolean);
+begin
+    GameState.isGameInProcess := val;
+    fMain.iContinue.Enabled := val;
+end;
+
+procedure TGameManager.SetIsHungry(val: boolean);
+begin
+    GameState.isHungry := val;
 end;
 
 end.

@@ -65,6 +65,7 @@ type
     procedure Image7Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure tabsScreenChange(Sender: TObject);
+    procedure iContinueClick(Sender: TObject);
   private
     { Private declarations }
     StartDragPos: TPointF;
@@ -89,6 +90,44 @@ implementation
 uses uImgMap, DB;
 {$R *.Macintosh.fmx MACOS}
 
+procedure TfMain.iNewGameClick(Sender: TObject);
+begin
+    // исходя их загруженных или инициализированных данных, приводим игру в соответсвующее состояние
+    SetGameState;
+
+    // запускаем веселье (стартуем таймеры и все такое)
+    StartGame;
+
+    tabsScreen.ActiveTab := tabGame;
+end;
+
+procedure TfMain.InitGame;
+begin
+
+    // создаем менеджер ресурсов
+    mResManager := TResourceManager.Create;
+    // привязываем менеджер к главной форме
+    mResManager.SetupComponents(lResources, flResources);
+
+    // создаем менеджер игровой логики
+    mGameManager := TGameManager.Create;
+    // инициализируем игру
+    mGameManager.InitGame;
+    mResManager.UpdateResPanel;
+
+    mToolPanel.SetupComponents(
+        lTabs,
+        tabsTool,
+        [iObject, iOperation, iScience, iProduction],
+        [fImgMap.iObjectActive, fImgMap.iOperationActive, fImgMap.iScienceActive, fImgMap.iProductionActive],
+        [fImgMap.iObjectUnactive, fImgMap.iOperationUnactive, fImgMap.iScienceUnactive, fImgMap.iProductionUnactive]
+    );
+    mToolPanel.SetupObjectPanelComponents( imgPreview, lObjectName, [iact1,iact2,iact3,iact4,iact5,iact6 ] );
+    mToolPanel.Init;
+
+
+end;
+
 procedure TfMain.SetGameState;
 { настройка менеджеров и внешнего вида формы, соглвсно текущему стсоянию: эре, режиму.
   подразумевается, что все возможные ресурсы уже созданы или загружены из сейва.
@@ -101,10 +140,10 @@ procedure TfMain.SetGameState;
      - запуск игры после всех настроек
 }
 begin
-
+ {
      // настройка панели ресурсов
      // определяем видимость ресурсов, исходя из текущей эры и режима
-     with mResManager, mGameManager.GameSatate do
+     with mResManager, mGameManager.GameState do
      begin
          SetAttr(RESOURCE_IQ, FIELD_VISIBLE,
             (Era in [ERA_PRIMAL, ERA_ANCIENT, ERA_MEDIVAL, ERA_TECHNICAL, ERA_ELECTRONIC, ERA_COSMIC, ERA_EXPANSE, ERA_SINGULAR]) and
@@ -144,6 +183,7 @@ begin
          // менеджер ресурсов обновляет видимость ресурсов на панели
          UpdateResPanel;
      end;
+ }
 
      // инициализация движка для текущего режима
      mTileDrive := TTileModeDrive.Create;
@@ -233,9 +273,18 @@ end;
 
 procedure TfMain.FormCreate(Sender: TObject);
 begin
+    tabsScreen.ActiveTab := tabMenu;
+
+    // создаем форму, содержащую базу всех используемых в игре изображений
+    fImgMap := TfImgMap.Create(Application);
+
     // загружаем данные автосейва, или инициализируем новую игру
     InitGame;
+end;
 
+procedure TfMain.iContinueClick(Sender: TObject);
+begin
+    tabsScreen.ActiveTab := tabGame;
 end;
 
 procedure TfMain.iExitClick(Sender: TObject);
@@ -248,16 +297,6 @@ begin
     tabsScreen.ActiveTab := tabMenu;
 end;
 
-procedure TfMain.iNewGameClick(Sender: TObject);
-begin
-    // исходя их загруженных или инициализированных данных, приводим игру в соответсвующее состояние
-    SetGameState;
-
-    // запускаем веселье (стартуем таймеры и все такое)
-    StartGame;
-
-    tabsScreen.ActiveTab := tabGame;
-end;
 
 procedure TfMain.iNewGameMouseEnter(Sender: TObject);
 begin
@@ -269,34 +308,6 @@ begin
     fImgMap.AssignImage((Sender as TImage), (Sender as TComponent).Name + '_unactive');
 end;
 
-procedure TfMain.InitGame;
-begin
-
-    // создаем форму, содержащую базу всех используемых в игре изображений
-    fImgMap := TfImgMap.Create(Application);
-
-    // создаем менеджер ресурсов
-    mResManager := TResourceManager.Create;
-    // привязываем менеджер к главной форме
-    mResManager.SetupComponents(lResources, flResources);
-
-    // создаем менеджер игровой логики
-    mGameManager := TGameManager.Create;
-    // инициализируем игру
-    mGameManager.InitGame;
-
-    mToolPanel.SetupComponents(
-        lTabs,
-        tabsTool,
-        [iObject, iOperation, iScience, iProduction],
-        [fImgMap.iObjectActive, fImgMap.iOperationActive, fImgMap.iScienceActive, fImgMap.iProductionActive],
-        [fImgMap.iObjectUnactive, fImgMap.iOperationUnactive, fImgMap.iScienceUnactive, fImgMap.iProductionUnactive]
-    );
-    mToolPanel.SetupObjectPanelComponents( imgPreview, lObjectName, [iact1,iact2,iact3,iact4,iact5,iact6 ] );
-    mToolPanel.Init;
-
-    tabsScreen.ActiveTab := tabMenu;
-end;
 
 procedure TfMain.StartGame;
 begin

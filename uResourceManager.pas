@@ -172,7 +172,7 @@ begin
                 .Create( _kind, _count )
                 .Growing( _increment, 0 );
 
-        visible     := false; // _count <> 0;
+        visible     := _count <> 0;// false; // _count <> 0;
         virgin      := _count = 0;
     end;
 
