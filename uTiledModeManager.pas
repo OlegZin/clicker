@@ -91,6 +91,9 @@ var
     currLayer: integer;
 begin
 
+    /// возможно, это перезапуск игры. очищаем старые данные
+    mngObject.ClearField;
+
 ////////////////////////////////////////////////////////////////////////////////
     currLayer := 2;
 
@@ -352,6 +355,7 @@ begin
         fViewPort.Width := MAP_COL_COUNT * TILE_WIDTH;
         fViewPort.Height := MAP_ROW_COUNT * TILE_HEIGHT;
     end;
+
 
     for layer := 0 to mngObject.GetLayerCount do
     begin

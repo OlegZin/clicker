@@ -2,3 +2,5 @@
 *.dproj.local
 *.identcache
 *.rsm
+*.otares
+*.ico

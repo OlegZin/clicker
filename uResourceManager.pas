@@ -161,19 +161,33 @@ function TResourceManager.CreateRecource(_kind: integer; _count, _increment: rea
 { инициализирование ресурса: параметры и создание пердставления }
 begin
 
-    // заполняем данными
-    SetLength(fResources, Length(fResources)+1);
-    with fResources[high(fResources)] do
+    /// ресурс еще не создан
+    if high(fResources) < _kind then
     begin
-        Resource := TResourcedObject.Create;
-        SetLength(Resource.Recource, 1 );
-        Resource.Recource[0] :=
-            uGameObjectManager.TResource
-                .Create( _kind, _count )
-                .Growing( _increment, 0 );
 
-        visible     := true;//_count <> 0;// false; // _count <> 0;
-        virgin      := _count = 0;
+        // заполняем данными
+        SetLength(fResources, Length(fResources)+1);
+        with fResources[high(fResources)] do
+        begin
+            Resource := TResourcedObject.Create;
+            SetLength(Resource.Recource, 1 );
+
+            Resource.Recource[0] :=
+                uGameObjectManager.TResource
+                    .Create( _kind, _count )
+                    .Growing( _increment, 0 );
+
+            visible     := true;//_count <> 0;// false; // _count <> 0;
+            virgin      := _count = 0;
+        end;
+
+    end else
+    begin
+        fResources[_kind].Resource.Recource[0].Item.Count := _count;
+        fResources[_kind].Resource.Recource[0].Item.bCount := _count;
+        SetLength(fResources[_kind].Resource.Recource[0].Item.Bonus, 0);
+        fResources[_kind].visible := true;
+        fResources[_kind].virgin  := _count = 0;
     end;
 
 end;
@@ -289,7 +303,7 @@ begin
         then view.layout.Parent := fFLayout;
 
         // отвязываем представление от формы, если нужно скрыть
-        if   Assigned( view.layout ) and ( not visible )
+        if   Assigned( view.layout ) and ( not visible or virgin )
         then view.layout.Parent := nil;
 
         UpdateView( i );

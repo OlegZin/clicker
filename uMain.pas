@@ -93,6 +93,8 @@ uses uImgMap, DB;
 
 procedure TfMain.iNewGameClick(Sender: TObject);
 begin
+    InitGame;
+
     // исходя их загруженных или инициализированных данных, приводим игру в соответсвующее состояние
     SetGameState;
 
@@ -105,15 +107,21 @@ end;
 procedure TfMain.InitGame;
 begin
 
-    // создаем менеджер ресурсов
-    mResManager := TResourceManager.Create;
-    // привязываем менеджер к главной форме
-    mResManager.SetupComponents(lResources, flResources);
+    if not assigned(mResManager) then
+    begin
+        // создаем менеджер ресурсов
+        mResManager := TResourceManager.Create;
+        // привязываем менеджер к главной форме
+        mResManager.SetupComponents(lResources, flResources);
+    end;
 
     // создаем менеджер игровой логики
-    mGameManager := TGameManager.Create;
+    if not assigned(mGameManager)
+    then mGameManager := TGameManager.Create;
+
     // инициализируем игру
     mGameManager.InitGame;
+
     mResManager.UpdateResPanel;
 
     mToolPanel.SetupComponents(
@@ -187,12 +195,19 @@ begin
  }
 
      // инициализация движка для текущего режима
-     mTileDrive := TTileModeDrive.Create;
-     mTileDrive.SetupComponents(sbScreen);
-     mTileDrive.DownCallback := OnMouseDownCallback;
-     mTileDrive.MoveCallback := OnMouseMoveCallback;
-     mTileDrive.UpCallback := OnMouseUpCallback;
+     // создаем объект управляющий игровым полем, если игра только запущена.
+     if not Assigned(mTileDrive) then
+     begin
+         mTileDrive := TTileModeDrive.Create;
+         mTileDrive.SetupComponents(sbScreen);
+         mTileDrive.DownCallback := OnMouseDownCallback;
+         mTileDrive.MoveCallback := OnMouseMoveCallback;
+         mTileDrive.UpCallback := OnMouseUpCallback;
+     end;
+
+     // генерим новое поле
      mTileDrive.BuildField;
+     // визуализируем
      mTileDrive.UpdateField;
 
 end;
@@ -280,7 +295,7 @@ begin
     fImgMap := TfImgMap.Create(Application);
 
     // загружаем данные автосейва, или инициализируем новую игру
-    InitGame;
+//    InitGame;
 end;
 
 procedure TfMain.iContinueClick(Sender: TObject);
@@ -295,8 +310,7 @@ end;
 
 procedure TfMain.Image7Click(Sender: TObject);
 begin
-//    tabsScreen.ActiveTab := tabMenu;
-     mGameManager.ShowMessage('!');
+    tabsScreen.ActiveTab := tabMenu;
 end;
 
 

@@ -136,10 +136,7 @@ type
         Name : string;
         Description : string;
         Identity: TIdentity;           // определ€ющий набор признаков
-        Relation: TRelations;          // набор св€зей с прочими объектами
         Position: TPosition;           // положение в общем игровом пространстве
-        Dependence: TRelations;        // набор зависимостей объектов. например,
-                                       // дерево технологий, набор ресурсов дл€ крафта
         Visualization: TVisualization; // ссылки на способы отображени€ в разных состо€ни€х
         constructor Create; overload;
     end;
@@ -207,6 +204,9 @@ type
 
       public
 
+        procedure ClearField;
+        /// метод обнул€ет массив объектоа, а заодно и все созданные дл€ них объекты-картинки
+
         function GetLayerCount: integer;
         ///    возвращает максимальный возможный индекс сло€
 
@@ -273,6 +273,34 @@ begin
         FIELD_ONCE  : item.bOnce   := item.bOnce   + item.Bonus[i].value;
     end;
 
+end;
+
+procedure TObjectManager.ClearField;
+var
+    layer, i, j: integer;
+begin
+    for layer := 0 to High(fObjects) do
+    begin
+        /// грохаем картинки
+        for I := 0 to High(fObjects[layer]) do
+        begin
+            if assigned(fObjects[layer][i].Image) then
+            begin
+                fObjects[layer][i].Image.Free;
+                fObjects[layer][i].Image := nil;
+            end;
+
+            if fObjects[layer][i] is TResourcedObject then
+            for j := 0 to High((fObjects[layer][i] as TResourcedObject).Recource) do
+            begin
+                (fObjects[layer][i] as TResourcedObject).Recource[j].Free;
+                (fObjects[layer][i] as TResourcedObject).Recource[j] := nil;
+            end;
+        end;
+
+        /// удал€ем элементы сло€
+        SetLength(fObjects[layer], 0);
+    end;
 end;
 
 function TObjectManager.CreateTile(Kind, X, Y, layer: integer; H: real): integer;
