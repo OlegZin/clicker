@@ -86,7 +86,7 @@ procedure TTileModeDrive.BuildField;
 { формирование игрового поля.
  }
 var
-    col, row, id: integer;
+    col, row, id, objCount: integer;
     ColMax, RowMax: integer;
     currLayer: integer;
 begin
@@ -111,7 +111,8 @@ begin
     currLayer := 3;
 
     // простая трава
-    for col := 0 to 500 do
+    objCount := 300 * (MAP_TILE_COUNT div 100);  // количество объектов в % от количества клеток
+    for col := 0 to objCount do
     begin
         id := mngObject.CreateTile( OBJ_SMALLGRASS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_SMALLGRASS) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_GRASS, 10 ) .Action( ACT_CLICK, -1,  0.1 ) );
@@ -123,37 +124,43 @@ begin
     currLayer := 4;
 
     // более редкие растения
-    for col := 0 to 10 do
+    objCount := 1 * (MAP_TILE_COUNT div 100); // количество объектов в % от количества клеток
+    for col := 0 to objCount do
     begin
         id := mngObject.CreateTile( OBJ_PAPOROTNIK, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_PAPOROTNIK) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_GRASS, 30 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
-    for col := 0 to 10 do
+    objCount := 1 * (MAP_TILE_COUNT div 100); // количество объектов в % от количества клеток
+    for col := 0 to objCount do
     begin
         id := mngObject.CreateTile( OBJ_MUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_MUSH) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
-    for col := 0 to 25 do
+    objCount := 2 * (MAP_TILE_COUNT div 100); // количество объектов в % от количества клеток
+    for col := 0 to objCount do
     begin
         id := mngObject.CreateTile( OBJ_WHITE_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_WHITE_FLOWERS) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
-    for col := 0 to 25 do
+    objCount := 2 * (MAP_TILE_COUNT div 100); // количество объектов в % от количества клеток
+    for col := 0 to objCount do
     begin
         id := mngObject.CreateTile( OBJ_YELLOW_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_YELLOW_FLOWERS) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
-    for col := 0 to 15 do
+    objCount := 2 * (MAP_TILE_COUNT div 100); // количество объектов в % от количества клеток
+    for col := 0 to objCount do
     begin
         id := mngObject.CreateTile( OBJ_BROWN_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BROWN_FLOWERS) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_HEALTH, 10 ).Maximum(10).Growing(0.001, 0).Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
-    for col := 0 to 15 do
+    objCount := 1 * (MAP_TILE_COUNT div 100); // количество объектов в % от количества клеток
+    for col := 0 to objCount do
     begin
         id := mngObject.CreateTile( OBJ_BROWN_MUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BROWN_MUSH) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
@@ -165,7 +172,8 @@ begin
     currLayer := 5;
 
     // простые камни
-    for col := 0 to 10 do
+    objCount := 5 * (MAP_TILE_COUNT div 100); // количество объектов в % от количества клеток
+    for col := 0 to objCount do
     begin
         id := mngObject.CreateTile( OBJ_BROVNSTONE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BROVNSTONE) );
         /// часть ресурса, которую можно собрать быстро
@@ -174,7 +182,8 @@ begin
         mngObject.SetResource( id, TResource.Create( RESOURCE_STONE, 500 ).Action( ACT_CLICK, -0.1, 0.1 ).Action( ACT_PICK, -2, 0.2, 10 ) );
     end;
 
-    for col := 0 to 10 do
+    objCount := 5 * (MAP_TILE_COUNT div 100); // количество объектов в % от количества клеток
+    for col := 0 to objCount do
     begin
         id := mngObject.CreateTile( OBJ_GRAYSTONE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_GRAYSTONE) );
         /// часть ресурса, которую можно собрать быстро
@@ -183,23 +192,27 @@ begin
         mngObject.SetResource( id, TResource.Create( RESOURCE_STONE, 1000 ).Action( ACT_CLICK, -0.1, 0.1 ).Action( ACT_PICK, -2, 0.3, 20 ) );
     end;
 
-    for col := 0 to 5 do
+    objCount := 1 * (MAP_TILE_COUNT div 100); // количество объектов в % от количества клеток
+    for col := 0 to objCount do
     begin
-        id := mngObject.CreateTile( OBJ_BIGSTONE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_GRAYSTONE) );
+        id := mngObject.CreateTile( OBJ_BIGSTONE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BIGSTONE) );
         /// часть ресурса, которую можно собрать быстро
         mngObject.SetResource( id, TResource.Create( RESOURCE_STONE, 30 ) .Action( ACT_CLICK, -1, 0.1 ) );
         /// основная часть ресурса
         mngObject.SetResource( id, TResource.Create( RESOURCE_STONE, 1000 ).Action( ACT_CLICK, -0.1, 0.1 ).Action( ACT_PICK, -2, 0.3, 20 ) );
     end;
 
+
     // простые деревья
-    for col := 0 to 25 do
+    objCount := 20 * (MAP_TILE_COUNT div 100); // количество объектов в % от количества клеток
+    for col := 0 to objCount do
     begin
         id := mngObject.CreateTile( OBJ_BUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BUSH) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_WOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
-    for col := 0 to 150 do
+    objCount := 100 * (MAP_TILE_COUNT div 100); // количество объектов в % от количества клеток
+    for col := 0 to objCount do
     begin
         id := mngObject.CreateTile( OBJ_TREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_TREE) );
         /// часть ресурса, которую можно собрать быстро
@@ -208,7 +221,8 @@ begin
         mngObject.SetResource( id, TResource.Create( RESOURCE_WOOD,  500 ).Action( ACT_CLICK, -0.1, 0.1 ).Action( ACT_AXE, -10, 1, 15 ) );
     end;
 
-    for col := 0 to 20 do
+    objCount := 20 * (MAP_TILE_COUNT div 100); // количество объектов в % от количества клеток
+    for col := 0 to objCount do
     begin
         id := mngObject.CreateTile( OBJ_BIGTREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BIGTREE) );
         /// часть ресурса, которую можно собрать быстро
@@ -217,7 +231,8 @@ begin
         mngObject.SetResource( id, TResource.Create( RESOURCE_WOOD,  1000 ).Action( ACT_CLICK, -0.1, 0.1 ).Action( ACT_AXE, -15, 2, 25 ) );
     end;
 
-    for col := 0 to 5 do
+    objCount := 10 * (MAP_TILE_COUNT div 100); // количество объектов в % от количества клеток
+    for col := 0 to objCount do
     begin
         ID := mngObject.CreateTile( OBJ_DEADTREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_DEADTREE) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_WOOD,  800 ).Action( ACT_CLICK, -0.1, 0.1 ).Action( ACT_AXE, -5, 1, 10 ) );
@@ -225,7 +240,8 @@ begin
 
 
 
-    for col := 0 to 5 do
+    objCount := 5 * (MAP_TILE_COUNT div 100); // количество объектов в % от количества клеток
+    for col := 0 to objCount do
     begin
         id := mngObject.CreateTile( OBJ_APPLETREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_APPLETREE) );
         mngObject.SetResource( id,
@@ -237,7 +253,8 @@ begin
     end;
 
 
-    for col := 0 to 5 do
+    objCount := 5 * (MAP_TILE_COUNT div 100); // количество объектов в % от количества клеток
+    for col := 0 to objCount do
     begin
         id := mngObject.CreateTile( OBJ_BIZON, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BIZON) );
         mngObject.SetResource( id,

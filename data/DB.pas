@@ -4,8 +4,11 @@ interface
 
 const
 
-    MAP_COL_COUNT   = 15;
-    MAP_ROW_COUNT   = 15;
+    MAP_COL_COUNT   = 20;
+    MAP_ROW_COUNT   = 20;
+    MAP_TILE_COUNT   = MAP_COL_COUNT * MAP_ROW_COUNT;
+    /// константа используется для регулировки насыщения мира объектами.
+    /// при формировании мира количество объектов указывается в процентах от этого значения
 
     TILE_WIDTH      = 64;
     TILE_HEIGHT     = 64;
