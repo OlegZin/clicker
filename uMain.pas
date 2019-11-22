@@ -295,7 +295,8 @@ end;
 
 procedure TfMain.Image7Click(Sender: TObject);
 begin
-    tabsScreen.ActiveTab := tabMenu;
+//    tabsScreen.ActiveTab := tabMenu;
+     mGameManager.ShowMessage('!');
 end;
 
 

@@ -4,7 +4,8 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects;
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects,
+  FMX.Layouts;
 
 type
   TfImgMap = class(TForm)
@@ -79,6 +80,7 @@ type
     Image12: TImage;
     Image13: TImage;
     tile_bigstone: TImage;
+    lMessage: TLayout;
   private
     { Private declarations }
   public

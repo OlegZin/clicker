@@ -68,6 +68,7 @@ type
         procedure InitGame;
         procedure CalcGameState;
 
+        procedure ShowMessage(text : string);
     end;
 
 var
@@ -78,7 +79,7 @@ implementation
 { TGameManager }
 
 uses
-    uGameObjectManager, uResourceManager, uTiledModeManager, DB, uToolPanelManager, uMain;
+    uGameObjectManager, uResourceManager, uTiledModeManager, DB, uToolPanelManager, uMain, uImgMap;
 
 procedure TGameManager.CalcGameState;
 ///    логическое ядро.
@@ -357,6 +358,11 @@ end;
 procedure TGameManager.SetIsHungry(val: boolean);
 begin
     GameState.isHungry := val;
+end;
+
+procedure TGameManager.ShowMessage(text: string);
+begin
+    fImgMap.tile_bigtree.Parent := fMain;
 end;
 
 end.
