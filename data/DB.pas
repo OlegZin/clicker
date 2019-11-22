@@ -4,8 +4,8 @@ interface
 
 const
 
-    MAP_COL_COUNT   = 20;
-    MAP_ROW_COUNT   = 20;
+    MAP_COL_COUNT   = 15;
+    MAP_ROW_COUNT   = 15;
 
     TILE_WIDTH      = 64;
     TILE_HEIGHT     = 64;
@@ -93,6 +93,7 @@ const
     OBJ_BROWN_FLOWERS = 41;
     OBJ_BROWN_MUSH = 42;
     OBJ_DEADANIMAL = 43;
+    OBJ_BIGSTONE = 44;
 
 
     // типы тесурсов
@@ -117,7 +118,7 @@ const
 
 var
     // все существующие игровые объекты
-    TableObjects : array [0..43, 0..3] of string = (
+    TableObjects : array [0..44, 0..3] of string = (
       /// типы местности
       ('Лес',     'tile_forest', '+', ''),
       ('Равнина', 'tile_plane',  '+', ''),
@@ -167,7 +168,9 @@ var
       ('Желтые цветы',  'tile_y_flower',  '', ''),
       ('Бурые цветы',  'tile_b_flower',  '', ''),
       ('Белые грибы',  'tile_b_mush',  '', ''),
-      ('Туша животного',  'tile_deadanimal',  '', '')
+      ('Туша животного',  'tile_deadanimal',  '', ''),
+      ('Большой камень',  'tile_bigstone',  '', '')
+
 
 
 

@@ -180,7 +180,7 @@ begin
         CreateRecource( RESOURCE_STONE,   0,   0  );
         CreateRecource( RESOURCE_ICE,     0,   0  );
         CreateRecource( RESOURCE_LAVA,    0,   0  );
-        CreateRecource( RESOURCE_FOOD,  0.5, -0.1 );
+        CreateRecource( RESOURCE_FOOD,   50, -0.1 );
         CreateRecource( RESOURCE_BONE,    0,   0  );
         CreateRecource( RESOURCE_PRODUCT, 1,   0  );
         CreateRecource( RESOURCE_SPEAR,   5,   0  );
@@ -189,12 +189,7 @@ begin
 
 
         SetAttr(RESOURCE_HEALTH, FIELD_MAXIMUM, 100);
-{        SetAttr(RESOURCE_PRODUCT, FIELD_VISIBLE, true);
-        SetAttr(RESOURCE_GRASS, FIELD_VISIBLE, true);
-        SetAttr(RESOURCE_SPEAR, FIELD_VISIBLE, true);
-        SetAttr(RESOURCE_SKIN, FIELD_VISIBLE, true);
-        SetAttr(RESOURCE_HIDE, FIELD_VISIBLE, true);
-}
+
 //        GameState.Potential := 0;
 //        GameState.Era := ERA_PRIMAL;
 //        GameState.Mode := MODE_LOCAL;

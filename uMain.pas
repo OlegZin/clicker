@@ -50,6 +50,7 @@ type
     Label1: TLabel;
     Label2: TLabel;
     iContinue: TImage;
+    rBackground: TRectangle;
     procedure tResTimerTimer(Sender: TObject);
     procedure OnMouseDownCallback(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Single);

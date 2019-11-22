@@ -78,7 +78,7 @@ type
     Image11: TImage;
     Image12: TImage;
     Image13: TImage;
-    Image14: TImage;
+    tile_bigstone: TImage;
   private
     { Private declarations }
   public

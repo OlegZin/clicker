@@ -15,7 +15,7 @@ interface
 
 uses
     FMX.Layouts, FMX.Objects, SysUtils, System.Types, FMX.Graphics, FMX.ImgList, uImgMap,
-    System.UITypes, System.Classes, uGameObjectManager;
+    System.UITypes, System.Classes, uGameObjectManager, FMX.Types;
 
 type
 
@@ -27,6 +27,7 @@ type
     private
         fScreen : TScrollBox;
         fViewPort: TLayout;
+        fBackground: TRectangle;
 
         fSelect_top,
         fSelect_bottom,
@@ -110,7 +111,7 @@ begin
     currLayer := 3;
 
     // простая трава
-    for col := 0 to 1000 do
+    for col := 0 to 500 do
     begin
         id := mngObject.CreateTile( OBJ_SMALLGRASS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_SMALLGRASS) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_GRASS, 10 ) .Action( ACT_CLICK, -1,  0.1 ) );
@@ -122,37 +123,37 @@ begin
     currLayer := 4;
 
     // более редкие растения
-    for col := 0 to 20 do
+    for col := 0 to 10 do
     begin
         id := mngObject.CreateTile( OBJ_PAPOROTNIK, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_PAPOROTNIK) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_GRASS, 30 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
-    for col := 0 to 20 do
+    for col := 0 to 10 do
     begin
         id := mngObject.CreateTile( OBJ_MUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_MUSH) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
-    for col := 0 to 50 do
+    for col := 0 to 25 do
     begin
         id := mngObject.CreateTile( OBJ_WHITE_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_WHITE_FLOWERS) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
-    for col := 0 to 50 do
+    for col := 0 to 25 do
     begin
         id := mngObject.CreateTile( OBJ_YELLOW_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_YELLOW_FLOWERS) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
-    for col := 0 to 30 do
+    for col := 0 to 15 do
     begin
         id := mngObject.CreateTile( OBJ_BROWN_FLOWERS, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BROWN_FLOWERS) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_HEALTH, 10 ).Maximum(10).Growing(0.001, 0).Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
-    for col := 0 to 30 do
+    for col := 0 to 15 do
     begin
         id := mngObject.CreateTile( OBJ_BROWN_MUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BROWN_MUSH) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
@@ -164,7 +165,7 @@ begin
     currLayer := 5;
 
     // простые камни
-    for col := 0 to 20 do
+    for col := 0 to 10 do
     begin
         id := mngObject.CreateTile( OBJ_BROVNSTONE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BROVNSTONE) );
         /// часть ресурса, которую можно собрать быстро
@@ -173,7 +174,7 @@ begin
         mngObject.SetResource( id, TResource.Create( RESOURCE_STONE, 500 ).Action( ACT_CLICK, -0.1, 0.1 ).Action( ACT_PICK, -2, 0.2, 10 ) );
     end;
 
-    for col := 0 to 20 do
+    for col := 0 to 10 do
     begin
         id := mngObject.CreateTile( OBJ_GRAYSTONE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_GRAYSTONE) );
         /// часть ресурса, которую можно собрать быстро
@@ -182,15 +183,23 @@ begin
         mngObject.SetResource( id, TResource.Create( RESOURCE_STONE, 1000 ).Action( ACT_CLICK, -0.1, 0.1 ).Action( ACT_PICK, -2, 0.3, 20 ) );
     end;
 
+    for col := 0 to 5 do
+    begin
+        id := mngObject.CreateTile( OBJ_BIGSTONE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_GRAYSTONE) );
+        /// часть ресурса, которую можно собрать быстро
+        mngObject.SetResource( id, TResource.Create( RESOURCE_STONE, 30 ) .Action( ACT_CLICK, -1, 0.1 ) );
+        /// основная часть ресурса
+        mngObject.SetResource( id, TResource.Create( RESOURCE_STONE, 1000 ).Action( ACT_CLICK, -0.1, 0.1 ).Action( ACT_PICK, -2, 0.3, 20 ) );
+    end;
 
     // простые деревья
-    for col := 0 to 50 do
+    for col := 0 to 25 do
     begin
         id := mngObject.CreateTile( OBJ_BUSH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BUSH) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_WOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
-    for col := 0 to 200 do
+    for col := 0 to 150 do
     begin
         id := mngObject.CreateTile( OBJ_TREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_TREE) );
         /// часть ресурса, которую можно собрать быстро
@@ -208,7 +217,7 @@ begin
         mngObject.SetResource( id, TResource.Create( RESOURCE_WOOD,  1000 ).Action( ACT_CLICK, -0.1, 0.1 ).Action( ACT_AXE, -15, 2, 25 ) );
     end;
 
-    for col := 0 to 10 do
+    for col := 0 to 5 do
     begin
         ID := mngObject.CreateTile( OBJ_DEADTREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_DEADTREE) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_WOOD,  800 ).Action( ACT_CLICK, -0.1, 0.1 ).Action( ACT_AXE, -5, 1, 10 ) );
@@ -216,7 +225,7 @@ begin
 
 
 
-    for col := 0 to 20 do
+    for col := 0 to 5 do
     begin
         id := mngObject.CreateTile( OBJ_APPLETREE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_APPLETREE) );
         mngObject.SetResource( id,
@@ -228,7 +237,7 @@ begin
     end;
 
 
-    for col := 0 to 10 do
+    for col := 0 to 5 do
     begin
         id := mngObject.CreateTile( OBJ_BIZON, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BIZON) );
         mngObject.SetResource( id,
@@ -239,7 +248,7 @@ begin
         );
     end;
 
-    for col := 0 to 10 do
+    for col := 0 to 5 do
     begin
         id := mngObject.CreateTile( OBJ_WOLF, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_WOLF) );
         mngObject.SetResource( id,
@@ -250,7 +259,7 @@ begin
         );
     end;
 
-    for col := 0 to 10 do
+    for col := 0 to 5 do
     begin
         id := mngObject.CreateTile( OBJ_BEAR, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BEAR) );
         mngObject.SetResource( id,
@@ -261,7 +270,7 @@ begin
         );
     end;
 
-    for col := 0 to 5 do
+    for col := 0 to 3 do
     begin
         id := mngObject.CreateTile( OBJ_BLACKWOLF, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BLACKWOLF) );
         mngObject.SetResource( id,
@@ -273,7 +282,7 @@ begin
     end;
 
 
-    for col := 0 to 5 do
+    for col := 0 to 3 do
     begin
         id := mngObject.CreateTile( OBJ_DEADANIMAL, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_DEADANIMAL) );
         mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 20 ).Action( ACT_CLICK, -0.3, 0.01 ).Action( ACT_HAND, -2, 0.5, 5 ) );
@@ -291,13 +300,16 @@ begin
     // туман войны
     for col := 0 to MAP_COL_COUNT - 1 do
     for row := 0 to MAP_ROW_COUNT - 1 do
-    if ((col > 2) or (row > 2))
-//    if ((col < MAP_COL_COUNT - 3) or (row < MAP_ROW_COUNT - 3))
-
+    if (col < ((MAP_COL_COUNT div 2) - 1)) or (col > ((MAP_COL_COUNT div 2) + 1)) or
+       (row < ((MAP_ROW_COUNT div 2) - 1)) or (row > ((MAP_ROW_COUNT div 2) + 1))
     then
     begin
-       id := mngObject.CreateTile( OBJ_FOG, col * TILE_WIDTH, row * TILE_HEIGHT, currLayer );
-        mngObject.SetResource( id, RESOURCE_IQ, 5, -1, 0, 0 );
+       id := mngObject.CreateTile( OBJ_FOG, col * TILE_WIDTH, row * TILE_HEIGHT, currLayer, ImgHeight(OBJ_FOG) );
+       mngObject.SetResource( id,
+           TResource.Create( RESOURCE_IQ, 10 ).
+           Action( ACT_CLICK, -0.1, 0.1 ).
+           Action( ACT_EXAME, -10, 5 )
+       );
     end;
 }
     /// оптимизируем порядок объектов по слоям для корректной отрисовки по глубине
@@ -319,9 +331,9 @@ begin
         fViewPort := TLayout.Create(fScreen);
         fViewPort.Parent := fScreen;
         fViewPort.ClipChildren := true;
+        fViewPort.Align := TAlignLayout.Center;
         fViewPort.Width := MAP_COL_COUNT * TILE_WIDTH;
         fViewPort.Height := MAP_ROW_COUNT * TILE_HEIGHT;
-        fViewPort.SendToBack;
     end;
 
     for layer := 0 to mngObject.GetLayerCount do
