@@ -316,7 +316,7 @@ begin
 
 ////////////////////////////////////////////////////////////////////////////////
     currLayer := 98;
-{
+
     // туман войны
     for col := 0 to MAP_COL_COUNT - 1 do
     for row := 0 to MAP_ROW_COUNT - 1 do
@@ -331,7 +331,7 @@ begin
            Action( ACT_EXAME, -10, 5 )
        );
     end;
-}
+
     /// оптимизируем порядок объектов по слоям для корректной отрисовки по глубине
     mngObject.OptimizeObjects;
 end;

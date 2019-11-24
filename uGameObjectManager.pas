@@ -276,6 +276,7 @@ begin
 end;
 
 procedure TObjectManager.ClearField;
+/// полностью вычищаем память ранее созданной игровойц сесии
 var
     layer, i, j: integer;
 begin
@@ -296,6 +297,9 @@ begin
                 (fObjects[layer][i] as TResourcedObject).Recource[j].Free;
                 (fObjects[layer][i] as TResourcedObject).Recource[j] := nil;
             end;
+
+            fObjects[layer][i].Free;
+            fObjects[layer][i] := nil;
         end;
 
         /// удаляем элементы слоя

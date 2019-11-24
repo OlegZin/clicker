@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects,
-  FMX.Layouts;
+  FMX.Layouts, FMX.Controls.Presentation, FMX.StdCtrls, uGameManager;
 
 type
   TfImgMap = class(TForm)
@@ -74,18 +74,34 @@ type
     Image7: TImage;
     iContinue_unactive: TImage;
     iContinue_active: TImage;
-    Image9: TImage;
-    Image10: TImage;
-    Image11: TImage;
-    Image12: TImage;
-    Image13: TImage;
+    icon_neutral: TImage;
+    icon_wow: TImage;
+    icon_angry: TImage;
+    icon_fear: TImage;
+    icon_what: TImage;
     tile_bigstone: TImage;
     lMessage: TLayout;
+    rBackround: TRectangle;
+    iImg: TImage;
+    lBody: TLayout;
+    Rectangle1: TRectangle;
+    Rectangle2: TRectangle;
+    Rectangle3: TRectangle;
+    Rectangle4: TRectangle;
+    Rectangle5: TRectangle;
+    Rectangle6: TRectangle;
+    Rectangle7: TRectangle;
+    Rectangle8: TRectangle;
+    lMess: TLabel;
+    rOkButton: TRectangle;
+    lMessOKButton: TLabel;
+    icon_dead: TImage;
+    rMessScreenBackground: TRectangle;
   private
     { Private declarations }
   public
     { Public declarations }
-    procedure AssignImage( target_img: TImage; source_img: string );
+    function AssignImage( target_img: TImage; source_img: string ): boolean;
   end;
 
 var
@@ -97,14 +113,18 @@ implementation
 
 { TfImgMap }
 
-procedure TfImgMap.AssignImage(target_img: TImage; source_img: string);
+function TfImgMap.AssignImage(target_img: TImage; source_img: string): boolean;
 var
    source: TImage;
 begin
+  result := false;
   source := TImage(FindComponent( source_img ));
 
   if assigned(source) then
-  target_img.bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
+  begin
+      target_img.bitmap.Assign( source.MultiResBitmap.Bitmaps[1.0] );
+      result := true;
+  end;
 end;
 
 end.

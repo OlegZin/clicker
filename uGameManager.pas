@@ -39,6 +39,8 @@ const
     PROCESS_CHANGE_FIELD = 1;  // изменилось состояние объекта на поле
 
 type
+    TCallback = procedure( result: variant ) of object;
+
     TGameState = record
         Potential: Currency;          // текущий потенциал, который не теряется при начале новой игры
                                        // и является одним из ресурсов
@@ -46,29 +48,36 @@ type
         Mode     : Integer;            // текущий игровой режим. соответсвует константе TAG_MODE_XXX
         CurSelObjectId: integer;      // текущий выбранный на игровом поле объект. 0 - не выбран
 
-        isHungry : boolean;           // флаг отсекает лишние вычисления при неизменности статуса голода:
+        fisHungry : boolean;           // флаг отсекает лишние вычисления при неизменности статуса голода:
                                       // запас еды нулевой. позволяет произвоить действия перехода из/в состояние только один
                                       // раз в момент изменения условий
 
-        isGameInProcess : boolean;    // флаг указывает, что игра начата и в процессе. учитывается в главном меню
+        fisGameInProcess : boolean;    // флаг указывает, что игра начата и в процессе. учитывается в главном меню
                                       // при определении доступности кнопок
+        fisGameOver : integer;        // флаг завершения игры. значение - результат. 0 - поражение (кончились ключевые ресурсы)
     end;
 
     TGameManager = class
       private
+        fMessCallback : TCallback;
         procedure SetIsHungry(val: boolean);
         procedure SetIsGameInProcess(val: boolean);
       public
         GameState : TGameState;
 
-        property isHungry: boolean read GameState.isHungry write SetIsHungry;
-        property isGameInProcess: boolean read GameState.isGameInProcess write SetIsGameInProcess;
+        property isHungry: boolean read GameState.fisHungry write SetIsHungry;
+        property isGameInProcess: boolean read GameState.fisGameInProcess write SetIsGameInProcess;
+        property isGameOver: integer read GameState.fisGameOver write GameState.fisGameOver;
 
         function ProcessObjectClick( id : integer ): integer;
         procedure InitGame;
         procedure CalcGameState;
 
-        procedure ShowMessage(text : string);
+        procedure ShowMessage(icon, text : string; callback: TCallback = nil);
+
+        procedure OnOkClick(Sender: TObject);
+
+        procedure OnGameOver( result: variant );
     end;
 
 var
@@ -79,7 +88,7 @@ implementation
 { TGameManager }
 
 uses
-    uGameObjectManager, uResourceManager, uTiledModeManager, DB, uToolPanelManager, uMain, uImgMap;
+    uGameObjectManager, uResourceManager, uTiledModeManager, DB, uToolPanelManager, uMain, uImgMap, FMX.Types;
 
 procedure TGameManager.CalcGameState;
 ///    логическое ядро.
@@ -115,8 +124,15 @@ begin
 
     /// проверка на выполнение условий завершения игры - ПОРАЖЕНИЕ.
     /// к ним относится сочетние парметров: текущее здоровье = 0, количество людей = 0, еда = 0
-//    if True then
-
+    if (mResManager.GetAttr(RESOURCE_FOOD, FIELD_COUNT) <= 0) and
+       (mResManager.GetAttr(RESOURCE_HEALTH, FIELD_COUNT) <= 0) and
+       (mResManager.GetAttr(RESOURCE_MAN, FIELD_COUNT) <= 1)
+    then
+    begin
+        isGameOver := 0; // поражение - кончились ключевые ресурсы
+        isGameInProcess := false;
+        ShowMessage(MESS_ICON_DEAD ,'Страшный голод и беды положили конец вашей истории...', OnGameOver);
+    end;
 
 end;
 
@@ -172,8 +188,9 @@ begin
     begin
 
         // создаем ресурсы: тип, начальное количество, изменение за тик таймера
+        // если уже созданы - сбрасываем значения до указанных
         CreateRecource( RESOURCE_IQ,      0,   0  );
-        CreateRecource( RESOURCE_HEALTH, 29,  0.1 );
+        CreateRecource( RESOURCE_HEALTH, 25,  0.1 );
         CreateRecource( RESOURCE_MAN,     1,   0  );
         CreateRecource( RESOURCE_WOMAN,   0,   0  );
         CreateRecource( RESOURCE_WOOD,    0,   0  );
@@ -196,10 +213,11 @@ begin
 //        GameState.Mode := MODE_LOCAL;
 
         isHungry := false;
-        isGameInProcess := false;
+        isGameOver := -1; // сброс флага завершения игры
     end;
 
 end;
+
 
 function TGameManager.ProcessObjectClick(id: integer): integer;
 /// обработка клика мышкой/тапа по объекту
@@ -361,18 +379,56 @@ end;
 
 procedure TGameManager.SetIsGameInProcess(val: boolean);
 begin
-    GameState.isGameInProcess := val;
+    GameState.fisGameInProcess := val;
     fMain.iContinue.Enabled := val;
 end;
 
 procedure TGameManager.SetIsHungry(val: boolean);
 begin
-    GameState.isHungry := val;
+    GameState.fisHungry := val;
 end;
 
-procedure TGameManager.ShowMessage(text: string);
+procedure TGameManager.ShowMessage(icon, text: string; callback: TCallback = nil);
 begin
-    fImgMap.tile_bigtree.Parent := fMain;
+    fMain.tResTimer.Enabled := false;
+
+    fImgMap.rOkButton.OnClick := self.OnOkClick;
+    fMessCallback := callback;
+
+    fImgMap.rMessScreenBackground.Parent := fMain;
+    fImgMap.rMessScreenBackground.Align := TAlignLayout.Client;
+    fImgMap.rMessScreenBackground.OnClick := self.OnOkClick;
+    fImgMap.rMessScreenBackground.BringToFront;
+
+    fImgMap.lMessage.Parent := fMain;
+    fImgMap.lMessage.BringToFront;
+
+
+    if not fImgMap.AssignImage( fImgMap.iImg, icon )
+    then fImgMap.AssignImage( fImgMap.iImg, MESS_ICON_NEUTRAL );
+
+
+    if fImgMap.lMessage.Width > fMain.Width
+    then fImgMap.lMessage.Width := fMain.Width;
+
+    fImgMap.lMessage.Position.X := (fMain.Width - fImgMap.lMessage.Width) / 2;
+    fImgMap.lMessage.Align := TAlignLayout.Center;
+    fImgMap.lMess.Text := text;
+end;
+
+procedure TGameManager.OnGameOver(result: variant);
+begin
+    fMain.tabsScreen.ActiveTab := fMain.tabMenu;
+end;
+
+procedure TGameManager.OnOkClick(Sender: TObject);
+begin
+    fImgMap.rMessScreenBackground.Parent := nil;
+    fImgMap.lMessage.Parent := nil;
+
+    fMain.tResTimer.Enabled := true;
+
+    if Assigned(fMessCallback) then fMessCallback('ok');
 end;
 
 end.

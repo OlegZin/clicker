@@ -102,22 +102,12 @@ begin
     StartGame;
 
     tabsScreen.ActiveTab := tabGame;
+
+    mGameManager.ShowMessage(MESS_ICON_NEUTRAL, 'Плохая охота... Злой волк. Почти убить меня... Ушел к пещере... Женщина... Спасать...');
 end;
 
 procedure TfMain.InitGame;
 begin
-
-    if not assigned(mResManager) then
-    begin
-        // создаем менеджер ресурсов
-        mResManager := TResourceManager.Create;
-        // привязываем менеджер к главной форме
-        mResManager.SetupComponents(lResources, flResources);
-    end;
-
-    // создаем менеджер игровой логики
-    if not assigned(mGameManager)
-    then mGameManager := TGameManager.Create;
 
     // инициализируем игру
     mGameManager.InitGame;
@@ -294,6 +284,19 @@ begin
     // создаем форму, содержащую базу всех используемых в игре изображений
     fImgMap := TfImgMap.Create(Application);
 
+    if not assigned(mResManager) then
+    begin
+        // создаем менеджер ресурсов
+        mResManager := TResourceManager.Create;
+        // привязываем менеджер к главной форме
+        mResManager.SetupComponents(lResources, flResources);
+    end;
+
+    // создаем менеджер игровой логики
+    if not assigned(mGameManager)
+    then mGameManager := TGameManager.Create;
+
+    mGameManager.isGameInProcess := false;
     // загружаем данные автосейва, или инициализируем новую игру
 //    InitGame;
 end;

@@ -24,6 +24,13 @@ const
 
     FUNGRY_VALUE = -0.2;
 
+    MESS_ICON_DEAD    = 'icon_dead';
+    MESS_ICON_NEUTRAL = 'icon_neutral';
+    MESS_ICON_WOW     = 'icon_wow';
+    MESS_ICON_ANGRY   = 'icon_angry';
+    MESS_ICON_FEAR    = 'icon_fear';
+    MESS_ICON_WHAT    = 'icon_what';
+
     // синонимы полей записи ресурса
     FIELD_CAPTION     = 0;
     FIELD_DESCRIP     = 1;
