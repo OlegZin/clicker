@@ -301,6 +301,18 @@ begin
         );
     end;
 
+    for col := 0 to 3 do
+    begin
+        id := mngObject.CreateTile( OBJ_MAMMOTH, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BLACKWOLF) );
+        mngObject.SetResource( id,
+            TResource.Create( RESOURCE_IQ, 30 ).
+            Action( ACT_CLICK, -0.03, 0.01    ).
+            Action( ACT_HAND,  -0.03, 0.01, 1 ).
+            Action( ACT_SPEAR,    -1,    0, 3 )
+        );
+    end;
+
+
 
     for col := 0 to 3 do
     begin
@@ -310,13 +322,19 @@ begin
     end;
 
 
+    for col := 0 to 3 do
+    begin
+        id := mngObject.CreateTile( OBJ_TAGEDSTONE, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_DEADANIMAL) );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_IQ, 20 ).Action( ACT_EXAME, -20, 20, 60 ) );
+    end;
+
 
 
 
 
 ////////////////////////////////////////////////////////////////////////////////
     currLayer := 98;
-
+{
     // туман войны
     for col := 0 to MAP_COL_COUNT - 1 do
     for row := 0 to MAP_ROW_COUNT - 1 do
@@ -331,7 +349,7 @@ begin
            Action( ACT_EXAME, -10, 5 )
        );
     end;
-
+}
     /// оптимизируем порядок объектов по слоям для корректной отрисовки по глубине
     mngObject.OptimizeObjects;
 end;

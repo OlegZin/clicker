@@ -64,7 +64,7 @@ const
     OBJ_FOG         =  9;  // туман войны (неисследованная территория)
 
     OBJ_PREDATOR    = 10;  // хищник
-    OBJ_MAMONT      = 11;  // мамонт (временный)
+    OBJ_MAMMOTH     = 11;  // мамонт (временный)
     OBJ_CAVE        = 12;  // пещера
     OBJ_HERD        = 13;  // стадо (временный)
 
@@ -104,6 +104,7 @@ const
     OBJ_BROWN_MUSH = 42;
     OBJ_DEADANIMAL = 43;
     OBJ_BIGSTONE = 44;
+    OBJ_TAGEDSTONE = 45;
 
 
     // типы тесурсов
@@ -128,7 +129,7 @@ const
 
 var
     // все существующие игровые объекты
-    TableObjects : array [0..44, 0..3] of string = (
+    TableObjects : array [0..45, 0..3] of string = (
       /// типы местности
       ('Лес',     'tile_forest', '+', ''),
       ('Равнина', 'tile_plane',  '+', ''),
@@ -142,7 +143,7 @@ var
       ('Туман',   'tile_fog',    '+', ''),
       /// естественные объекты
       ('Хищник', 'tile_predator', '', ''),      //10
-      ('Мамонт', 'tile_mamont', '', ''),
+      ('Мамонт', 'tile_mammoth', 'Мамонт!', ''),
       ('Пещера', 'tile_cave', '', ''),
       ('Стадо', 'tile_herd', '', ''),
       /// относящиеся к деятельности человека
@@ -179,7 +180,8 @@ var
       ('Бурые цветы',  'tile_b_flower',  '', ''),
       ('Белые грибы',  'tile_b_mush',  '', ''),
       ('Туша животного',  'tile_deadanimal',  '', ''),
-      ('Большой камень',  'tile_bigstone',  '', '')
+      ('Большой камень',  'tile_bigstone',  '', ''),
+      ('Камень с письменами',  'tile_tagedstone',  '', '')
 
 
 

@@ -97,6 +97,8 @@ type
     lMessOKButton: TLabel;
     icon_dead: TImage;
     rMessScreenBackground: TRectangle;
+    tile_mammoth: TImage;
+    tile_tagedstone: TImage;
   private
     { Private declarations }
   public
