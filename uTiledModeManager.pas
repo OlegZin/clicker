@@ -169,6 +169,12 @@ begin
         mngObject.SetResource( id, TResource.Create( RESOURCE_FOOD, 10 ) .Action( ACT_CLICK, -1, 0.1 ) );
     end;
 
+    objCount := 1 * (MAP_TILE_COUNT div 100); // количество объектов в % от количества клеток
+    for col := 0 to objCount do
+    begin
+        id := mngObject.CreateTile( OBJ_HEALFLOWER, Random(ColMax)-TILE_WIDTH, Random(RowMax)-TILE_HEIGHT, currLayer, ImgHeight(OBJ_BROWN_MUSH) );
+        mngObject.SetResource( id, TResource.Create( RESOURCE_HEALTH, 1000 ) .Action( ACT_CLICK, -100, 0.1 ) );
+    end;
 
 
 ////////////////////////////////////////////////////////////////////////////////

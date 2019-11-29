@@ -99,6 +99,7 @@ type
     rMessScreenBackground: TRectangle;
     tile_mammoth: TImage;
     tile_tagedstone: TImage;
+    tile_healflower: TImage;
   private
     { Private declarations }
   public

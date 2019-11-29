@@ -105,6 +105,7 @@ const
     OBJ_DEADANIMAL = 43;
     OBJ_BIGSTONE = 44;
     OBJ_TAGEDSTONE = 45;
+    OBJ_HEALFLOWER = 46;
 
 
     // типы тесурсов
@@ -129,7 +130,7 @@ const
 
 var
     // все существующие игровые объекты
-    TableObjects : array [0..45, 0..3] of string = (
+    TableObjects : array [0..46, 0..3] of string = (
       /// типы местности
       ('Лес',     'tile_forest', '+', ''),
       ('Равнина', 'tile_plane',  '+', ''),
@@ -181,7 +182,8 @@ var
       ('Белые грибы',  'tile_b_mush',  '', ''),
       ('Туша животного',  'tile_deadanimal',  '', ''),
       ('Большой камень',  'tile_bigstone',  '', ''),
-      ('Камень с письменами',  'tile_tagedstone',  '', '')
+      ('Камень с письменами',  'tile_tagedstone',  '', ''),
+      ('Оживика',  'tile_healflower',  '', '')
 
 
 
